@@ -115,7 +115,7 @@ var value; // 无法推断类型
 
 Java 类型可以分为：
 
-```text
+```bash
 Java 类型
 ├── 基本类型 Primitive Type
 │ ├── byte
@@ -209,7 +209,7 @@ char 占 16 位，取值范围：
 
 char 是无符号整数类型。
 
-```
+```java
 char c1 = 'A';
 char c2 = 65;
 System.out.println(c1); // A
@@ -226,7 +226,7 @@ char c = '中';
 
 但部分 Unicode 字符需要两个 char 表示，例如某些 Emoji：
 
-```
+```java
 String emoji = "😀";
 System.out.println(emoji.length()); // 2
 ```
@@ -301,7 +301,7 @@ user2.setName("Java");
 
 此时 user1 和 user2 指向同一个对象：
 
-```text
+```bash
 user1 ──┐
 ├──→ User 对象
 user2 ──┘
@@ -368,7 +368,7 @@ int[] values = new int[3];
 - new int[3] 创建数组对象。
 - 数组对象内部保存三个 int 元素。
 
-```text
+```bash
 values
 ↓
 int[] 数组对象
@@ -478,7 +478,7 @@ String path = "C:\\Users\\Java";
 
 按照声明位置，可以分为：
 
-```text
+```bash
 变量
 ├── 局部变量
 ├── 方法参数
@@ -490,9 +490,9 @@ String path = "C:\\Users\\Java";
 
 定义在方法、构造方法或代码块内部：
 
-```
+```java
 public void execute() {
-int count = 10;
+    int count = 10;
 }
 ```
 
@@ -504,16 +504,16 @@ int count = 10;
 - 生命周期随方法或代码块执行结束而结束
 - 错误：
 
-```
+```java
 public void execute() {
-int count;
-System.out.println(count); // 编译错误
+    int count;
+    System.out.println(count); // 编译错误
 }
 ```
 
 **2.7.2 方法参数**
 
-```
+```java
 public void execute(int count) {
 }
 ```
@@ -553,7 +553,7 @@ public class User {
 
 静态变量属于类，所有实例共享：
 
-```text
+```bash
 User 类
 └── static count
 user1 ──→ User 对象1
@@ -611,10 +611,10 @@ name = null
 
 **2.8.2 局部变量没有默认值**
 
-```
+```java
 public void test() {
-int value;
-System.out.println(value);
+    int value;
+    System.out.println(value);
 }
 ```
 
@@ -623,7 +623,7 @@ System.out.println(value);
 
 **2.8.3 条件分支下的确定赋值**
 
-```
+```java
 int value;
 if (condition) {
 value = 1;
@@ -634,7 +634,7 @@ System.out.println(value); // 编译错误
 因为当 condition == false 时， value 没有初始化。
 正确：
 
-```
+```java
 int value;
 if (condition) {
 value = 1;

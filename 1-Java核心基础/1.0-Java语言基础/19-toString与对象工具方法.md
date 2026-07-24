@@ -4,7 +4,7 @@
 
 Objects.deepEquals(a, b) 可以处理数组：
 
-```
+```java
 int[] a = {1, 2};
 int[] b = {1, 2};
 System.out.println(
@@ -37,7 +37,7 @@ com.example.User@1a2b3c
 
 默认输出缺乏业务信息：
 
-```
+```java
 System.out.println(user);
 ```
 
@@ -49,13 +49,13 @@ com.example.User@5f184fc6
 
 重写后：
 
-```
+```java
 @Override
 public String toString() {
-return "User{"
-+ "userId='" + userId + '\''
-+ ", name='" + name + '\''
-+ '}';
+    return "User{"
+    + "userId='" + userId + '\''
+    + ", name='" + name + '\''
+    + '}';
 }
 ```
 
@@ -88,13 +88,13 @@ User{userId='U001', name='Java'}
 - Authorization Header
 - 错误：
 
-```
+```java
 @Override
 public String toString() {
-return "User{"
-+ "password='" + password + '\''
-+ ", token='" + token + '\''
-+ '}';
+    return "User{"
+    + "password='" + password + '\''
+    + ", token='" + token + '\''
+    + '}';
 }
 ```
 
@@ -143,7 +143,7 @@ return "User{"
 
 Object 定义：
 
-```
+```java
 public final native Class<?> getClass();
 ```
 
@@ -156,7 +156,7 @@ Class<?> type = user.getClass();
 
 例如：
 
-```
+```java
 System.out.println(
 user.getClass().getName()
 );
@@ -170,7 +170,7 @@ com.example.User
 
 **9.25.1 getClass 返回运行时类型**
 
-```
+```java
 Animal animal = new Dog();
 System.out.println(
 animal.getClass()
@@ -217,7 +217,7 @@ Class 与反射机制后续单独展开。
 
 Object 提供：
 
-```
+```java
 protected native Object clone()
 throws CloneNotSupportedException;
 ```
@@ -269,7 +269,7 @@ public class Order implements Cloneable {
 
 执行 clone 后：
 
-```text
+```bash
 原 Order 对象
 └── items ──┐
 ├──→ 同一个 List
@@ -301,11 +301,11 @@ clone 的问题包括：
 - 更推荐：
 - 拷贝构造方法
 
-```
+```java
 public Order(Order source) {
-this.orderNo = source.orderNo;
-this.items =
-new ArrayList<>(source.items);
+    this.orderNo = source.orderNo;
+    this.items =
+    new ArrayList<>(source.items);
 }
 ```
 
@@ -433,7 +433,7 @@ public class User {
 
 调用：
 
-```
+```java
 User user = new User();
 System.out.println(user.hashCode());
 System.out.println(
@@ -480,7 +480,7 @@ String b = new String("Java");
 
 普通 HashMap：
 
-```
+```java
 Map<String, Integer> map =
 new HashMap<>();
 map.put(a, 1);
@@ -502,7 +502,7 @@ a.equals(b) == true
 
 IdentityHashMap：
 
-```
+```java
 Map<String, Integer> map =
 new IdentityHashMap<>();
 map.put(a, 1);
@@ -558,7 +558,7 @@ final 类
 
 例如：
 
-```
+```java
 public final class Money {
 }
 ```
@@ -591,7 +591,7 @@ public class Point {
 
 子类重写：
 
-```
+```java
 @Override
 protected boolean canEqual(
 Object other
@@ -944,7 +944,7 @@ static class User {
 
 执行：
 
-```
+```java
 Set<User> users = new HashSet<>();
 users.add(new User("U001"));
 users.add(new User("U001"));
@@ -1078,12 +1078,12 @@ public class ToStringDemo {
 分析该实现为什么不适合生产日志。
 改为：
 
-```
+```java
 @Override
 public String toString() {
-return "User{"
-+ "username='" + username + '\''
-+ '}';
+    return "User{"
+    + "username='" + username + '\''
+    + '}';
 }
 ```
 
@@ -1361,17 +1361,17 @@ private final OrderId orderId;
 
 **9.41.3 equals 和 hashCode 使用同一组字段**
 
-```
+```java
 @Override
 public boolean equals(Object other) {
-// userId、tenantId
+    // userId、tenantId
 }
 @Override
 public int hashCode() {
-return Objects.hash(
-userId,
-tenantId
-);
+    return Objects.hash(
+    userId,
+    tenantId
+    );
 }
 ```
 
@@ -1411,10 +1411,10 @@ String skuCode
 
 禁止：
 
-```
+```java
 @Override
 public boolean equals(Object other) {
-return repository.exists(...);
+    return repository.exists(...);
 }
 ```
 

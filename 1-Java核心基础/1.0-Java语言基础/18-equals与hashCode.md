@@ -123,7 +123,7 @@ notifyAll()
 历史上还存在对象终结相关机制，但不应依赖它管理资源。
 这些方法大致可以分为：
 
-```text
+```bash
 对象身份与类型
 ├── getClass()
 ├── equals()
@@ -146,7 +146,7 @@ notifyAll()
 
 对于基本类型， == 比较数值是否相等：
 
-```
+```java
 int a = 10;
 int b = 10;
 System.out.println(a == b); // true
@@ -154,7 +154,7 @@ System.out.println(a == b); // true
 
 不同数值类型之间可能先发生类型提升：
 
-```
+```java
 int a = 10;
 long b = 10L;
 System.out.println(a == b); // true
@@ -167,7 +167,7 @@ System.out.println(a == b); // true
 对于引用类型， == 比较：
 两个引用值是否指向同一个对象。
 
-```
+```java
 User user1 = new User("A");
 User user2 = user1;
 User user3 = new User("A");
@@ -177,7 +177,7 @@ System.out.println(user1 == user3); // false
 
 引用关系：
 
-```text
+```bash
 user1 ─────┐
 ├────→ User 对象1
 user2 ─────┘
@@ -242,7 +242,7 @@ return this == obj;
 
 因此，如果一个类没有重写 equals() ：
 
-```
+```java
 User user1 = new User("A");
 User user2 = new User("A");
 System.out.println(user1.equals(user2));
@@ -446,10 +446,10 @@ x.equals(x) == true
 
 错误示例：
 
-```
+```java
 @Override
 public boolean equals(Object other) {
-return false;
+    return false;
 }
 ```
 
@@ -506,10 +506,10 @@ x.equals(y)
 不应一会儿 true，一会儿 false。
 错误示例：
 
-```
+```java
 @Override
 public boolean equals(Object other) {
-return Math.random() > 0.5;
+    return Math.random() > 0.5;
 }
 ```
 
@@ -629,21 +629,21 @@ return false;
 - 可能与 ORM 代理等框架类型发生冲突
 - 完整示例：
 
-```
+```java
 @Override
 public boolean equals(Object other) {
-if (this == other) {
-return true;
-}
-if (other == null
-|| getClass() != other.getClass()) {
-return false;
-}
-User user = (User) other;
-return Objects.equals(
-userId,
-user.userId
-);
+    if (this == other) {
+        return true;
+    }
+    if (other == null
+    || getClass() != other.getClass()) {
+        return false;
+    }
+    User user = (User) other;
+    return Objects.equals(
+    userId,
+    user.userId
+    );
 }
 ```
 
@@ -651,7 +651,7 @@ user.userId
 
 对于不可继承的值对象：
 
-```
+```java
 public final class Money {
 }
 ```
@@ -777,17 +777,17 @@ Objects.equals(id, other.id)
 - 避免依赖数据库 ID 设计内存对象相等性
 - 示例：
 
-```
+```java
 @Override
 public boolean equals(Object other) {
-if (this == other) {
-return true;
-}
-if (!(other instanceof Order order)) {
-return false;
-}
-return orderId != null
-&& orderId.equals(order.orderId);
+    if (this == other) {
+        return true;
+    }
+    if (!(other instanceof Order order)) {
+        return false;
+    }
+    return orderId != null
+    && orderId.equals(order.orderId);
 }
 ```
 
@@ -914,7 +914,7 @@ public final class User {
 没有重写 hashCode。
 创建：
 
-```
+```java
 User user1 = new User("U001");
 User user2 = new User("U001");
 System.out.println(user1.equals(user2));
@@ -934,7 +934,7 @@ user1.hashCode() != user2.hashCode()
 
 放入 HashSet：
 
-```
+```java
 Set<User> users = new HashSet<>();
 users.add(user1);
 System.out.println(users.contains(user2));
@@ -954,10 +954,10 @@ false
 
 可以使用：
 
-```
+```java
 @Override
 public int hashCode() {
-return Objects.hash(userId, name);
+    return Objects.hash(userId, name);
 }
 ```
 
@@ -1001,15 +1001,15 @@ equals 使用哪些字段，hashCode 通常也应该使用同一组字段。
 
 经典形式：
 
-```
+```java
 @Override
 public int hashCode() {
-int result = 17;
-result = 31 * result
-+ Objects.hashCode(userId);
-result = 31 * result
-+ Objects.hashCode(name);
-return result;
+    int result = 17;
+    result = 31 * result
+    + Objects.hashCode(userId);
+    result = 31 * result
+    + Objects.hashCode(name);
+    return result;
 }
 ```
 
@@ -1032,7 +1032,7 @@ Objects.hash(...)
 
 假设：
 
-```
+```java
 Map<User, String> map =
 new HashMap<>();
 ```
@@ -1109,7 +1109,7 @@ public class UserKey {
 
 使用：
 
-```
+```java
 UserKey key = new UserKey("U001");
 Map<UserKey, String> map =
 new HashMap<>();
@@ -1249,7 +1249,7 @@ equals 的语义由具体类定义，不能假设所有对象的 equals 都只�
 
 数组继承 Object，但没有重写为元素内容比较。
 
-```
+```java
 int[] a = {1, 2, 3};
 int[] b = {1, 2, 3};
 System.out.println(a.equals(b));
@@ -1294,7 +1294,7 @@ Arrays.deepHashCode(array)
 Java 集合通常已经定义了内容相等语义。
 例如 List：
 
-```
+```java
 List<String> a =
 List.of("A", "B");
 List<String> b =
@@ -1352,7 +1352,7 @@ equals 描述的是抽象数据语义，不一定要求具体实现类相同。
 
 包装类型通常按包装值比较：
 
-```
+```java
 Integer a = 1000;
 Integer b = 1000;
 System.out.println(a.equals(b)); // true
@@ -1383,7 +1383,7 @@ a.equals(b)
 
 String 重写了 equals，比较字符序列内容：
 
-```
+```java
 String a = new String("Java");
 String b = new String("Java");
 System.out.println(a == b); // false

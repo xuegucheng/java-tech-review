@@ -60,7 +60,7 @@ value = 20;
 
 错误：
 
-```
+```java
 final int value;
 if (condition) {
 value = 10;
@@ -92,7 +92,7 @@ value = i;
 
 ## 8.17 final 引用变量
 
-```
+```java
 final List<String> list =
 new ArrayList<>();
 ```
@@ -106,7 +106,7 @@ list.clear();
 
 不允许：
 
-```
+```java
 list = new ArrayList<>();
 ```
 
@@ -387,7 +387,7 @@ public class Config {
 
 ## 8.21 final 方法参数
 
-```
+```java
 public void execute(final User user) {
 }
 ```
@@ -430,7 +430,7 @@ final 或 effectively final
 变量虽然没有显式使用 final，但初始化后从未重新赋值。
 例如：
 
-```
+```java
 String name = "Java";
 Runnable task = () ->
 System.out.println(name);
@@ -439,7 +439,7 @@ System.out.println(name);
 name 没有重新赋值，因此是 effectively final。
 如果之后重新赋值：
 
-```
+```java
 String name = "Java";
 name = "JVM";
 Runnable task = () ->
@@ -527,7 +527,7 @@ private void validate() {
 
 ## 8.24 final 类
 
-```
+```java
 public final class String {
 }
 ```
@@ -558,7 +558,7 @@ final 类不能有子类，因此其中的实例方法不会被外部子类重�
 - 防止继承破坏对象不变量
 - 例如：
 
-```
+```java
 public final class Money {
 }
 ```
@@ -643,7 +643,7 @@ public final class Order {
 
 外部仍然可以：
 
-```
+```java
 List<String> source =
 new ArrayList<>();
 Order order = new Order(source);
@@ -935,7 +935,7 @@ public class B {
 
 访问：
 
-```
+```java
 System.out.println(A.value);
 ```
 
@@ -1253,7 +1253,7 @@ public class ConstantInitializationDemo {
 观察是否输出静态初始化信息。
 然后改为：
 
-```
+```java
 static final int VALUE =
 Integer.parseInt("10");
 ```
@@ -1653,9 +1653,9 @@ private static String lastValue;
 
 需要测试和扩展时：
 
-```
+```java
 public interface MessageSender {
-void send(Message message);
+    void send(Message message);
 }
 ```
 

@@ -19,7 +19,7 @@
 
 Java 通常包含三个层面的含义：
 
-```text
+```bash
 Java
 ├── Java 语言
 │ └── 语法、类型系统、面向对象、异常、泛型等
@@ -72,7 +72,7 @@ JVM 是一套规范，也可以指这套规范的具体实现。
 JRE，Java Runtime Environment，Java 运行环境。
 传统理解：
 
-```text
+```bash
 JRE
 ├── JVM
 └── Java 标准类库及运行所需组件
@@ -86,7 +86,7 @@ JRE 用于运行 Java 程序，但通常不包含完整的开发工具，例如 
 
 JDK，Java Development Kit，Java 开发工具包。
 
-```text
+```bash
 JDK
 ├── Java 运行环境
 │ ├── JVM

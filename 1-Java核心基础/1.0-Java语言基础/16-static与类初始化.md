@@ -85,7 +85,7 @@ User user2 = new User();
 
 可以抽象为：
 
-```text
+```bash
 User 类
 └── static count
 user1 ──→ User 对象1
@@ -152,7 +152,7 @@ public class User {
 
 调用：
 
-```
+```java
 new User();
 new User();
 new User();
@@ -192,7 +192,7 @@ user2.count = 20;
 
 最终读取：
 
-```
+```java
 System.out.println(User.count);
 ```
 
@@ -370,7 +370,7 @@ public class User {
 实例方法既有当前对象，也能够访问类级成员。
 更明确的写法是：
 
-```
+```java
 System.out.println(User.count);
 System.out.println(this.name);
 ```
@@ -707,7 +707,7 @@ User.create();
 
 **8.9.3 访问普通静态字段触发初始化**
 
-```
+```java
 System.out.println(Config.timeout);
 ```
 
@@ -736,7 +736,7 @@ public class Constants {
 
 调用：
 
-```
+```java
 System.out.println(Constants.TIMEOUT);
 ```
 
@@ -770,7 +770,7 @@ public class Constants {
 这里 TIMEOUT 需要运行时计算，不是编译期常量。
 访问：
 
-```
+```java
 System.out.println(Constants.TIMEOUT);
 ```
 
@@ -801,7 +801,7 @@ public class Child extends Parent {
 
 调用：
 
-```
+```java
 System.out.println(Child.value);
 ```
 
@@ -965,7 +965,7 @@ second 已获得默认值 0
 
 Java 支持静态导入：
 
-```java
+```
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 ```
@@ -993,7 +993,7 @@ Math.max(a, b);
 - DSL 风格 API
 - 例如：
 
-```java
+```
 import static org.junit.jupiter.api.Assertions.assertEquals;
 ```
 
@@ -1001,7 +1001,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 如果大量导入：
 
-```java
+```
 import static A.*;
 import static B.*;
 import static C.*;
@@ -1061,7 +1061,7 @@ private StringUtils() {
 
 **8.14.2 为什么工具类常使用 final**
 
-```
+```java
 public final class StringUtils {
 }
 ```
