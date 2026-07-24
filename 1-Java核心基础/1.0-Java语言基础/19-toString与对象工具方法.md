@@ -240,11 +240,11 @@ public class User implements Cloneable {
         try {
             return (User) super.clone();
         } catch (
-    CloneNotSupportedException exception
-    ) {
-        throw new AssertionError(exception);
+        CloneNotSupportedException exception
+        ) {
+            throw new AssertionError(exception);
+        }
     }
-}
 }
 ```
 
@@ -573,15 +573,15 @@ public class Point {
     ) {
         return other instanceof Point;
     }
-@Override
-public boolean equals(Object other) {
-    if (!(other instanceof Point point)) {
-        return false;
+    @Override
+    public boolean equals(Object other) {
+        if (!(other instanceof Point point)) {
+            return false;
+        }
+        return point.canEqual(this)
+        && x == point.x
+        && y == point.y;
     }
-return point.canEqual(this)
-&& x == point.x
-&& y == point.y;
-}
 }
 ```
 
@@ -856,12 +856,12 @@ public class DefaultEqualsDemo {
         user1.equals(user2)
         );
     }
-static class User {
-    private final String name;
-    User(String name) {
-        this.name = name;
+    static class User {
+        private final String name;
+        User(String name) {
+            this.name = name;
+        }
     }
-}
 }
 ```
 
@@ -883,29 +883,29 @@ public class EqualsDemo {
         user1.equals(user2)
         );
     }
-static final class User {
-    private final String userId;
-    User(String userId) {
-        this.userId = userId;
+    static final class User {
+        private final String userId;
+        User(String userId) {
+            this.userId = userId;
+        }
+        @Override
+        public boolean equals(Object other) {
+            if (this == other) {
+                return true;
+            }
+            if (!(other instanceof User user)) {
+                return false;
+            }
+            return Objects.equals(
+            userId,
+            user.userId
+            );
+        }
+        @Override
+        public int hashCode() {
+            return Objects.hash(userId);
+        }
     }
-@Override
-public boolean equals(Object other) {
-    if (this == other) {
-        return true;
-    }
-if (!(other instanceof User user)) {
-    return false;
-}
-return Objects.equals(
-userId,
-user.userId
-);
-}
-@Override
-public int hashCode() {
-    return Objects.hash(userId);
-}
-}
 }
 ```
 
@@ -924,16 +924,16 @@ static class User {
     User(String userId) {
         this.userId = userId;
     }
-@Override
-public boolean equals(Object other) {
-    if (!(other instanceof User user)) {
-        return false;
+    @Override
+    public boolean equals(Object other) {
+        if (!(other instanceof User user)) {
+            return false;
+        }
+        return Objects.equals(
+        userId,
+        user.userId
+        );
     }
-return Objects.equals(
-userId,
-user.userId
-);
-}
 }
 ```
 
@@ -960,26 +960,26 @@ public class MutableKeyDemo {
         key.userId = "U002";
         System.out.println(map.get(key));
     }
-static class UserKey {
-    private String userId;
-    UserKey(String userId) {
-        this.userId = userId;
+    static class UserKey {
+        private String userId;
+        UserKey(String userId) {
+            this.userId = userId;
+        }
+        @Override
+        public boolean equals(Object other) {
+            if (!(other instanceof UserKey key)) {
+                return false;
+            }
+            return Objects.equals(
+            userId,
+            key.userId
+            );
+        }
+        @Override
+        public int hashCode() {
+            return Objects.hash(userId);
+        }
     }
-@Override
-public boolean equals(Object other) {
-    if (!(other instanceof UserKey key)) {
-        return false;
-    }
-return Objects.equals(
-userId,
-key.userId
-);
-}
-@Override
-public int hashCode() {
-    return Objects.hash(userId);
-}
-}
 }
 ```
 
@@ -1061,12 +1061,12 @@ public class ToStringDemo {
         @Override
         public String toString() {
             return "User{"
-                + "username='" + username + '\''
-                + ", password='" + password + '\''
-                + ", token='" + token + '\''
-                + '}';
+            + "username='" + username + '\''
+            + ", password='" + password + '\''
+            + ", token='" + token + '\''
+            + '}';
         }
-}
+    }
 }
 ```
 
@@ -1094,20 +1094,20 @@ public class CloneDemo {
         System.out.println(source.items);
         System.out.println(copy.items);
     }
-static class Order implements Cloneable {
-    private List<String> items =
-    new ArrayList<>();
-    @Override
-    public Order clone() {
-        try {
-            return (Order) super.clone();
-        } catch (
-    CloneNotSupportedException exception
-    ) {
-        throw new AssertionError(exception);
+    static class Order implements Cloneable {
+        private List<String> items =
+        new ArrayList<>();
+        @Override
+        public Order clone() {
+            try {
+                return (Order) super.clone();
+            } catch (
+            CloneNotSupportedException exception
+            ) {
+                throw new AssertionError(exception);
+            }
+        }
     }
-}
-}
 }
 ```
 

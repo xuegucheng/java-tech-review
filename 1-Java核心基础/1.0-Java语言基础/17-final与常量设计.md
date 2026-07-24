@@ -490,12 +490,12 @@ public abstract class ImportTemplate {
         process();
         finish();
     }
-protected abstract void read();
-protected abstract void process();
-private void validate() {
-}
-private void finish() {
-}
+    protected abstract void read();
+    protected abstract void process();
+    private void validate() {
+    }
+    private void finish() {
+    }
 }
 ```
 
@@ -600,23 +600,23 @@ public final class Money {
         this.currency =
         Objects.requireNonNull(currency);
     }
-public BigDecimal amount() {
-    return amount;
-}
-public Currency currency() {
-    return currency;
-}
-public Money add(Money other) {
-    if (!currency.equals(other.currency)) {
-        throw new IllegalArgumentException(
-        "币种不一致"
+    public BigDecimal amount() {
+        return amount;
+    }
+    public Currency currency() {
+        return currency;
+    }
+    public Money add(Money other) {
+        if (!currency.equals(other.currency)) {
+            throw new IllegalArgumentException(
+            "币种不一致"
+            );
+        }
+        return new Money(
+        amount.add(other.amount),
+        currency
         );
     }
-return new Money(
-amount.add(other.amount),
-currency
-);
-}
 }
 ```
 
@@ -809,14 +809,14 @@ public class Order {
         this.orderNo = orderNo;
         this.status = status;
     }
-public static Order create(
-String orderNo
-) {
-    return new Order(
-    orderNo,
-    OrderStatus.CREATED
-    );
-}
+    public static Order create(
+    String orderNo
+    ) {
+        return new Order(
+        orderNo,
+        OrderStatus.CREATED
+        );
+    }
 }
 ```
 
@@ -868,13 +868,13 @@ new Outer.Nested();
 public class Singleton {
     private Singleton() {
     }
-private static class Holder {
-    private static final Singleton INSTANCE =
-    new Singleton();
-}
-public static Singleton getInstance() {
-    return Holder.INSTANCE;
-}
+    private static class Holder {
+        private static final Singleton INSTANCE =
+        new Singleton();
+    }
+    public static Singleton getInstance() {
+        return Holder.INSTANCE;
+    }
 }
 ```
 
@@ -1057,9 +1057,9 @@ List.of("A", "B");
 public final class Calculator {
     private Calculator() {
     }
-public static int add(int a, int b) {
-    return a + b;
-}
+    public static int add(int a, int b) {
+        return a + b;
+    }
 }
 ```
 
@@ -1077,9 +1077,9 @@ public final class ConfigService {
     new ConfigService();
     private ConfigService() {
     }
-public static ConfigService getInstance() {
-    return INSTANCE;
-}
+    public static ConfigService getInstance() {
+        return INSTANCE;
+    }
 }
 ```
 
@@ -1106,15 +1106,15 @@ public class StaticFieldDemo {
         user2.increment();
         System.out.println(User.getCount());
     }
-static class User {
-    private static int count;
-    void increment() {
-        count++;
+    static class User {
+        private static int count;
+        void increment() {
+            count++;
+        }
+        static int getCount() {
+            return count;
+        }
     }
-static int getCount() {
-    return count;
-}
-}
 }
 ```
 
@@ -1156,21 +1156,21 @@ public class StaticInitializationDemo {
     static {
         System.out.println("block 1");
     }
-private static int second =
-print("second", 2);
-static {
-    System.out.println("block 2");
-}
-private static int print(
-String name,
-int value
-) {
-    System.out.println(name);
-    return value;
-}
-public static void main(String[] args) {
-    System.out.println("main");
-}
+    private static int second =
+    print("second", 2);
+    static {
+        System.out.println("block 2");
+    }
+    private static int print(
+    String name,
+    int value
+    ) {
+        System.out.println(name);
+        return value;
+    }
+    public static void main(String[] args) {
+        System.out.println("main");
+    }
 }
 ```
 
@@ -1191,28 +1191,28 @@ public class ParentChildInitializationDemo {
     public static void main(String[] args) {
         new Child();
     }
-static class Parent {
-    static {
-        System.out.println("父类静态");
+    static class Parent {
+        static {
+            System.out.println("父类静态");
+        }
+        {
+            System.out.println("父类实例");
+        }
+        Parent() {
+            System.out.println("父类构造");
+        }
     }
-{
-    System.out.println("父类实例");
-}
-Parent() {
-    System.out.println("父类构造");
-}
-}
-static class Child extends Parent {
-    static {
-        System.out.println("子类静态");
+    static class Child extends Parent {
+        static {
+            System.out.println("子类静态");
+        }
+        {
+            System.out.println("子类实例");
+        }
+        Child() {
+            System.out.println("子类构造");
+        }
     }
-{
-    System.out.println("子类实例");
-}
-Child() {
-    System.out.println("子类构造");
-}
-}
 }
 ```
 
@@ -1237,11 +1237,11 @@ public class ConstantInitializationDemo {
             "Constants initialized"
             );
         }
-    static final int VALUE = 10;
-}
-public static void main(String[] args) {
-    System.out.println(Constants.VALUE);
-}
+        static final int VALUE = 10;
+    }
+    public static void main(String[] args) {
+        System.out.println(Constants.VALUE);
+    }
 }
 ```
 
@@ -1262,16 +1262,16 @@ public class ParentStaticFieldDemo {
         static {
             System.out.println("Parent");
         }
-    static int value = 10;
-}
-static class Child extends Parent {
-    static {
-        System.out.println("Child");
+        static int value = 10;
     }
-}
-public static void main(String[] args) {
-    System.out.println(Child.value);
-}
+    static class Child extends Parent {
+        static {
+            System.out.println("Child");
+        }
+    }
+    public static void main(String[] args) {
+        System.out.println(Child.value);
+    }
 }
 ```
 
@@ -1315,18 +1315,18 @@ public class RuntimeConstantDemo {
             "Config initialized"
             );
         }
-    static final int COMPILE_TIME = 10;
-    static final int RUNTIME =
-    Integer.parseInt("20");
-}
-public static void main(String[] args) {
-    System.out.println(
-    Config.COMPILE_TIME
-    );
-    System.out.println(
-    Config.RUNTIME
-    );
-}
+        static final int COMPILE_TIME = 10;
+        static final int RUNTIME =
+        Integer.parseInt("20");
+    }
+    public static void main(String[] args) {
+        System.out.println(
+        Config.COMPILE_TIME
+        );
+        System.out.println(
+        Config.RUNTIME
+        );
+    }
 }
 ```
 
@@ -1341,13 +1341,13 @@ public class CircularInitializationDemo {
     static class A {
         static int value = B.value + 1;
     }
-static class B {
-    static int value = A.value + 1;
-}
-public static void main(String[] args) {
-    System.out.println(A.value);
-    System.out.println(B.value);
-}
+    static class B {
+        static int value = A.value + 1;
+    }
+    public static void main(String[] args) {
+        System.out.println(A.value);
+        System.out.println(B.value);
+    }
 }
 ```
 
@@ -1363,28 +1363,28 @@ public class InitializationFailureDemo {
                 "初始化失败"
                 );
             }
-    }
-}
-public static void main(String[] args) {
-    for (int i = 0; i < 2; i++) {
-        try {
-            System.out.println(
-            Config.class
-            );
-            Class.forName(
-            Config.class.getName(),
-            true,
-            Config.class
-            .getClassLoader()
-            );
-            } catch (Throwable throwable) {
-            System.out.println(
-            throwable.getClass()
-            .getSimpleName()
-            );
         }
-}
-}
+    }
+    public static void main(String[] args) {
+        for (int i = 0; i < 2; i++) {
+            try {
+                System.out.println(
+                Config.class
+                );
+                Class.forName(
+                Config.class.getName(),
+                true,
+                Config.class
+                .getClassLoader()
+                );
+            } catch (Throwable throwable) {
+                System.out.println(
+                throwable.getClass()
+                .getSimpleName()
+                );
+            }
+        }
+    }
 }
 ```
 
@@ -1670,9 +1670,9 @@ public final class Order {
     public Order(List<OrderItem> items) {
         this.items = List.copyOf(items);
     }
-public List<OrderItem> getItems() {
-    return items;
-}
+    public List<OrderItem> getItems() {
+        return items;
+    }
 }
 ```
 

@@ -349,17 +349,17 @@ public final class User {
         this.userId = userId;
         this.name = name;
     }
-@Override
-public boolean equals(Object other) {
-    if (this == other) {
-        return true;
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        }
+        if (!(other instanceof User user)) {
+            return false;
+        }
+        return Objects.equals(userId, user.userId)
+        && Objects.equals(name, user.name);
     }
-if (!(other instanceof User user)) {
-    return false;
-}
-return Objects.equals(userId, user.userId)
-&& Objects.equals(name, user.name);
-}
 }
 ```
 
@@ -535,13 +535,13 @@ public class Point {
         this.x = x;
         this.y = y;
     }
-@Override
-public boolean equals(Object other) {
-    if (!(other instanceof Point point)) {
-        return false;
+    @Override
+    public boolean equals(Object other) {
+        if (!(other instanceof Point point)) {
+            return false;
+        }
+        return x == point.x && y == point.y;
     }
-return x == point.x && y == point.y;
-}
 }
 ```
 
@@ -558,17 +558,17 @@ public class ColorPoint extends Point {
         super(x, y);
         this.color = color;
     }
-@Override
-public boolean equals(Object other) {
-    if (!(other instanceof ColorPoint point)) {
-        return false;
+    @Override
+    public boolean equals(Object other) {
+        if (!(other instanceof ColorPoint point)) {
+            return false;
+        }
+        return super.equals(point)
+        && Objects.equals(
+        color,
+        point.color
+        );
     }
-return super.equals(point)
-&& Objects.equals(
-color,
-point.color
-);
-}
 }
 ```
 
@@ -895,16 +895,16 @@ public final class User {
     public User(String userId) {
         this.userId = userId;
     }
-@Override
-public boolean equals(Object other) {
-    if (!(other instanceof User user)) {
-        return false;
+    @Override
+    public boolean equals(Object other) {
+        if (!(other instanceof User user)) {
+            return false;
+        }
+        return Objects.equals(
+        userId,
+        user.userId
+        );
     }
-return Objects.equals(
-userId,
-user.userId
-);
-}
 }
 ```
 
@@ -969,25 +969,25 @@ public final class User {
         if (this == other) {
             return true;
         }
-    if (!(other instanceof User user)) {
-        return false;
+        if (!(other instanceof User user)) {
+            return false;
+        }
+        return Objects.equals(
+        userId,
+        user.userId
+        )
+        && Objects.equals(
+        name,
+        user.name
+        );
     }
-return Objects.equals(
-userId,
-user.userId
-)
-&& Objects.equals(
-name,
-user.name
-);
-}
-@Override
-public int hashCode() {
-    return Objects.hash(
-    userId,
-    name
-    );
-}
+    @Override
+    public int hashCode() {
+        return Objects.hash(
+        userId,
+        name
+        );
+    }
 }
 ```
 
@@ -1094,13 +1094,13 @@ public class UserKey {
     public boolean equals(Object other) {
         // 使用 userId
     }
-@Override
-public int hashCode() {
-    return Objects.hash(userId);
-}
-public void setUserId(String userId) {
-    this.userId = userId;
-}
+    @Override
+    public int hashCode() {
+        return Objects.hash(userId);
+    }
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
 }
 ```
 
@@ -1158,20 +1158,20 @@ public final class UserKey {
         this.userId =
         Objects.requireNonNull(userId);
     }
-@Override
-public boolean equals(Object other) {
-    if (this == other) {
-        return true;
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        }
+        if (!(other instanceof UserKey key)) {
+            return false;
+        }
+        return userId.equals(key.userId);
     }
-if (!(other instanceof UserKey key)) {
-    return false;
-}
-return userId.equals(key.userId);
-}
-@Override
-public int hashCode() {
-    return userId.hashCode();
-}
+    @Override
+    public int hashCode() {
+        return userId.hashCode();
+    }
 }
 ```
 

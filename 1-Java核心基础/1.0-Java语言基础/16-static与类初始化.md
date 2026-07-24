@@ -142,9 +142,9 @@ public class User {
     public User() {
         count++;
     }
-public static int getCount() {
-    return count;
-}
+    public static int getCount() {
+        return count;
+    }
 }
 ```
 
@@ -528,7 +528,7 @@ public class Config {
         if (true) {
             throw new RuntimeException("初始化失败");
         }
-}
+    }
 }
 ```
 
@@ -558,14 +558,14 @@ public class StaticOrderDemo {
     static {
         System.out.println("静态代码块 1");
     }
-private static int b = print("初始化 b", 2);
-static {
-    System.out.println("静态代码块 2");
-}
-private static int print(String message, int value) {
-    System.out.println(message);
-    return value;
-}
+    private static int b = print("初始化 b", 2);
+    static {
+        System.out.println("静态代码块 2");
+    }
+    private static int print(String message, int value) {
+        System.out.println(message);
+        return value;
+    }
 }
 ```
 
@@ -726,7 +726,7 @@ public class Constants {
     static {
         System.out.println("Constants initialized");
     }
-public static final int TIMEOUT = 30;
+    public static final int TIMEOUT = 30;
 }
 ```
 
@@ -758,8 +758,8 @@ public class Constants {
     static {
         System.out.println("Constants initialized");
     }
-public static final int TIMEOUT =
-Integer.parseInt("30");
+    public static final int TIMEOUT =
+    Integer.parseInt("30");
 }
 ```
 
@@ -781,7 +781,7 @@ public class Parent {
     static {
         System.out.println("Parent initialized");
     }
-public static int value = 10;
+    public static int value = 10;
 }
 ```
 
@@ -1024,9 +1024,9 @@ DEFAULT_SIZE;
 public final class StringUtils {
     private StringUtils() {
     }
-public static boolean isBlank(String value) {
-    return value == null || value.isBlank();
-}
+    public static boolean isBlank(String value) {
+        return value == null || value.isBlank();
+    }
 }
 ```
 
