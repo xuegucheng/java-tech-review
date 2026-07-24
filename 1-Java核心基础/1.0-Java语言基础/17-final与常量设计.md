@@ -522,8 +522,8 @@ private void validate() {
 
 **8.23.3 static final 方法**
 
-静态方法不参与重写，只能被隐藏。
-因此静态方法通常不需要使用 final 防止重写。
+- 静态方法不参与重写，只能被隐藏。
+- 因此静态方法通常不需要使用 final 防止重写。
 
 ## 8.24 final 类
 
@@ -543,8 +543,8 @@ public class CustomString extends String {
 
 **8.24.1 final 类中的方法**
 
-final 类不能有子类，因此其中的实例方法不会被外部子类重写。
-不需要为每个方法再机械添加 final。
+- final 类不能有子类，因此其中的实例方法不会被外部子类重写。
+- 不需要为每个方法再机械添加 final。
 
 **8.24.2 final 类的适用场景**
 

@@ -209,9 +209,9 @@ dog.getClass() == Animal.class // false
 
 **9.25.3 getClass() 不能被重写**
 
-getClass() 是 final 方法。
-对象不能伪造自己的实际运行时 Class。
-Class 与反射机制后续单独展开。
+- getClass() 是 final 方法。
+- 对象不能伪造自己的实际运行时 Class。
+- Class 与反射机制后续单独展开。
 
 ## 9.26 clone()
 
@@ -1214,118 +1214,64 @@ Object 是 Java 类体系的根类。
 
 **9.40.2 基本类型也是 Object 子类**
 
-**错误。**
-
-基本类型不是对象。
-赋值给 Object 时会发生自动装箱。
-
-**误区三：引用类型的 == 比较对象内容**
-
-**错误。**
-
-引用类型的 == 比较是否指向同一个对象。
-
-**误区四：所有类默认 equals 都比较字段内容**
-
-**错误。**
-
-Object 默认 equals 近似于 this == obj 。
-
-**误区五：重写 equals 就足够了**
-
-**错误。**
-
-只要对象可能进入哈希容器，就必须同时正确重写 hashCode。
-实际上从契约角度，只要重写 equals，就应该同步重写 hashCode。
-
-**误区六：hashCode 相等代表对象相等**
-
-**错误。**
-
-哈希冲突允许不同对象拥有相同 hashCode。
-
-**误区七：对象不相等时 hashCode 必须不同**
-
-**错误。**
-
-equals 不相等的对象可以拥有相同 hashCode。
-
-**误区八：hashCode 就是对象地址**
-
-**错误。**
-
-规范不要求 hashCode 等于内存地址。
-
-**误区九：Map Key 修改字段后不影响查找**
-
-**错误。**
-
-如果修改了参与 hashCode 的字段，键可能无法从原桶中找到。
-
-**误区十：数组 equals 比较数组内容**
-
-**错误。**
-
-数组没有按元素重写 equals，应使用 Arrays.equals。
-
-**误区十一：BigDecimal 数值相等时 equals 一定为 true**
-
-**错误。**
-
-BigDecimal.equals 还会比较 scale。
-
-**误区十二：final 类可以彻底解决 equals 设计**
-
-不完整。
-final 可以避免继承破坏相等性，但仍需正确选择字段并维护 hashCode 契约。
-
-**误区十三：toString 可以随意打印所有字段**
-
-**错误。**
-
-敏感字段和大型对象图不应输出。
-
-**误区十四：toString 适合作为业务数据协议**
-
-**错误。**
-
-toString 主要用于人类可读描述，格式不应视为稳定协议。
-
-**误区十五：clone 会自动深拷贝**
-
-**错误。**
-
-Object.clone 默认更接近字段级浅拷贝。
-
-**误区十六：Cloneable 定义了 clone 方法**
-
-**错误。**
-
-Cloneable 是标记接口，本身没有声明方法。
-
-**误区十七：getClass 返回变量声明类型**
-
-**错误。**
-
-getClass 返回对象的运行时类型。
-
-**误区十八：wait 和 notify 属于 Thread**
-
-**错误。**
-
-它们定义在 Object 中，因为任意对象都能作为监视器。
-
-**误区十九：System.identityHashCode 是业务唯一 ID**
-
-**错误。**
-
-它只适合对象身份相关的底层或调试场景，不保证全局唯一。
-
-**误区二十：自动生成 equals/hashCode 永远安全**
-
-**错误。**
-
-自动生成可能错误包含可变字段、集合、懒加载属性或双向关联。
+- 错误。
+- 基本类型不是对象。
+- 赋值给 Object 时会发生自动装箱。
+- 误区三：引用类型的 == 比较对象内容
+- 错误。
+- 引用类型的 == 比较是否指向同一个对象。
+- 误区四：所有类默认 equals 都比较字段内容
+- 错误。
+- Object 默认 equals 近似于 this == obj 。
+- 误区五：重写 equals 就足够了
+- 错误。
+- 只要对象可能进入哈希容器，就必须同时正确重写 hashCode。
+- 实际上从契约角度，只要重写 equals，就应该同步重写 hashCode。
+- 误区六：hashCode 相等代表对象相等
+- 错误。
+- 哈希冲突允许不同对象拥有相同 hashCode。
+- 误区七：对象不相等时 hashCode 必须不同
+- 错误。
+- equals 不相等的对象可以拥有相同 hashCode。
+- 误区八：hashCode 就是对象地址
+- 错误。
+- 规范不要求 hashCode 等于内存地址。
+- 误区九：Map Key 修改字段后不影响查找
+- 错误。
+- 如果修改了参与 hashCode 的字段，键可能无法从原桶中找到。
+- 误区十：数组 equals 比较数组内容
+- 错误。
+- 数组没有按元素重写 equals，应使用 Arrays.equals。
+- 误区十一：BigDecimal 数值相等时 equals 一定为 true
+- 错误。
+- BigDecimal.equals 还会比较 scale。
+- 误区十二：final 类可以彻底解决 equals 设计
+- 不完整。
+- final 可以避免继承破坏相等性，但仍需正确选择字段并维护 hashCode 契约。
+- 误区十三：toString 可以随意打印所有字段
+- 错误。
+- 敏感字段和大型对象图不应输出。
+- 误区十四：toString 适合作为业务数据协议
+- 错误。
+- toString 主要用于人类可读描述，格式不应视为稳定协议。
+- 误区十五：clone 会自动深拷贝
+- 错误。
+- Object.clone 默认更接近字段级浅拷贝。
+- 误区十六：Cloneable 定义了 clone 方法
+- 错误。
+- Cloneable 是标记接口，本身没有声明方法。
+- 误区十七：getClass 返回变量声明类型
+- 错误。
+- getClass 返回对象的运行时类型。
+- 误区十八：wait 和 notify 属于 Thread
+- 错误。
+- 它们定义在 Object 中，因为任意对象都能作为监视器。
+- 误区十九：System.identityHashCode 是业务唯一 ID
+- 错误。
+- 它只适合对象身份相关的底层或调试场景，不保证全局唯一。
+- 误区二十：自动生成 equals/hashCode 永远安全
+- 错误。
+- 自动生成可能错误包含可变字段、集合、懒加载属性或双向关联。
 
 ## 9.41 工程实践建议
 
