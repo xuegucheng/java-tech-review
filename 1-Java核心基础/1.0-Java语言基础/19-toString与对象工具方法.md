@@ -109,6 +109,7 @@ return "User{"
 - 网络传输协议
 - 缓存 Key 协议
 - 签名原文
+
 因为 toString 主要用于人类可读描述，格式可能随代码调整。
 
 需要稳定格式时，应使用明确的：
@@ -128,6 +129,7 @@ return "User{"
 - 执行耗时计算
 - 抛出业务异常
 - 访问可能未初始化的懒加载属性
+
 日志框架、IDE 或调试器可能自动调用 toString。
 因此应保持：
 
@@ -369,6 +371,7 @@ IllegalMonitorStateException
 - 条件循环
 - notify 与 notifyAll
 - 已放在并发编程笔记中，本章只理解：
+
 它们属于 Object，是因为任意对象都可以充当同步监视器。
 
 ## 9.28 对象终结机制
@@ -446,6 +449,7 @@ System.identityHashCode(user)
 - 分析引用关系
 - 身份型数据结构
 - 排查对象重复创建
+
 不应把它作为业务唯一 ID。
 
 ## 9.30 IdentityHashMap
@@ -629,6 +633,7 @@ Lombok 可以通过注解生成：
 - 是否可能用作 HashMap Key
 - 是否存在循环引用
 - 是否包含大集合
+
 不应因为方便就机械生成全部字段相等性。
 例如实体对象包含：
 
@@ -1351,6 +1356,7 @@ private final OrderId orderId;
 - 集合字段
 - 数据库延迟生成 ID
 - 随机变化字段
+
 作为相等性基础。
 
 **9.41.3 equals 和 hashCode 使用同一组字段**
@@ -1429,6 +1435,7 @@ equals 应：
 - hashCode
 - toString
 - Setter
+
 的注解。
 
 应明确控制：
@@ -1516,4 +1523,5 @@ HashMap Key
 - 性、传递性、一致性和非空性。重写 equals 后必须同步重写 hashCode，并保证 equals 相等的对象 hashCode 一定相等。HashMap 和 HashSet 会先通过 hashCode
 - 定位候选位置，再通过 equals 确认逻辑相等，因此参与 equals 和 hashCode 的字段应保持稳定，尤其不应随意修改作为 Map Key 的对象。值对象通常按全部业务值
 - 判断相等，实体对象通常按稳定业务身份判断相等。toString 应提供有用的调试信息，但不能泄露敏感数据；clone 默认是浅拷贝，工程上通常更推荐拷贝构造方法或
+
 静态复制工厂。
