@@ -525,8 +525,8 @@ public void execute(int count) {
 
 ```java
 public class User {
-private String name;
-private int age;
+    private String name;
+    private int age;
 }
 ```
 
@@ -545,7 +545,7 @@ user1.age 和 user2.age 彼此独立。
 
 ```java
 public class User {
-private static int count;
+    private static int count;
 }
 ```
 
@@ -593,9 +593,9 @@ user1.count;
 
 ```java
 public class User {
-private int age;
-private boolean active;
-private String name;
+    private int age;
+    private boolean active;
+    private String name;
 }
 ```
 

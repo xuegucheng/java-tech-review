@@ -307,8 +307,8 @@ money1.equals(money2) // true
 
 ```java
 public final class Money {
-private final BigDecimal amount;
-private final Currency currency;
+    private final BigDecimal amount;
+    private final Currency currency;
 }
 ```
 
@@ -343,19 +343,19 @@ Money 的相等性通常由：
 
 ```java
 public final class User {
-private final String userId;
-private final String name;
-public User(String userId, String name) {
-this.userId = userId;
-this.name = name;
-}
+    private final String userId;
+    private final String name;
+    public User(String userId, String name) {
+        this.userId = userId;
+        this.name = name;
+    }
 @Override
 public boolean equals(Object other) {
-if (this == other) {
-return true;
-}
+    if (this == other) {
+        return true;
+    }
 if (!(other instanceof User user)) {
-return false;
+    return false;
 }
 return Objects.equals(userId, user.userId)
 && Objects.equals(name, user.name);
@@ -529,17 +529,17 @@ x.equals(null) == false
 
 ```java
 public class Point {
-private final int x;
-private final int y;
-public Point(int x, int y) {
-this.x = x;
-this.y = y;
-}
+    private final int x;
+    private final int y;
+    public Point(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
 @Override
 public boolean equals(Object other) {
-if (!(other instanceof Point point)) {
-return false;
-}
+    if (!(other instanceof Point point)) {
+        return false;
+    }
 return x == point.x && y == point.y;
 }
 }
@@ -549,20 +549,20 @@ return x == point.x && y == point.y;
 
 ```java
 public class ColorPoint extends Point {
-private final String color;
-public ColorPoint(
-int x,
-int y,
-String color
-) {
-super(x, y);
-this.color = color;
-}
+    private final String color;
+    public ColorPoint(
+    int x,
+    int y,
+    String color
+    ) {
+        super(x, y);
+        this.color = color;
+    }
 @Override
 public boolean equals(Object other) {
-if (!(other instanceof ColorPoint point)) {
-return false;
-}
+    if (!(other instanceof ColorPoint point)) {
+        return false;
+    }
 return super.equals(point)
 && Objects.equals(
 color,
@@ -703,8 +703,8 @@ currency
 
 ```java
 public final class Coordinate {
-private final int x;
-private final int y;
+    private final int x;
+    private final int y;
 }
 ```
 
@@ -722,9 +722,9 @@ y 相等
 
 ```java
 public class Order {
-private OrderId orderId;
-private OrderStatus status;
-private List<OrderItem> items;
+    private OrderId orderId;
+    private OrderStatus status;
+    private List<OrderItem> items;
 }
 ```
 
@@ -891,15 +891,15 @@ equals 不相等
 
 ```java
 public final class User {
-private final String userId;
-public User(String userId) {
-this.userId = userId;
-}
+    private final String userId;
+    public User(String userId) {
+        this.userId = userId;
+    }
 @Override
 public boolean equals(Object other) {
-if (!(other instanceof User user)) {
-return false;
-}
+    if (!(other instanceof User user)) {
+        return false;
+    }
 return Objects.equals(
 userId,
 user.userId
@@ -962,16 +962,16 @@ return Objects.hash(userId, name);
 
 ```java
 public final class User {
-private final String userId;
-private final String name;
-@Override
-public boolean equals(Object other) {
-if (this == other) {
-return true;
-}
-if (!(other instanceof User user)) {
-return false;
-}
+    private final String userId;
+    private final String name;
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        }
+    if (!(other instanceof User user)) {
+        return false;
+    }
 return Objects.equals(
 userId,
 user.userId
@@ -983,10 +983,10 @@ user.name
 }
 @Override
 public int hashCode() {
-return Objects.hash(
-userId,
-name
-);
+    return Objects.hash(
+    userId,
+    name
+    );
 }
 }
 ```
@@ -1089,17 +1089,17 @@ map.get(user2);
 
 ```java
 public class UserKey {
-private String userId;
-@Override
-public boolean equals(Object other) {
-// 使用 userId
-}
+    private String userId;
+    @Override
+    public boolean equals(Object other) {
+        // 使用 userId
+    }
 @Override
 public int hashCode() {
-return Objects.hash(userId);
+    return Objects.hash(userId);
 }
 public void setUserId(String userId) {
-this.userId = userId;
+    this.userId = userId;
 }
 }
 ```
@@ -1153,24 +1153,24 @@ hashCode 基于 U002
 
 ```java
 public final class UserKey {
-private final String userId;
-public UserKey(String userId) {
-this.userId =
-Objects.requireNonNull(userId);
-}
+    private final String userId;
+    public UserKey(String userId) {
+        this.userId =
+        Objects.requireNonNull(userId);
+    }
 @Override
 public boolean equals(Object other) {
-if (this == other) {
-return true;
-}
+    if (this == other) {
+        return true;
+    }
 if (!(other instanceof UserKey key)) {
-return false;
+    return false;
 }
 return userId.equals(key.userId);
 }
 @Override
 public int hashCode() {
-return userId.hashCode();
+    return userId.hashCode();
 }
 }
 ```

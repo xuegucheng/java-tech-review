@@ -159,7 +159,7 @@ items 不能重新指向另一个列表
 ```java
 private final List<String> items;
 public Order(List<String> items) {
-this.items = List.copyOf(items);
+    this.items = List.copyOf(items);
 }
 ```
 
@@ -169,7 +169,7 @@ this.items = List.copyOf(items);
 
 ```java
 public class User {
-private final String userId;
+    private final String userId;
 }
 ```
 
@@ -193,10 +193,10 @@ private final String type = "DEFAULT";
 
 ```java
 public class User {
-private final String userId;
-public User(String userId) {
-this.userId = userId;
-}
+    private final String userId;
+    public User(String userId) {
+        this.userId = userId;
+    }
 }
 ```
 
@@ -214,10 +214,10 @@ public User() {
 
 ```java
 public class User {
-private final String id;
-{
-id = UUID.randomUUID().toString();
-}
+    private final String id;
+    {
+        id = UUID.randomUUID().toString();
+    }
 }
 ```
 
@@ -306,7 +306,7 @@ public static final Integer VALUE = 10;
 
 ```java
 public class Constants {
-public static final int TIMEOUT = 30;
+    public static final int TIMEOUT = 30;
 }
 ```
 
@@ -351,10 +351,10 @@ TIMEOUT = 60;
 
 ```java
 public class User {
-private final String userId;
-public User(String userId) {
-this.userId = userId;
-}
+    private final String userId;
+    public User(String userId) {
+        this.userId = userId;
+    }
 }
 ```
 
@@ -369,11 +369,11 @@ this.userId = userId;
 
 ```java
 public class Config {
-private static final String ENVIRONMENT;
-static {
-ENVIRONMENT =
-System.getProperty("environment");
-}
+    private static final String ENVIRONMENT;
+    static {
+        ENVIRONMENT =
+        System.getProperty("environment");
+    }
 }
 ```
 
@@ -454,8 +454,8 @@ effectively final 是行为上的不再赋值，而不是使用了 final 关键�
 
 ```java
 public class Account {
-public final void validate() {
-}
+    public final void validate() {
+    }
 }
 ```
 
@@ -463,9 +463,9 @@ public final void validate() {
 
 ```java
 public class SavingsAccount extends Account {
-@Override
-public void validate() {
-}
+    @Override
+    public void validate() {
+    }
 }
 ```
 
@@ -484,12 +484,12 @@ public void validate() {
 
 ```java
 public abstract class ImportTemplate {
-public final void execute() {
-validate();
-read();
-process();
-finish();
-}
+    public final void execute() {
+        validate();
+        read();
+        process();
+        finish();
+    }
 protected abstract void read();
 protected abstract void process();
 private void validate() {
@@ -566,10 +566,10 @@ public final class Money {
 
 ```java
 public final class User {
-private String name;
-public void setName(String name) {
-this.name = name;
-}
+    private String name;
+    public void setName(String name) {
+        this.name = name;
+    }
 }
 ```
 
@@ -589,29 +589,29 @@ this.name = name;
 
 ```java
 public final class Money {
-private final BigDecimal amount;
-private final Currency currency;
-public Money(
-BigDecimal amount,
-Currency currency
-) {
-this.amount =
-Objects.requireNonNull(amount);
-this.currency =
-Objects.requireNonNull(currency);
-}
+    private final BigDecimal amount;
+    private final Currency currency;
+    public Money(
+    BigDecimal amount,
+    Currency currency
+    ) {
+        this.amount =
+        Objects.requireNonNull(amount);
+        this.currency =
+        Objects.requireNonNull(currency);
+    }
 public BigDecimal amount() {
-return amount;
+    return amount;
 }
 public Currency currency() {
-return currency;
+    return currency;
 }
 public Money add(Money other) {
-if (!currency.equals(other.currency)) {
-throw new IllegalArgumentException(
-"币种不一致"
-);
-}
+    if (!currency.equals(other.currency)) {
+        throw new IllegalArgumentException(
+        "币种不一致"
+        );
+    }
 return new Money(
 amount.add(other.amount),
 currency
@@ -633,10 +633,10 @@ currency
 
 ```java
 public final class Order {
-private final List<String> items;
-public Order(List<String> items) {
-this.items = items;
-}
+    private final List<String> items;
+    public Order(List<String> items) {
+        this.items = items;
+    }
 }
 ```
 
@@ -718,10 +718,10 @@ static 只表示类级共享，不表示线程安全。
 
 ```java
 public class Counter {
-private static int count;
-public static void increment() {
-count++;
-}
+    private static int count;
+    public static void increment() {
+        count++;
+    }
 }
 ```
 
@@ -800,22 +800,22 @@ paymentProcessor.pay(order);
 
 ```java
 public class Order {
-private final String orderNo;
-private OrderStatus status;
-private Order(
-String orderNo,
-OrderStatus status
-) {
-this.orderNo = orderNo;
-this.status = status;
-}
+    private final String orderNo;
+    private OrderStatus status;
+    private Order(
+    String orderNo,
+    OrderStatus status
+    ) {
+        this.orderNo = orderNo;
+        this.status = status;
+    }
 public static Order create(
 String orderNo
 ) {
-return new Order(
-orderNo,
-OrderStatus.CREATED
-);
+    return new Order(
+    orderNo,
+    OrderStatus.CREATED
+    );
 }
 }
 ```
@@ -842,8 +842,8 @@ Order order = Order.create(orderNo);
 
 ```java
 public class Outer {
-public static class Nested {
-}
+    public static class Nested {
+    }
 }
 ```
 
@@ -866,14 +866,14 @@ new Outer.Nested();
 
 ```java
 public class Singleton {
-private Singleton() {
-}
+    private Singleton() {
+    }
 private static class Holder {
-private static final Singleton INSTANCE =
-new Singleton();
+    private static final Singleton INSTANCE =
+    new Singleton();
 }
 public static Singleton getInstance() {
-return Holder.INSTANCE;
+    return Holder.INSTANCE;
 }
 }
 ```
@@ -922,10 +922,10 @@ new Config();
 
 ```java
 public class A {
-static int value = B.value + 1;
+    static int value = B.value + 1;
 }
 public class B {
-static int value = A.value + 1;
+    static int value = A.value + 1;
 }
 ```
 
@@ -1007,10 +1007,10 @@ private static final int COMPLETED_STATUS = 30;
 
 ```java
 public enum OrderStatus {
-CREATED(10),
-PROCESSING(20),
-COMPLETED(30);
-private final int code;
+    CREATED(10),
+    PROCESSING(20),
+    COMPLETED(30);
+    private final int code;
 }
 ```
 
@@ -1055,10 +1055,10 @@ List.of("A", "B");
 
 ```java
 public final class Calculator {
-private Calculator() {
-}
+    private Calculator() {
+    }
 public static int add(int a, int b) {
-return a + b;
+    return a + b;
 }
 }
 ```
@@ -1073,12 +1073,12 @@ return a + b;
 
 ```java
 public final class ConfigService {
-private static final ConfigService INSTANCE =
-new ConfigService();
-private ConfigService() {
-}
+    private static final ConfigService INSTANCE =
+    new ConfigService();
+    private ConfigService() {
+    }
 public static ConfigService getInstance() {
-return INSTANCE;
+    return INSTANCE;
 }
 }
 ```
@@ -1099,20 +1099,20 @@ return INSTANCE;
 
 ```java
 public class StaticFieldDemo {
-public static void main(String[] args) {
-User user1 = new User();
-User user2 = new User();
-user1.increment();
-user2.increment();
-System.out.println(User.getCount());
-}
+    public static void main(String[] args) {
+        User user1 = new User();
+        User user2 = new User();
+        user1.increment();
+        user2.increment();
+        System.out.println(User.getCount());
+    }
 static class User {
-private static int count;
-void increment() {
-count++;
-}
+    private static int count;
+    void increment() {
+        count++;
+    }
 static int getCount() {
-return count;
+    return count;
 }
 }
 }
@@ -1128,11 +1128,11 @@ return count;
 
 ```java
 public class StaticMethodDemo {
-private String name = "Java";
-public static void print() {
-// System.out.println(name);
-// 编译错误
-}
+    private String name = "Java";
+    public static void print() {
+        // System.out.println(name);
+        // 编译错误
+    }
 }
 ```
 
@@ -1142,7 +1142,7 @@ public static void print() {
 public static void print(
 StaticMethodDemo demo
 ) {
-System.out.println(demo.name);
+    System.out.println(demo.name);
 }
 ```
 
@@ -1151,25 +1151,25 @@ System.out.println(demo.name);
 
 ```java
 public class StaticInitializationDemo {
-private static int first =
-print("first", 1);
-static {
-System.out.println("block 1");
-}
+    private static int first =
+    print("first", 1);
+    static {
+        System.out.println("block 1");
+    }
 private static int second =
 print("second", 2);
 static {
-System.out.println("block 2");
+    System.out.println("block 2");
 }
 private static int print(
 String name,
 int value
 ) {
-System.out.println(name);
-return value;
+    System.out.println(name);
+    return value;
 }
 public static void main(String[] args) {
-System.out.println("main");
+    System.out.println("main");
 }
 }
 ```
@@ -1188,29 +1188,29 @@ main
 
 ```java
 public class ParentChildInitializationDemo {
-public static void main(String[] args) {
-new Child();
-}
+    public static void main(String[] args) {
+        new Child();
+    }
 static class Parent {
-static {
-System.out.println("父类静态");
-}
+    static {
+        System.out.println("父类静态");
+    }
 {
-System.out.println("父类实例");
+    System.out.println("父类实例");
 }
 Parent() {
-System.out.println("父类构造");
+    System.out.println("父类构造");
 }
 }
 static class Child extends Parent {
-static {
-System.out.println("子类静态");
-}
+    static {
+        System.out.println("子类静态");
+    }
 {
-System.out.println("子类实例");
+    System.out.println("子类实例");
 }
 Child() {
-System.out.println("子类构造");
+    System.out.println("子类构造");
 }
 }
 }
@@ -1231,16 +1231,16 @@ System.out.println("子类构造");
 
 ```java
 public class ConstantInitializationDemo {
-static class Constants {
-static {
-System.out.println(
-"Constants initialized"
-);
-}
-static final int VALUE = 10;
+    static class Constants {
+        static {
+            System.out.println(
+            "Constants initialized"
+            );
+        }
+    static final int VALUE = 10;
 }
 public static void main(String[] args) {
-System.out.println(Constants.VALUE);
+    System.out.println(Constants.VALUE);
 }
 }
 ```
@@ -1258,19 +1258,19 @@ Integer.parseInt("10");
 
 ```java
 public class ParentStaticFieldDemo {
-static class Parent {
-static {
-System.out.println("Parent");
-}
-static int value = 10;
+    static class Parent {
+        static {
+            System.out.println("Parent");
+        }
+    static int value = 10;
 }
 static class Child extends Parent {
-static {
-System.out.println("Child");
-}
+    static {
+        System.out.println("Child");
+    }
 }
 public static void main(String[] args) {
-System.out.println(Child.value);
+    System.out.println(Child.value);
 }
 }
 ```
@@ -1287,15 +1287,15 @@ Parent
 
 ```java
 public class FinalReferenceDemo {
-public static void main(String[] args) {
-final List<String> values =
-new ArrayList<>();
-values.add("A");
-values.add("B");
-System.out.println(values);
-// values = new ArrayList<>();
-// 编译错误
-}
+    public static void main(String[] args) {
+        final List<String> values =
+        new ArrayList<>();
+        values.add("A");
+        values.add("B");
+        System.out.println(values);
+        // values = new ArrayList<>();
+        // 编译错误
+    }
 }
 ```
 
@@ -1309,23 +1309,23 @@ System.out.println(values);
 
 ```java
 public class RuntimeConstantDemo {
-static class Config {
-static {
-System.out.println(
-"Config initialized"
-);
-}
-static final int COMPILE_TIME = 10;
-static final int RUNTIME =
-Integer.parseInt("20");
+    static class Config {
+        static {
+            System.out.println(
+            "Config initialized"
+            );
+        }
+    static final int COMPILE_TIME = 10;
+    static final int RUNTIME =
+    Integer.parseInt("20");
 }
 public static void main(String[] args) {
-System.out.println(
-Config.COMPILE_TIME
-);
-System.out.println(
-Config.RUNTIME
-);
+    System.out.println(
+    Config.COMPILE_TIME
+    );
+    System.out.println(
+    Config.RUNTIME
+    );
 }
 }
 ```
@@ -1338,15 +1338,15 @@ Config.RUNTIME
 
 ```java
 public class CircularInitializationDemo {
-static class A {
-static int value = B.value + 1;
-}
+    static class A {
+        static int value = B.value + 1;
+    }
 static class B {
-static int value = A.value + 1;
+    static int value = A.value + 1;
 }
 public static void main(String[] args) {
-System.out.println(A.value);
-System.out.println(B.value);
+    System.out.println(A.value);
+    System.out.println(B.value);
 }
 }
 ```
@@ -1356,33 +1356,33 @@ System.out.println(B.value);
 
 ```java
 public class InitializationFailureDemo {
-static class Config {
-static {
-if (System.currentTimeMillis() > 0) {
-throw new RuntimeException(
-"初始化失败"
-);
-}
-}
+    static class Config {
+        static {
+            if (System.currentTimeMillis() > 0) {
+                throw new RuntimeException(
+                "初始化失败"
+                );
+            }
+    }
 }
 public static void main(String[] args) {
-for (int i = 0; i < 2; i++) {
-try {
-System.out.println(
-Config.class
-);
-Class.forName(
-Config.class.getName(),
-true,
-Config.class
-.getClassLoader()
-);
-} catch (Throwable throwable) {
-System.out.println(
-throwable.getClass()
-.getSimpleName()
-);
-}
+    for (int i = 0; i < 2; i++) {
+        try {
+            System.out.println(
+            Config.class
+            );
+            Class.forName(
+            Config.class.getName(),
+            true,
+            Config.class
+            .getClassLoader()
+            );
+            } catch (Throwable throwable) {
+            System.out.println(
+            throwable.getClass()
+            .getSimpleName()
+            );
+        }
 }
 }
 }
@@ -1577,9 +1577,9 @@ static {
 public static String normalize(
 String value
 ) {
-return value == null
-? null
-: value.trim();
+    return value == null
+    ? null
+    : value.trim();
 }
 ```
 
@@ -1642,7 +1642,7 @@ List.of("A", "B");
 private static final List<String> VALUES =
 List.of("A", "B");
 public static List<String> values() {
-return VALUES;
+    return VALUES;
 }
 ```
 
@@ -1666,12 +1666,12 @@ config.getTimeout();
 
 ```java
 public final class Order {
-private final List<OrderItem> items;
-public Order(List<OrderItem> items) {
-this.items = List.copyOf(items);
-}
+    private final List<OrderItem> items;
+    public Order(List<OrderItem> items) {
+        this.items = List.copyOf(items);
+    }
 public List<OrderItem> getItems() {
-return items;
+    return items;
 }
 }
 ```

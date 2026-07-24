@@ -58,8 +58,8 @@ static 表示成员属于类级别，而不是某个具体对象。
 
 ```java
 public class User {
-private static int count;
-private String name;
+    private static int count;
+    private String name;
 }
 ```
 
@@ -128,7 +128,7 @@ user.DEFAULT_NAME;
 
 ```java
 public class User {
-private static int count;
+    private static int count;
 }
 ```
 
@@ -138,12 +138,12 @@ private static int count;
 
 ```java
 public class User {
-private static int count;
-public User() {
-count++;
-}
+    private static int count;
+    public User() {
+        count++;
+    }
 public static int getCount() {
-return count;
+    return count;
 }
 }
 ```
@@ -216,8 +216,8 @@ System.out.println(User.count);
 
 ```java
 public class Config {
-private static int timeout;
-private static String environment;
+    private static int timeout;
+    private static String environment;
 }
 ```
 
@@ -251,7 +251,7 @@ private static final int DEFAULT_TIMEOUT = 30;
 
 ```java
 public class GlobalState {
-public static int currentUserId;
+    public static int currentUserId;
 }
 ```
 
@@ -273,9 +273,9 @@ public static int currentUserId;
 
 ```java
 public class MathUtils {
-public static int max(int a, int b) {
-return a > b ? a : b;
-}
+    public static int max(int a, int b) {
+        return a > b ? a : b;
+    }
 }
 ```
 
@@ -312,7 +312,7 @@ User.printCount();
 
 ```java
 public static void print() {
-System.out.println(this);
+    System.out.println(this);
 }
 ```
 
@@ -322,10 +322,10 @@ System.out.println(this);
 
 ```java
 public class User {
-private String name;
-public static void printName() {
-System.out.println(name);
-}
+    private String name;
+    public static void printName() {
+        System.out.println(name);
+    }
 }
 ```
 
@@ -344,7 +344,7 @@ name 属于具体对象
 
 ```java
 public static void printName(User user) {
-System.out.println(user.name);
+    System.out.println(user.name);
 }
 ```
 
@@ -355,12 +355,12 @@ System.out.println(user.name);
 
 ```java
 public class User {
-private static int count;
-private String name;
-public void print() {
-System.out.println(count);
-System.out.println(name);
-}
+    private static int count;
+    private String name;
+    public void print() {
+        System.out.println(count);
+        System.out.println(name);
+    }
 }
 ```
 
@@ -387,7 +387,7 @@ System.out.println(this.name);
 
 ```java
 public static Order create(String orderNo) {
-return new Order(orderNo);
+    return new Order(orderNo);
 }
 ```
 
@@ -406,9 +406,9 @@ return new Order(orderNo);
 
 ```java
 public static void createOrder(Order order) {
-// 查询数据库
-// 扣减库存
-// 发送消息
+    // 查询数据库
+    // 扣减库存
+    // 发送消息
 }
 ```
 
@@ -426,9 +426,9 @@ public static void createOrder(Order order) {
 
 ```java
 public class Parent {
-public static void execute() {
-System.out.println("Parent");
-}
+    public static void execute() {
+        System.out.println("Parent");
+    }
 }
 ```
 
@@ -436,9 +436,9 @@ System.out.println("Parent");
 
 ```java
 public class Child extends Parent {
-public static void execute() {
-System.out.println("Child");
-}
+    public static void execute() {
+        System.out.println("Child");
+    }
 }
 ```
 
@@ -480,13 +480,13 @@ static {
 
 ```java
 public class Config {
-private static final Map<String, String> VALUES;
-static {
-Map<String, String> values = new HashMap<>();
-values.put("timeout", "30");
-values.put("retry", "3");
-VALUES = Map.copyOf(values);
-}
+    private static final Map<String, String> VALUES;
+    static {
+        Map<String, String> values = new HashMap<>();
+        values.put("timeout", "30");
+        values.put("retry", "3");
+        VALUES = Map.copyOf(values);
+    }
 }
 ```
 
@@ -509,9 +509,9 @@ VALUES = Map.copyOf(values);
 
 ```java
 public class Demo {
-static {
-System.out.println("Demo initialized");
-}
+    static {
+        System.out.println("Demo initialized");
+    }
 }
 ```
 
@@ -524,10 +524,10 @@ System.out.println("Demo initialized");
 
 ```java
 public class Config {
-static {
-if (true) {
-throw new RuntimeException("初始化失败");
-}
+    static {
+        if (true) {
+            throw new RuntimeException("初始化失败");
+        }
 }
 }
 ```
@@ -554,17 +554,17 @@ NoClassDefFoundError
 
 ```java
 public class StaticOrderDemo {
-private static int a = print("初始化 a", 1);
-static {
-System.out.println("静态代码块 1");
-}
+    private static int a = print("初始化 a", 1);
+    static {
+        System.out.println("静态代码块 1");
+    }
 private static int b = print("初始化 b", 2);
 static {
-System.out.println("静态代码块 2");
+    System.out.println("静态代码块 2");
 }
 private static int print(String message, int value) {
-System.out.println(message);
-return value;
+    System.out.println(message);
+    return value;
 }
 }
 ```
@@ -585,11 +585,11 @@ return value;
 
 ```java
 public class StaticDefaultDemo {
-private static int value = initialize();
-private static int initialize() {
-System.out.println(value);
-return 10;
-}
+    private static int value = initialize();
+    private static int initialize() {
+        System.out.println(value);
+        return 10;
+    }
 }
 ```
 
@@ -723,9 +723,9 @@ System.out.println(Config.timeout);
 
 ```java
 public class Constants {
-static {
-System.out.println("Constants initialized");
-}
+    static {
+        System.out.println("Constants initialized");
+    }
 public static final int TIMEOUT = 30;
 }
 ```
@@ -755,9 +755,9 @@ Constants initialized
 
 ```java
 public class Constants {
-static {
-System.out.println("Constants initialized");
-}
+    static {
+        System.out.println("Constants initialized");
+    }
 public static final int TIMEOUT =
 Integer.parseInt("30");
 }
@@ -778,9 +778,9 @@ System.out.println(Constants.TIMEOUT);
 
 ```java
 public class Parent {
-static {
-System.out.println("Parent initialized");
-}
+    static {
+        System.out.println("Parent initialized");
+    }
 public static int value = 10;
 }
 ```
@@ -789,9 +789,9 @@ public static int value = 10;
 
 ```java
 public class Child extends Parent {
-static {
-System.out.println("Child initialized");
-}
+    static {
+        System.out.println("Child initialized");
+    }
 }
 ```
 
@@ -846,9 +846,9 @@ Class<User> type = User.class;
 
 ```java
 public class Parent {
-static {
-System.out.println("Parent static");
-}
+    static {
+        System.out.println("Parent static");
+    }
 }
 ```
 
@@ -856,9 +856,9 @@ System.out.println("Parent static");
 
 ```java
 public class Child extends Parent {
-static {
-System.out.println("Child static");
-}
+    static {
+        System.out.println("Child static");
+    }
 }
 ```
 
@@ -922,8 +922,8 @@ Java 对字段初始化中的前向引用存在限制。
 
 ```java
 public class Example {
-private static int first = second;
-private static int second = 10;
+    private static int first = second;
+    private static int second = 10;
 }
 ```
 
@@ -932,11 +932,11 @@ private static int second = 10;
 
 ```java
 public class Example {
-private static int first = getSecond();
-private static int second = 10;
-private static int getSecond() {
-return second;
-}
+    private static int first = getSecond();
+    private static int second = 10;
+    private static int getSecond() {
+        return second;
+    }
 }
 ```
 
@@ -1022,10 +1022,10 @@ DEFAULT_SIZE;
 
 ```java
 public final class StringUtils {
-private StringUtils() {
-}
+    private StringUtils() {
+    }
 public static boolean isBlank(String value) {
-return value == null || value.isBlank();
+    return value == null || value.isBlank();
 }
 }
 ```
@@ -1077,7 +1077,7 @@ public final class StringUtils {
 
 ```java
 public final class OrderUtils {
-private static Order currentOrder;
+    private static Order currentOrder;
 }
 ```
 
@@ -1097,6 +1097,6 @@ private static Order currentOrder;
 public static BigDecimal calculateTotal(
 List<OrderItem> items
 ) {
-// 纯计算
+    // 纯计算
 }
 ```

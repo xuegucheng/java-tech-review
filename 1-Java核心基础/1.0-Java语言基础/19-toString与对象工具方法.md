@@ -234,16 +234,16 @@ Cloneable
 
 ```java
 public class User implements Cloneable {
-private String name;
-@Override
-public User clone() {
-try {
-return (User) super.clone();
-} catch (
-CloneNotSupportedException exception
-) {
-throw new AssertionError(exception);
-}
+    private String name;
+    @Override
+    public User clone() {
+        try {
+            return (User) super.clone();
+        } catch (
+    CloneNotSupportedException exception
+    ) {
+        throw new AssertionError(exception);
+    }
 }
 }
 ```
@@ -260,8 +260,8 @@ Cloneable 本身没有声明 clone 方法，它只是告诉 Object.clone：
 
 ```java
 public class Order implements Cloneable {
-private String orderNo;
-private List<String> items;
+    private String orderNo;
+    private List<String> items;
 }
 ```
 
@@ -311,10 +311,10 @@ new ArrayList<>(source.items);
 
 ```java
 public static Order copyOf(Order source) {
-return new Order(
-source.orderNo,
-source.items
-);
+    return new Order(
+    source.orderNo,
+    source.items
+    );
 }
 ```
 
@@ -421,10 +421,10 @@ System.identityHashCode(object)
 
 ```java
 public class User {
-@Override
-public int hashCode() {
-return 1;
-}
+    @Override
+    public int hashCode() {
+        return 1;
+    }
 }
 ```
 
@@ -533,7 +533,7 @@ instanceof Parent
 
 ```java
 class Child extends Parent {
-private String extra;
+    private String extra;
 }
 ```
 
@@ -568,16 +568,16 @@ public final class Money {
 
 ```java
 public class Point {
-protected boolean canEqual(
-Object other
-) {
-return other instanceof Point;
-}
+    protected boolean canEqual(
+    Object other
+    ) {
+        return other instanceof Point;
+    }
 @Override
 public boolean equals(Object other) {
-if (!(other instanceof Point point)) {
-return false;
-}
+    if (!(other instanceof Point point)) {
+        return false;
+    }
 return point.canEqual(this)
 && x == point.x
 && y == point.y;
@@ -657,8 +657,8 @@ List<OrderItem> items
 
 ```java
 public class Order {
-private final OrderId orderId;
-private OrderStatus status;
+    private final OrderId orderId;
+    private OrderStatus status;
 }
 ```
 
@@ -718,9 +718,9 @@ other.orderId
 
 ```java
 public final class Address {
-private final String province;
-private final String city;
-private final String detail;
+    private final String province;
+    private final String city;
+    private final String detail;
 }
 ```
 
@@ -812,10 +812,10 @@ return id == other.id
 
 ```java
 class Parent {
-private List<Child> children;
+    private List<Child> children;
 }
 class Child {
-private Parent parent;
+    private Parent parent;
 }
 ```
 
@@ -848,19 +848,19 @@ equals/hashCode 同样可能递归。
 
 ```java
 public class DefaultEqualsDemo {
-public static void main(String[] args) {
-User user1 = new User("A");
-User user2 = new User("A");
-System.out.println(user1 == user2);
-System.out.println(
-user1.equals(user2)
-);
-}
+    public static void main(String[] args) {
+        User user1 = new User("A");
+        User user2 = new User("A");
+        System.out.println(user1 == user2);
+        System.out.println(
+        user1.equals(user2)
+        );
+    }
 static class User {
-private final String name;
-User(String name) {
-this.name = name;
-}
+    private final String name;
+    User(String name) {
+        this.name = name;
+    }
 }
 }
 ```
@@ -876,25 +876,25 @@ false
 
 ```java
 public class EqualsDemo {
-public static void main(String[] args) {
-User user1 = new User("U001");
-User user2 = new User("U001");
-System.out.println(
-user1.equals(user2)
-);
-}
+    public static void main(String[] args) {
+        User user1 = new User("U001");
+        User user2 = new User("U001");
+        System.out.println(
+        user1.equals(user2)
+        );
+    }
 static final class User {
-private final String userId;
-User(String userId) {
-this.userId = userId;
-}
+    private final String userId;
+    User(String userId) {
+        this.userId = userId;
+    }
 @Override
 public boolean equals(Object other) {
-if (this == other) {
-return true;
-}
+    if (this == other) {
+        return true;
+    }
 if (!(other instanceof User user)) {
-return false;
+    return false;
 }
 return Objects.equals(
 userId,
@@ -903,7 +903,7 @@ user.userId
 }
 @Override
 public int hashCode() {
-return Objects.hash(userId);
+    return Objects.hash(userId);
 }
 }
 }
@@ -920,15 +920,15 @@ true
 
 ```java
 static class User {
-private final String userId;
-User(String userId) {
-this.userId = userId;
-}
+    private final String userId;
+    User(String userId) {
+        this.userId = userId;
+    }
 @Override
 public boolean equals(Object other) {
-if (!(other instanceof User user)) {
-return false;
-}
+    if (!(other instanceof User user)) {
+        return false;
+    }
 return Objects.equals(
 userId,
 user.userId
@@ -951,25 +951,25 @@ System.out.println(users.size());
 
 ```java
 public class MutableKeyDemo {
-public static void main(String[] args) {
-UserKey key = new UserKey("U001");
-Map<UserKey, String> map =
-new HashMap<>();
-map.put(key, "data");
-System.out.println(map.get(key));
-key.userId = "U002";
-System.out.println(map.get(key));
-}
+    public static void main(String[] args) {
+        UserKey key = new UserKey("U001");
+        Map<UserKey, String> map =
+        new HashMap<>();
+        map.put(key, "data");
+        System.out.println(map.get(key));
+        key.userId = "U002";
+        System.out.println(map.get(key));
+    }
 static class UserKey {
-private String userId;
-UserKey(String userId) {
-this.userId = userId;
-}
+    private String userId;
+    UserKey(String userId) {
+        this.userId = userId;
+    }
 @Override
 public boolean equals(Object other) {
-if (!(other instanceof UserKey key)) {
-return false;
-}
+    if (!(other instanceof UserKey key)) {
+        return false;
+    }
 return Objects.equals(
 userId,
 key.userId
@@ -977,7 +977,7 @@ key.userId
 }
 @Override
 public int hashCode() {
-return Objects.hash(userId);
+    return Objects.hash(userId);
 }
 }
 }
@@ -988,14 +988,14 @@ return Objects.hash(userId);
 
 ```java
 public class ArrayEqualsDemo {
-public static void main(String[] args) {
-int[] a = {1, 2, 3};
-int[] b = {1, 2, 3};
-System.out.println(a.equals(b));
-System.out.println(
-Arrays.equals(a, b)
-);
-}
+    public static void main(String[] args) {
+        int[] a = {1, 2, 3};
+        int[] b = {1, 2, 3};
+        System.out.println(a.equals(b));
+        System.out.println(
+        Arrays.equals(a, b)
+        );
+    }
 }
 ```
 
@@ -1010,12 +1010,12 @@ true
 
 ```java
 public class StringEqualsDemo {
-public static void main(String[] args) {
-String a = new String("Java");
-String b = new String("Java");
-System.out.println(a == b);
-System.out.println(a.equals(b));
-}
+    public static void main(String[] args) {
+        String a = new String("Java");
+        String b = new String("Java");
+        System.out.println(a == b);
+        System.out.println(a.equals(b));
+    }
 }
 ```
 
@@ -1030,16 +1030,16 @@ true
 
 ```java
 public class BigDecimalEqualsDemo {
-public static void main(String[] args) {
-BigDecimal a =
-new BigDecimal("1.0");
-BigDecimal b =
-new BigDecimal("1.00");
-System.out.println(a.equals(b));
-System.out.println(
-a.compareTo(b) == 0
-);
-}
+    public static void main(String[] args) {
+        BigDecimal a =
+        new BigDecimal("1.0");
+        BigDecimal b =
+        new BigDecimal("1.00");
+        System.out.println(a.equals(b));
+        System.out.println(
+        a.compareTo(b) == 0
+        );
+    }
 }
 ```
 
@@ -1054,18 +1054,18 @@ true
 
 ```java
 public class ToStringDemo {
-static class User {
-private String username;
-private String password;
-private String token;
-@Override
-public String toString() {
-return "User{"
-+ "username='" + username + '\''
-+ ", password='" + password + '\''
-+ ", token='" + token + '\''
-+ '}';
-}
+    static class User {
+        private String username;
+        private String password;
+        private String token;
+        @Override
+        public String toString() {
+            return "User{"
+                + "username='" + username + '\''
+                + ", password='" + password + '\''
+                + ", token='" + token + '\''
+                + '}';
+        }
 }
 }
 ```
@@ -1086,26 +1086,26 @@ return "User{"
 
 ```java
 public class CloneDemo {
-public static void main(String[] args) {
-Order source = new Order();
-source.items.add("A");
-Order copy = source.clone();
-copy.items.add("B");
-System.out.println(source.items);
-System.out.println(copy.items);
-}
+    public static void main(String[] args) {
+        Order source = new Order();
+        source.items.add("A");
+        Order copy = source.clone();
+        copy.items.add("B");
+        System.out.println(source.items);
+        System.out.println(copy.items);
+    }
 static class Order implements Cloneable {
-private List<String> items =
-new ArrayList<>();
-@Override
-public Order clone() {
-try {
-return (Order) super.clone();
-} catch (
-CloneNotSupportedException exception
-) {
-throw new AssertionError(exception);
-}
+    private List<String> items =
+    new ArrayList<>();
+    @Override
+    public Order clone() {
+        try {
+            return (Order) super.clone();
+        } catch (
+    CloneNotSupportedException exception
+    ) {
+        throw new AssertionError(exception);
+    }
 }
 }
 }
@@ -1122,20 +1122,20 @@ throw new AssertionError(exception);
 
 ```java
 public class IdentityMapDemo {
-public static void main(String[] args) {
-String a = new String("Java");
-String b = new String("Java");
-Map<String, Integer> normal =
-new HashMap<>();
-normal.put(a, 1);
-normal.put(b, 2);
-Map<String, Integer> identity =
-new IdentityHashMap<>();
-identity.put(a, 1);
-identity.put(b, 2);
-System.out.println(normal.size());
-System.out.println(identity.size());
-}
+    public static void main(String[] args) {
+        String a = new String("Java");
+        String b = new String("Java");
+        Map<String, Integer> normal =
+        new HashMap<>();
+        normal.put(a, 1);
+        normal.put(b, 2);
+        Map<String, Integer> identity =
+        new IdentityHashMap<>();
+        identity.put(a, 1);
+        identity.put(b, 2);
+        System.out.println(normal.size());
+        System.out.println(identity.size());
+    }
 }
 ```
 
@@ -1274,7 +1274,7 @@ getClass 返回对象的运行时类型。
 
 ```java
 public final class OrderId {
-private final String value;
+    private final String value;
 }
 ```
 
