@@ -10,7 +10,6 @@ public class User {
 }
 ```
 
-3
 可以理解为：
 
 ```java
@@ -18,23 +17,24 @@ public class User extends Object {
 }
 ```
 
-3
 因此，所有普通 Java 对象都具备 Object 定义的基础能力。
+
 本章主要解决以下问题：
-Object 为什么是所有类的父类？
-== 与 equals() 有什么区别？
-Object 默认的 equals() 比较什么？
-什么情况下应该重写 equals() ？
-equals() 必须满足哪些契约？
-为什么重写 equals() 后必须重写 hashCode() ？
-HashMap 和 HashSet 为什么同时依赖 hashCode() 与 equals() ？
-哪些字段适合参与对象相等性判断？
-可变字段参与 hashCode() 会有什么风险？
-getClass() 与 instanceof 在 equals 中如何选择？
-toString() 应该输出哪些内容？
-clone() 为什么通常不推荐直接使用？
-getClass() 、 wait() 、 notify() 等 Object 方法分别有什么作用？
-实体对象和值对象的相等性应该如何设计？
+
+- Object 为什么是所有类的父类？
+- == 与 equals() 有什么区别？
+- Object 默认的 equals() 比较什么？
+- 什么情况下应该重写 equals() ？
+- equals() 必须满足哪些契约？
+- 为什么重写 equals() 后必须重写 hashCode() ？
+- HashMap 和 HashSet 为什么同时依赖 hashCode() 与 equals() ？
+- 哪些字段适合参与对象相等性判断？
+- 可变字段参与 hashCode() 会有什么风险？
+- getClass() 与 instanceof 在 equals 中如何选择？
+- toString() 应该输出哪些内容？
+- clone() 为什么通常不推荐直接使用？
+- getClass() 、 wait() 、 notify() 等 Object 方法分别有什么作用？
+- 实体对象和值对象的相等性应该如何设计？
 本章核心主线：
 
 ```
@@ -53,13 +53,13 @@ equals 与 hashCode 必须保持一致
 形成稳定的对象相等性契约
 ```
 
-14
 本章暂不深入：
-HashMap 的哈希桶、红黑树和扩容机制：放在集合框架。
-对象头和 identity hash code：放在 JVM 模块。
-wait() 、 notify() 的线程协作机制：放在并发编程。
-Java Record 自动生成的 equals/hashCode：放在现代 Java 特性。
-ORM 实体代理与 equals 的复杂问题：放在框架实战部分。
+
+- HashMap 的哈希桶、红黑树和扩容机制：放在集合框架。
+- 对象头和 identity hash code：放在 JVM 模块。
+- wait() 、 notify() 的线程协作机制：放在并发编程。
+- Java Record 自动生成的 equals/hashCode：放在现代 Java 特性。
+- ORM 实体代理与 equals 的复杂问题：放在框架实战部分。
 
 ## 9.2 Object 是类体系的根类
 
@@ -73,20 +73,13 @@ Animal
 Dog
 ```
 
-6
 因此：
 
 ```
 Dog dog = new Dog();
-```
-
-2
-
-```
 Object object = dog;
 ```
 
-4
 是合法的向上转型。
 Object 可以引用任意普通对象：
 
@@ -97,21 +90,18 @@ Object value3 = new User();
 Object value4 = new int[]{1, 2, 3};
 ```
 
-5
 需要注意：
 
 ```
 Object value2 = 10;
 ```
 
-2
 这里发生了自动装箱：
 
 ```
 Object value2 = Integer.valueOf(10);
 ```
 
-2
 基本类型本身不是 Object 的子类，但对应的包装类型是对象。
 
 **9.2.1 Object 提供的核心方法**
@@ -129,7 +119,6 @@ notify()
 notifyAll()
 ```
 
-9
 历史上还存在对象终结相关机制，但不应依赖它管理资源。
 这些方法大致可以分为：
 
@@ -138,32 +127,15 @@ notifyAll()
 ├── getClass()
 ├── equals()
 └── hashCode()
-```
-
-5
-
-```text
 对象描述
 └── toString()
-```
-
-8
-
-```text
 对象复制
 └── clone()
-```
-
-11
-
-```text
 线程协作
 ├── wait()
 ├── notify()
 └── notifyAll()
 ```
-
-16
 
 ## 9.3 == 运算符
 
@@ -176,29 +148,17 @@ notifyAll()
 ```
 int a = 10;
 int b = 10;
-```
-
-3
-
-```
 System.out.println(a == b); // true
 ```
 
-5
 不同数值类型之间可能先发生类型提升：
 
 ```
 int a = 10;
 long b = 10L;
-```
-
-3
-
-```
 System.out.println(a == b); // true
 ```
 
-5
 这里 a 会提升为 long 后再比较。
 
 **9.3.2 引用类型的 ==**
@@ -210,31 +170,19 @@ System.out.println(a == b); // true
 User user1 = new User("A");
 User user2 = user1;
 User user3 = new User("A");
-```
-
-4
-
-```
 System.out.println(user1 == user2); // true
 System.out.println(user1 == user3); // false
 ```
 
-7
 引用关系：
 
 ```text
 user1 ─────┐
 ├────→ User 对象1
 user2 ─────┘
-```
-
-4
-
-```
 user3 ──────────→ User 对象2
 ```
 
-6
 即使两个对象字段完全相同：
 
 ```
@@ -242,14 +190,12 @@ user1.name = "A";
 user3.name = "A";
 ```
 
-3
 只要不是同一个对象：
 
 ```
 user1 == user3
 ```
 
-2
 仍然是 false 。
 
 **9.3.3 null 比较**
@@ -261,7 +207,6 @@ if (user == null) {
 }
 ```
 
-3
 判断引用是否为空时，应使用：
 
 ```
@@ -269,14 +214,12 @@ user == null
 user != null
 ```
 
-3
 而不是：
 
 ```
 user.equals(null)
 ```
 
-2
 因为当 user == null 时，调用方法会抛出 NullPointerException 。
 
 ## 9.4 equals() 方法
@@ -287,7 +230,6 @@ Object 定义了：
 public boolean equals(Object obj)
 ```
 
-2
 它用于表达对象之间的逻辑相等关系。
 默认实现可以近似理解为：
 
@@ -297,28 +239,20 @@ return this == obj;
 }
 ```
 
-4
 因此，如果一个类没有重写 equals() ：
 
 ```
 User user1 = new User("A");
 User user2 = new User("A");
-```
-
-3
-
-```
 System.out.println(user1.equals(user2));
 ```
 
-5
 通常结果是：
 
 ```
 false
 ```
 
-2
 因为默认 equals 仍然判断是否为同一个对象。
 
 **9.4.1 身份相等与逻辑相等**
@@ -331,7 +265,6 @@ false
 user1 == user2
 ```
 
-2
 逻辑相等
 判断两个对象在业务意义上是否相等：
 
@@ -339,7 +272,6 @@ user1 == user2
 user1.equals(user2)
 ```
 
-2
 例如两个金额对象：
 
 ```
@@ -347,48 +279,39 @@ Money money1 = new Money("100.00", "CNY");
 Money money2 = new Money("100.00", "CNY");
 ```
 
-3
 它们不是同一个对象：
 
 ```
 money1 == money2 // false
 ```
 
-2
 但业务上可以认为相等：
 
 ```
 money1.equals(money2) // true
 ```
 
-2
-
 ## 9.5 什么时候应该重写 equals()
 
 适合重写 equals 的典型对象：
-值对象
-DTO
-配置对象
-复合键
-集合元素
-Map Key
-需要按字段比较的业务对象
-测试中需要内容比较的对象
-例如：
 
-```
-public final class Money {
-```
-
-2
+- 值对象
+- DTO
+- 配置对象
+- 复合键
+- 集合元素
+- Map Key
+- 需要按字段比较的业务对象
+- 测试中需要内容比较的对象
+- 例如：
 
 ```java
+public final class Money {
 private final BigDecimal amount;
 private final Currency currency;
 }
 ```
 
-6
 Money 的相等性通常由：
 
 ```
@@ -397,75 +320,51 @@ Money 的相等性通常由：
 币种
 ```
 
-4
 共同决定。
 
 **9.5.1 不一定需要重写 equals 的对象**
 
 部分对象更强调唯一身份：
-连接对象
-线程对象
-IO 资源
-某些服务对象
-某些有生命周期的实体
-仅用于内部行为封装的对象
+
+- 连接对象
+- 线程对象
+- IO 资源
+- 某些服务对象
+- 某些有生命周期的实体
+- 仅用于内部行为封装的对象
 对于这些对象，默认身份相等可能已经足够。
+
 因此：
-不是所有类都必须重写 equals 和 hashCode。
-相等性必须根据对象语义设计。
+
+- 不是所有类都必须重写 equals 和 hashCode。
+- 相等性必须根据对象语义设计。
 
 ## 9.6 equals() 的基本实现
 
 示例：
 
-```
-public final class User {
-```
-
-2
-
 ```java
+public final class User {
 private final String userId;
 private final String name;
-```
-
-5
-
-```
 public User(String userId, String name) {
 this.userId = userId;
 this.name = name;
 }
-```
-
-10
-
-```
 @Override
 public boolean equals(Object other) {
 if (this == other) {
 return true;
 }
-```
-
-16
-
-```
 if (!(other instanceof User user)) {
 return false;
 }
-```
-
-20
-
-```
 return Objects.equals(userId, user.userId)
 && Objects.equals(name, user.name);
 }
 }
 ```
 
-25
 可以分为三个步骤。
 
 **9.6.1 第一步：判断是否为同一对象**
@@ -476,12 +375,12 @@ return true;
 }
 ```
 
-4
 优点：
-同一对象必然相等
-避免后续字段比较
-提高常见场景性能
-正确处理自身比较
+
+- 同一对象必然相等
+- 避免后续字段比较
+- 提高常见场景性能
+- 正确处理自身比较
 
 **9.6.2 第二步：判断类型**
 
@@ -491,18 +390,17 @@ return false;
 }
 ```
 
-4
 同时处理：
-other == null
-类型不兼容
-安全类型转换
-因为：
+
+- other == null
+- 类型不兼容
+- 安全类型转换
+- 因为：
 
 ```
 null instanceof User
 ```
 
-2
 结果是 false 。
 
 **9.6.3 第三步：比较关键字段**
@@ -512,7 +410,6 @@ return Objects.equals(userId, user.userId)
 && Objects.equals(name, user.name);
 ```
 
-3
 Objects.equals(a, b) 可以安全处理 null：
 
 ```
@@ -521,14 +418,11 @@ Objects.equals(null, "A") // false
 Objects.equals("A", "A") // true
 ```
 
-4
 近似逻辑：
 
 ```
 a == b || (a != null && a.equals(b))
 ```
-
-2
 
 ## 9.7 equals() 的契约
 
@@ -542,8 +436,6 @@ a == b || (a != null && a.equals(b))
 非空性
 ```
 
-6
-
 **9.7.1 自反性**
 
 任何非 null 对象都必须与自身相等：
@@ -552,7 +444,6 @@ a == b || (a != null && a.equals(b))
 x.equals(x) == true
 ```
 
-2
 错误示例：
 
 ```
@@ -562,7 +453,6 @@ return false;
 }
 ```
 
-5
 这会直接破坏集合和业务判断。
 
 **9.7.2 对称性**
@@ -573,22 +463,18 @@ return false;
 x.equals(y) == true
 ```
 
-2
 那么必须保证：
 
 ```
 y.equals(x) == true
 ```
 
-2
 不能出现：
 
 ```
 x 认为 y 相等
 y 认为 x 不相等
 ```
-
-3
 
 **9.7.3 传递性**
 
@@ -599,14 +485,12 @@ x.equals(y) == true
 y.equals(z) == true
 ```
 
-3
 则必须保证：
 
 ```
 x.equals(z) == true
 ```
 
-2
 否则集合中的去重、查找和分组可能产生不一致结果。
 
 **9.7.4 一致性**
@@ -619,7 +503,6 @@ x.equals(y)
 x.equals(y)
 ```
 
-4
 不应一会儿 true，一会儿 false。
 错误示例：
 
@@ -630,7 +513,6 @@ return Math.random() > 0.5;
 }
 ```
 
-5
 也不应把当前时间、随机数或外部可变状态放入 equals。
 
 **9.7.5 非空性**
@@ -641,7 +523,6 @@ return Math.random() > 0.5;
 x.equals(null) == false
 ```
 
-2
 不应抛异常，也不能返回 true。
 
 ## 9.8 对称性破坏示例
@@ -650,58 +531,27 @@ x.equals(null) == false
 
 ```java
 public class Point {
-```
-
-2
-
-```java
 private final int x;
 private final int y;
-```
-
-5
-
-```
 public Point(int x, int y) {
 this.x = x;
 this.y = y;
 }
-```
-
-10
-
-```
 @Override
 public boolean equals(Object other) {
 if (!(other instanceof Point point)) {
 return false;
 }
-```
-
-16
-
-```
 return x == point.x && y == point.y;
 }
 }
 ```
 
-20
 子类：
 
 ```java
 public class ColorPoint extends Point {
-```
-
-2
-
-```java
 private final String color;
-```
-
-4
-
-```
 public ColorPoint(
 int x,
 int y,
@@ -710,21 +560,11 @@ String color
 super(x, y);
 this.color = color;
 }
-```
-
-13
-
-```
 @Override
 public boolean equals(Object other) {
 if (!(other instanceof ColorPoint point)) {
 return false;
 }
-```
-
-19
-
-```
 return super.equals(point)
 && Objects.equals(
 color,
@@ -734,21 +574,14 @@ point.color
 }
 ```
 
-27
 调用：
 
 ```
 Point point = new Point(1, 2);
-```
-
-2
-
-```
 ColorPoint colorPoint =
 new ColorPoint(1, 2, "RED");
 ```
 
-5
 可能出现：
 
 ```
@@ -756,7 +589,6 @@ point.equals(colorPoint) // true
 colorPoint.equals(point) // false
 ```
 
-3
 对称性被破坏。
 这说明：
 可扩展类中的值相等性设计非常困难。
@@ -773,12 +605,12 @@ return false;
 }
 ```
 
-4
 特点：
-允许子类对象参与比较
-支持父子类型相等
-更灵活
-容易因子类增加字段破坏对称性或传递性
+
+- 允许子类对象参与比较
+- 支持父子类型相等
+- 更灵活
+- 容易因子类增加字段破坏对称性或传递性
 
 **9.9.2 使用 getClass()**
 
@@ -789,13 +621,13 @@ return false;
 }
 ```
 
-5
 特点：
-只有完全相同运行时类型才允许比较
-更容易维护 equals 契约
-父类对象与子类对象永远不相等
-可能与 ORM 代理等框架类型发生冲突
-完整示例：
+
+- 只有完全相同运行时类型才允许比较
+- 更容易维护 equals 契约
+- 父类对象与子类对象永远不相等
+- 可能与 ORM 代理等框架类型发生冲突
+- 完整示例：
 
 ```
 @Override
@@ -803,34 +635,17 @@ public boolean equals(Object other) {
 if (this == other) {
 return true;
 }
-```
-
-6
-
-```
 if (other == null
 || getClass() != other.getClass()) {
 return false;
 }
-```
-
-11
-
-```
 User user = (User) other;
-```
-
-13
-
-```
 return Objects.equals(
 userId,
 user.userId
 );
 }
 ```
-
-19
 
 **9.9.3 如何选择**
 
@@ -841,14 +656,12 @@ public final class Money {
 }
 ```
 
-3
 使用：
 
 ```
 instanceof Money
 ```
 
-2
 通常较安全，因为不会出现子类扩展问题。
 对于允许继承、但不同子类不应互相相等的类，可以考虑：
 
@@ -856,7 +669,6 @@ instanceof Money
 getClass() == other.getClass()
 ```
 
-2
 但框架实体、代理对象和继承模型需要结合实际设计。
 工程上更简单的方式是：
 需要稳定值相等性的类，优先设计成 final 不可变类。
@@ -873,36 +685,31 @@ amount
 currency
 ```
 
-3
 通常应该参与相等性。
+
 但以下字段通常不适合：
-创建时间
-修改时间
-缓存字段
-统计字段
-临时状态
-日志追踪信息
-懒加载对象
-运行时计算结果
+
+- 创建时间
+- 修改时间
+- 缓存字段
+- 统计字段
+- 临时状态
+- 日志追踪信息
+- 懒加载对象
+- 运行时计算结果
 
 **9.10.1 值对象**
 
 值对象没有独立身份，其相等性由全部业务值决定。
 例如坐标：
 
-```
-public final class Coordinate {
-```
-
-2
-
 ```java
+public final class Coordinate {
 private final int x;
 private final int y;
 }
 ```
 
-6
 相等条件：
 
 ```
@@ -911,33 +718,24 @@ x 相等
 y 相等
 ```
 
-4
-
 **9.10.2 实体对象**
 
 实体通常具有稳定身份：
 
 ```java
 public class Order {
-```
-
-2
-
-```java
 private OrderId orderId;
 private OrderStatus status;
 private List<OrderItem> items;
 }
 ```
 
-7
 相等性可能只由：
 
 ```
 orderId
 ```
 
-2
 决定。
 状态和订单项发生变化，不代表订单变成另一个实体。
 因此：
@@ -946,7 +744,6 @@ orderId
 order1.equals(order2)
 ```
 
-2
 是否相等，通常取决于二者是否代表同一业务订单。
 
 **9.10.3 数据库自增 ID 的问题**
@@ -958,28 +755,27 @@ Order order1 = new Order();
 Order order2 = new Order();
 ```
 
-3
 二者：
 
 ```
 id = null
 ```
 
-2
 如果简单写：
 
 ```
 Objects.equals(id, other.id)
 ```
 
-2
 两个未持久化对象会被错误判断为相等。
+
 可能的处理方式包括：
-使用创建时生成的业务 ID
-未分配 ID 时仅进行身份比较
-延迟将对象用作 Set 元素或 Map Key
-避免依赖数据库 ID 设计内存对象相等性
-示例：
+
+- 使用创建时生成的业务 ID
+- 未分配 ID 时仅进行身份比较
+- 延迟将对象用作 Set 元素或 Map Key
+- 避免依赖数据库 ID 设计内存对象相等性
+- 示例：
 
 ```
 @Override
@@ -987,25 +783,14 @@ public boolean equals(Object other) {
 if (this == other) {
 return true;
 }
-```
-
-6
-
-```
 if (!(other instanceof Order order)) {
 return false;
 }
-```
-
-10
-
-```
 return orderId != null
 && orderId.equals(order.orderId);
 }
 ```
 
-14
 但这仍然要与 hashCode 设计保持一致。
 
 ## 9.11 hashCode()
@@ -1016,14 +801,15 @@ Object 定义：
 public native int hashCode();
 ```
 
-2
 hashCode() 返回一个整数散列值。
+
 它主要用于：
-HashMap
-HashSet
-Hashtable
-ConcurrentHashMap
-其他哈希结构
+
+- HashMap
+- HashSet
+- Hashtable
+- ConcurrentHashMap
+- 其他哈希结构
 哈希值用于快速缩小查找范围，但不直接代表对象唯一身份。
 
 **9.11.1 hashCode 不是对象内存地址**
@@ -1034,7 +820,6 @@ ConcurrentHashMap
 hashCode = 对象内存地址
 ```
 
-2
 Java 规范不要求 hashCode 必须等于内存地址。
 对象还可能在内存中移动，而 hashCode 契约要求在相关状态不变时保持稳定。
 更准确的说法：
@@ -1048,7 +833,6 @@ Object 默认 hashCode 通常与对象身份有关，但具体生成方式由 JV
 对象数量可以远大于 int 可表示的散列值数量
 ```
 
-2
 这种情况称为哈希冲突。
 因此：
 
@@ -1056,14 +840,11 @@ Object 默认 hashCode 通常与对象身份有关，但具体生成方式由 JV
 a.hashCode() == b.hashCode()
 ```
 
-2
 不能推出：
 
 ```
 a.equals(b)
 ```
-
-2
 
 ## 9.12 equals 与 hashCode 的契约
 
@@ -1075,28 +856,24 @@ a.equals(b)
 a.equals(b) == true
 ```
 
-2
 必须保证：
 
 ```
 a.hashCode() == b.hashCode()
 ```
 
-2
 反过来不成立：
 
 ```
 a.hashCode() == b.hashCode()
 ```
 
-2
 不一定意味着：
 
 ```
 a.equals(b) == true
 ```
 
-2
 因为哈希冲突允许存在。
 
 **9.12.1 契约总结**
@@ -1104,59 +881,27 @@ a.equals(b) == true
 ```
 equals 相等
 → hashCode 必须相等
-```
-
-3
-
-```
 hashCode 相等
 → equals 不一定相等
-```
-
-6
-
-```
 equals 不相等
 → hashCode 可以相同，也可以不同
 ```
-
-9
 
 ## 9.13 为什么重写 equals 后必须重写 hashCode
 
 错误示例：
 
-```
-public final class User {
-```
-
-2
-
 ```java
+public final class User {
 private final String userId;
-```
-
-4
-
-```
 public User(String userId) {
 this.userId = userId;
 }
-```
-
-8
-
-```
 @Override
 public boolean equals(Object other) {
 if (!(other instanceof User user)) {
 return false;
 }
-```
-
-14
-
-```
 return Objects.equals(
 userId,
 user.userId
@@ -1165,57 +910,41 @@ user.userId
 }
 ```
 
-21
 没有重写 hashCode。
 创建：
 
 ```
 User user1 = new User("U001");
 User user2 = new User("U001");
-```
-
-3
-
-```
 System.out.println(user1.equals(user2));
 ```
 
-5
 结果：
 
 ```
 true
 ```
 
-2
 但默认 hashCode 可能不同：
 
 ```
 user1.hashCode() != user2.hashCode()
 ```
 
-2
 放入 HashSet：
 
 ```
 Set<User> users = new HashSet<>();
 users.add(user1);
-```
-
-3
-
-```
 System.out.println(users.contains(user2));
 ```
 
-5
 可能输出：
 
 ```
 false
 ```
 
-2
 虽然逻辑上 user1 与 user2 相等。
 原因是 HashSet 通常先根据 hashCode 定位桶，再使用 equals 比较。
 两个对象进入不同哈希位置后，可能根本不会互相比较。
@@ -1231,41 +960,20 @@ return Objects.hash(userId, name);
 }
 ```
 
-5
 完整示例：
 
-```
-public final class User {
-```
-
-2
-
 ```java
+public final class User {
 private final String userId;
 private final String name;
-```
-
-5
-
-```
 @Override
 public boolean equals(Object other) {
 if (this == other) {
 return true;
 }
-```
-
-11
-
-```
 if (!(other instanceof User user)) {
 return false;
 }
-```
-
-15
-
-```
 return Objects.equals(
 userId,
 user.userId
@@ -1275,11 +983,6 @@ name,
 user.name
 );
 }
-```
-
-25
-
-```
 @Override
 public int hashCode() {
 return Objects.hash(
@@ -1290,7 +993,6 @@ name
 }
 ```
 
-34
 关键原则：
 equals 使用哪些字段，hashCode 通常也应该使用同一组字段。
 
@@ -1302,42 +1004,26 @@ equals 使用哪些字段，hashCode 通常也应该使用同一组字段。
 @Override
 public int hashCode() {
 int result = 17;
-```
-
-4
-
-```
 result = 31 * result
 + Objects.hashCode(userId);
-```
-
-7
-
-```
 result = 31 * result
 + Objects.hashCode(name);
-```
-
-10
-
-```
 return result;
 }
 ```
 
-13
 其中 31 常见的原因包括：
-奇数
-质数
-分布效果通常较好
-可以通过移位和减法优化
-但实际开发通常直接使用：
+
+- 奇数
+- 质数
+- 分布效果通常较好
+- 可以通过移位和减法优化
+- 但实际开发通常直接使用：
 
 ```
 Objects.hash(...)
 ```
 
-2
 或 IDE 自动生成。
 对极端性能敏感的场景，再考虑减少可变参数数组创建等开销。
 
@@ -1350,21 +1036,18 @@ Map<User, String> map =
 new HashMap<>();
 ```
 
-3
 写入：
 
 ```
 map.put(user1, "A");
 ```
 
-2
 读取：
 
 ```
 map.get(user2);
 ```
 
-2
 简化流程：
 
 ```
@@ -1381,10 +1064,10 @@ map.get(user2);
 找到逻辑相等的键
 ```
 
-12
 因此：
-hashCode() 用于快速定位范围
-equals() 用于最终确认逻辑相等
+
+- hashCode() 用于快速定位范围
+- equals() 用于最终确认逻辑相等
 
 **9.15.1 为什么不能只使用 equals**
 
@@ -1394,7 +1077,6 @@ equals() 用于最终确认逻辑相等
 时间复杂度接近线性扫描
 ```
 
-2
 通过 hashCode，可以先快速定位少量候选对象。
 
 **9.15.2 为什么不能只使用 hashCode**
@@ -1408,107 +1090,61 @@ equals() 用于最终确认逻辑相等
 
 ```java
 public class UserKey {
-```
-
-2
-
-```java
 private String userId;
-```
-
-4
-
-```
 @Override
 public boolean equals(Object other) {
 // 使用 userId
 }
-```
-
-9
-
-```
 @Override
 public int hashCode() {
 return Objects.hash(userId);
 }
-```
-
-14
-
-```
 public void setUserId(String userId) {
 this.userId = userId;
 }
 }
 ```
 
-19
 使用：
 
 ```
 UserKey key = new UserKey("U001");
-```
-
-2
-
-```
 Map<UserKey, String> map =
 new HashMap<>();
-```
-
-5
-
-```
 map.put(key, "data");
 ```
 
-7
 随后修改：
 
 ```
 key.setUserId("U002");
 ```
 
-2
 再次查询：
 
 ```
 map.get(key);
 ```
 
-2
 可能返回：
 
 ```
 null
 ```
 
-2
 原因：
 
 ```
 放入时：
 hashCode 基于 U001
 → 对象进入桶 A
-```
-
-4
-
-```
 修改后：
 hashCode 基于 U002
 → 查询桶 B
-```
-
-8
-
-```
 对象实际仍在桶 A
 → 无法找到
 ```
 
-11
 因此：
 作为 HashMap Key 或 HashSet 元素的对象，其 equals/hashCode 依赖字段应尽量保持不可变。
 
@@ -1516,53 +1152,23 @@ hashCode 基于 U002
 
 推荐：
 
-```
-public final class UserKey {
-```
-
-2
-
 ```java
+public final class UserKey {
 private final String userId;
-```
-
-4
-
-```
 public UserKey(String userId) {
 this.userId =
 Objects.requireNonNull(userId);
 }
-```
-
-9
-
-```
 @Override
 public boolean equals(Object other) {
 if (this == other) {
 return true;
 }
-```
-
-15
-
-```
 if (!(other instanceof UserKey key)) {
 return false;
 }
-```
-
-19
-
-```
 return userId.equals(key.userId);
 }
-```
-
-22
-
-```
 @Override
 public int hashCode() {
 return userId.hashCode();
@@ -1570,47 +1176,40 @@ return userId.hashCode();
 }
 ```
 
-28
 特点：
-final 类
-final 字段
-无 Setter
-相等性稳定
-适合作为 Map Key
+
+- final 类
+- final 字段
+- 无 Setter
+- 相等性稳定
+- 适合作为 Map Key
 
 ## 9.17 BigDecimal 的 equals 特殊性
 
 ```
 BigDecimal a =
 new BigDecimal("1.0");
-```
-
-3
-
-```
 BigDecimal b =
 new BigDecimal("1.00");
 ```
 
-6
 执行：
 
 ```
 a.equals(b)
 ```
 
-2
 结果通常是：
 
 ```
 false
 ```
 
-2
 因为 BigDecimal 的 equals 同时考虑：
-数值
-scale
-即：
+
+- 数值
+- scale
+- 即：
 
 ```
 1.0
@@ -1618,7 +1217,6 @@ scale
 1.00
 ```
 
-4
 在 equals 语义上不同。
 但：
 
@@ -1626,30 +1224,22 @@ scale
 a.compareTo(b)
 ```
 
-2
 结果是：
 
 ```
 0
 ```
 
-2
 表示数值大小相等。
 因此金额判断需要明确：
 
 ```
 判断严格表示相等
 → equals()
-```
-
-3
-
-```
 判断数值大小相等
 → compareTo() == 0
 ```
 
-6
 这也说明：
 equals 的语义由具体类定义，不能假设所有对象的 equals 都只比较数学值。
 
@@ -1660,22 +1250,15 @@ equals 的语义由具体类定义，不能假设所有对象的 equals 都只�
 ```
 int[] a = {1, 2, 3};
 int[] b = {1, 2, 3};
-```
-
-3
-
-```
 System.out.println(a.equals(b));
 ```
 
-5
 通常结果：
 
 ```
 false
 ```
 
-2
 因为数组默认 equals 仍是身份比较。
 比较数组内容应使用：
 
@@ -1683,14 +1266,11 @@ false
 Arrays.equals(a, b)
 ```
 
-2
 多维数组：
 
 ```
 Arrays.deepEquals(a, b)
 ```
-
-2
 
 **9.18.1 数组 hashCode**
 
@@ -1701,14 +1281,11 @@ Arrays.deepEquals(a, b)
 Arrays.hashCode(array)
 ```
 
-2
 多维数组：
 
 ```
 Arrays.deepHashCode(array)
 ```
-
-2
 
 ## 9.19 集合的 equals
 
@@ -1718,67 +1295,52 @@ Java 集合通常已经定义了内容相等语义。
 ```
 List<String> a =
 List.of("A", "B");
-```
-
-3
-
-```
 List<String> b =
 List.of("A", "B");
-```
-
-6
-
-```
 System.out.println(a.equals(b));
 ```
 
-8
 结果：
 
 ```
 true
 ```
 
-2
 List 通常比较：
-元素数量
-元素顺序
-每个位置的元素是否相等
+
+- 元素数量
+- 元素顺序
+- 每个位置的元素是否相等
 
 **9.19.1 Set 的 equals**
 
 ```
 Set<String> a =
 Set.of("A", "B");
-```
-
-3
-
-```
 Set<String> b =
 Set.of("B", "A");
 ```
 
-6
 通常：
 
 ```
 a.equals(b)
 ```
 
-2
 结果为 true。
+
 Set 更关注：
-元素集合是否相同
-不关心元素顺序
+
+- 元素集合是否相同
+- 不关心元素顺序
 
 **9.19.2 Map 的 equals**
 
 Map 通常比较：
-键值映射关系是否一致
-Key 是否相等
-Value 是否相等
+
+- 键值映射关系是否一致
+- Key 是否相等
+- Value 是否相等
 不同 Map 实现之间也可能逻辑相等。
 这体现：
 equals 描述的是抽象数据语义，不一定要求具体实现类相同。
@@ -1790,22 +1352,15 @@ equals 描述的是抽象数据语义，不一定要求具体实现类相同。
 ```
 Integer a = 1000;
 Integer b = 1000;
-```
-
-3
-
-```
 System.out.println(a.equals(b)); // true
 ```
 
-5
 而：
 
 ```
 a == b
 ```
 
-2
 比较引用身份，结果可能为 false。
 因此包装类型比较数值应优先：
 
@@ -1813,14 +1368,12 @@ a == b
 Objects.equals(a, b)
 ```
 
-2
 或者在明确非 null 时：
 
 ```
 a.equals(b)
 ```
 
-2
 不要依赖缓存范围判断 == 。
 
 ## 9.21 String 的 equals
@@ -1830,16 +1383,10 @@ String 重写了 equals，比较字符序列内容：
 ```
 String a = new String("Java");
 String b = new String("Java");
-```
-
-3
-
-```
 System.out.println(a == b); // false
 System.out.println(a.equals(b)); // true
 ```
 
-6
 因此：
 
 ```
@@ -1847,7 +1394,6 @@ System.out.println(a.equals(b)); // true
 equals → 字符内容是否相同
 ```
 
-3
 字符串常量池会让部分 == 结果看起来为 true，但不应使用 == 判断字符串内容。
 字符串完整机制放到高级语言特性笔记。
 
@@ -1859,7 +1405,6 @@ equals → 字符内容是否相同
 a.equals(b)
 ```
 
-2
 要求 a 非 null。
 更安全：
 
@@ -1867,20 +1412,18 @@ a.equals(b)
 Objects.equals(a, b)
 ```
 
-2
 其行为：
-a b 结果
-null null true
-null 非 null false
-非 null null false
-非 null 非 null a.equals(b)
-业务代码中，比较可能为空的引用时，推荐：
+
+- a b 结果
+- null null true
+- null 非 null false
+- 非 null null false
+- 非 null 非 null a.equals(b)
+- 业务代码中，比较可能为空的引用时，推荐：
 
 ```
 Objects.equals(expected, actual)
 ```
-
-2
 
 **9.22.1 常量放前面的写法**
 
@@ -1890,14 +1433,12 @@ Objects.equals(expected, actual)
 "SUCCESS".equals(status)
 ```
 
-2
 可以防止：
 
 ```
 status.equals("SUCCESS")
 ```
 
-2
 在 status 为 null 时抛 NPE。
 现代代码也可以使用：
 
@@ -1905,5 +1446,4 @@ status.equals("SUCCESS")
 Objects.equals(status, "SUCCESS")
 ```
 
-2
 但状态值更适合使用枚举而不是字符串魔法值。
