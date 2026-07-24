@@ -1,14 +1,22 @@
-# 第9章：toString 与对象工具方法
+# toString 与对象工具方法
 
 ## 9.23 Objects.deepEquals()
 
 Objects.deepEquals(a, b) 可以处理数组：
-1 int[] a = {1, 2};
-2 int[] b = {1, 2};
+
+```
+int[] a = {1, 2};
+int[] b = {1, 2};
+```
+
 3
-4 System.out.println(
-5 Objects.deepEquals(a, b)
-6 );
+
+```
+System.out.println(
+Objects.deepEquals(a, b)
+);
+```
+
 7
 结果通常为 true。
 对于普通对象，则仍然依赖 equals。
@@ -16,33 +24,58 @@ Objects.deepEquals(a, b) 可以处理数组：
 ## 9.24 toString()
 
 Object 默认的 toString() 通常生成类似：
-1 com.example.User@1a2b3c
+
+```
+com.example.User@1a2b3c
+```
+
 2
 形式通常包含：
-1 类名
-2 @
-3 十六进制形式的哈希相关值
+
+```
+类名
+@
+十六进制形式的哈希相关值
+```
+
 4
 但不应依赖默认格式作为稳定协议。
-### 9.24.1 为什么重写 toString
+
+**9.24.1 为什么重写 toString**
+
 默认输出缺乏业务信息：
-1 System.out.println(user);
+
+```
+System.out.println(user);
+```
+
 2
 可能只看到：
-1 com.example.User@5f184fc6
+
+```
+com.example.User@5f184fc6
+```
+
 2
 重写后：
 
-1 @Override
-2 public String toString() {
-3 return "User{"
-4 + "userId='" + userId + '\''
-5 + ", name='" + name + '\''
-6 + '}';
-7 }
+```
+@Override
+public String toString() {
+return "User{"
++ "userId='" + userId + '\''
++ ", name='" + name + '\''
++ '}';
+}
+```
+
 8
 输出：
-1 User{userId='U001', name='Java'}
+
+```
+User{userId='U001', name='Java'}
+```
+
 2
 有利于：
 调试
@@ -50,7 +83,9 @@ Object 默认的 toString() 通常生成类似：
 测试失败分析
 IDE 查看对象
 问题定位
-### 9.24.2 toString 不应泄露敏感信息
+
+**9.24.2 toString 不应泄露敏感信息**
+
 不应输出：
 密码
 Token
@@ -62,21 +97,26 @@ API Key
 Cookie
 Authorization Header
 错误：
-1 @Override
-2 public String toString() {
-3 return "User{"
-4 + "password='" + password + '\''
-5 + ", token='" + token + '\''
-6 + '}';
-7 }
+
+```
+@Override
+public String toString() {
+return "User{"
++ "password='" + password + '\''
++ ", token='" + token + '\''
++ '}';
+}
+```
+
 8
 日志可能长期保存并被多人访问。
-### 9.24.3 toString 不应承担业务序列化协议
+
+**9.24.3 toString 不应承担业务序列化协议**
+
 不建议把 toString() 当成：
 JSON 序列化
 数据库存储格式
 网络传输协议
-
 缓存 Key 协议
 签名原文
 因为 toString 主要用于人类可读描述，格式可能随代码调整。
@@ -85,7 +125,9 @@ JSON 序列化
 DTO
 协议对象
 专用 format 方法
-### 9.24.4 toString 应避免复杂副作用
+
+**9.24.4 toString 应避免复杂副作用**
+
 不推荐在 toString 中：
 查询数据库
 发起网络请求
@@ -95,55 +137,106 @@ DTO
 访问可能未初始化的懒加载属性
 日志框架、IDE 或调试器可能自动调用 toString。
 因此应保持：
-1 轻量
-2 稳定
-3 无副作用
+
+```
+轻量
+稳定
+无副作用
+```
+
 4
 
 ## 9.25 getClass()
 
 Object 定义：
-1 public final native Class<?> getClass();
-2
-用于获取对象的运行时类型：
-1 User user = new User();
-2
-3 Class<?> type = user.getClass();
-4
-例如：
-1 System.out.println(
-2 user.getClass().getName()
-3 );
-4
-可能输出：
-1 com.example.User
+
+```
+public final native Class<?> getClass();
+```
 
 2
-### 9.25.1 getClass 返回运行时类型
-1 Animal animal = new Dog();
+用于获取对象的运行时类型：
+
+```
+User user = new User();
+```
+
 2
-3 System.out.println(
-4 animal.getClass()
-5 );
+
+```
+Class<?> type = user.getClass();
+```
+
+4
+例如：
+
+```
+System.out.println(
+user.getClass().getName()
+);
+```
+
+4
+可能输出：
+
+```
+com.example.User
+```
+
+2
+
+**9.25.1 getClass 返回运行时类型**
+
+```
+Animal animal = new Dog();
+```
+
+2
+
+```
+System.out.println(
+animal.getClass()
+);
+```
+
 6
 返回的是 Dog 的 Class 对象，而不是 Animal。
 因为：
-1 编译时类型：Animal
-2 运行时类型：Dog
+
+```
+编译时类型：Animal
+运行时类型：Dog
+```
+
 3
 getClass() 获取运行时类型。
-### 9.25.2 getClass() 与 instanceof
-1 animal instanceof Animal
+
+**9.25.2 getClass() 与 instanceof**
+
+```
+animal instanceof Animal
+```
+
 2
 判断对象是否属于某类型或其子类型。
-1 animal.getClass() == Animal.class
+
+```
+animal.getClass() == Animal.class
+```
+
 2
 判断运行时类型是否精确等于 Animal。
 例如 Dog：
-1 dog instanceof Animal // true
-2 dog.getClass() == Animal.class // false
+
+```
+dog instanceof Animal // true
+dog.getClass() == Animal.class // false
+```
+
 3
-### 9.25.3 getClass() 不能被重写
+
+**9.25.3 getClass() 不能被重写**
+
 getClass() 是 final 方法。
 对象不能伪造自己的实际运行时 Class。
 Class 与反射机制后续单独展开。
@@ -152,56 +245,99 @@ Class 与反射机制后续单独展开。
 
 Object 提供：
 
-1 protected native Object clone()
-2 throws CloneNotSupportedException;
+```
+protected native Object clone()
+throws CloneNotSupportedException;
+```
+
 3
 clone 用于复制对象，但其设计存在较多限制。
-### 9.26.1 Cloneable 标记接口
+
+**9.26.1 Cloneable 标记接口**
+
 要正常调用 Object.clone()，类通常需要实现：
-1 Cloneable
+
+```
+Cloneable
+```
+
 2
 示例：
-1 public class User implements Cloneable {
+
+```java
+public class User implements Cloneable {
+```
+
 2
-3 private String name;
+
+```java
+private String name;
+```
+
 4
-5 @Override
-6 public User clone() {
-7 try {
-8 return (User) super.clone();
-9 } catch (
-10 CloneNotSupportedException exception
-11 ) {
-12 throw new AssertionError(exception);
-13 }
-14 }
-15 }
+
+```
+@Override
+public User clone() {
+try {
+return (User) super.clone();
+} catch (
+CloneNotSupportedException exception
+) {
+throw new AssertionError(exception);
+}
+}
+}
+```
+
 16
 Cloneable 本身没有声明 clone 方法，它只是告诉 Object.clone：
-1 允许进行字段级复制
+
+```
+允许进行字段级复制
+```
+
 2
 这是一种标记接口。
-### 9.26.2 clone 默认是浅拷贝
-1 public class Order implements Cloneable {
+
+**9.26.2 clone 默认是浅拷贝**
+
+```java
+public class Order implements Cloneable {
+```
+
 2
-3 private String orderNo;
-4 private List<String> items;
-5 }
+
+```java
+private String orderNo;
+private List<String> items;
+}
+```
+
 6
 执行 clone 后：
 
-1 原 Order 对象
-2 └── items ──┐
-3 ├──→ 同一个 List
-4 克隆 Order 对象
-5 └── items ──┘
+```text
+原 Order 对象
+└── items ──┐
+├──→ 同一个 List
+克隆 Order 对象
+└── items ──┘
+```
+
 6
 外层对象被复制，但内部引用字段仍然共享。
 因此：
-1 clonedOrder.getItems().add("B");
+
+```
+clonedOrder.getItems().add("B");
+```
+
 2
 可能影响原对象。
-### 9.26.3 为什么通常不推荐 clone
+
+**9.26.3 为什么通常不推荐 clone**
+
 clone 的问题包括：
 Cloneable 接口没有定义 clone 方法
 Object.clone 是 protected
@@ -213,47 +349,74 @@ Object.clone 是 protected
 异常处理不自然
 更推荐：
 拷贝构造方法
-1 public Order(Order source) {
-2 this.orderNo = source.orderNo;
-3 this.items =
-4 new ArrayList<>(source.items);
-5 }
+
+```
+public Order(Order source) {
+this.orderNo = source.orderNo;
+this.items =
+new ArrayList<>(source.items);
+}
+```
+
 6
 静态复制工厂
-1 public static Order copyOf(Order source) {
-2 return new Order(
-3 source.orderNo,
-4 source.items
-5 );
-6 }
+
+```java
+public static Order copyOf(Order source) {
+return new Order(
+source.orderNo,
+source.items
+);
+}
+```
+
 7
 显式映射
 
-1 OrderCopyMapper.copy(source);
+```
+OrderCopyMapper.copy(source);
+```
+
 2
 这些方式的复制语义更清晰。
 
 ## 9.27 wait()、notify() 与 notifyAll()
 
 Object 定义了：
-1 wait()
-2 notify()
-3 notifyAll()
+
+```
+wait()
+notify()
+notifyAll()
+```
+
 4
 原因是：
 Java 中任何对象都可以作为监视器锁对象。
 例如：
-1 synchronized (lock) {
-2 lock.wait();
-3 }
+
+```
+synchronized (lock) {
+lock.wait();
+}
+```
+
 4
 唤醒：
-1 synchronized (lock) {
-2 lock.notifyAll();
-3 }
+
+```
+synchronized (lock) {
+lock.notifyAll();
+}
+```
+
 4
 这些方法必须在持有对象监视器时调用，否则会抛出：
-1 IllegalMonitorStateException
+
+```
+IllegalMonitorStateException
+```
+
 2
 完整机制包括：
 Monitor
@@ -270,7 +433,6 @@ notify 与 notifyAll
 历史上 Object 提供过对象终结相关机制，但它存在：
 执行时间不确定
 不保证及时执行
-
 可能永远不执行
 性能开销较高
 容易导致对象复活
@@ -284,41 +446,68 @@ Socket
 锁
 本地资源
 资源管理应使用：
-1 try-with-resources
+
+```
+try-with-resources
+```
+
 2
 例如：
-1 try (
-2 InputStream input =
-3 Files.newInputStream(path)
-4 ) {
-5 // 使用资源
-6 }
+
+```
+try (
+InputStream input =
+Files.newInputStream(path)
+) {
+// 使用资源
+}
+```
+
 7
 对象终结机制只作为历史知识了解，不应作为现代资源管理方案。
 
 ## 9.29 identityHashCode()
 
 System 提供：
-1 System.identityHashCode(object)
+
+```
+System.identityHashCode(object)
+```
+
 2
 它用于获得基于对象身份的哈希值，不受类重写 hashCode 影响。
 例如：
-1 public class User {
-2
-3 @Override
-4 public int hashCode() {
-5 return 1;
-6 }
-7 }
-8
-调用：
-1 User user = new User();
+
+```java
+public class User {
+```
 
 2
-3 System.out.println(user.hashCode());
-4 System.out.println(
-5 System.identityHashCode(user)
-6 );
+
+```
+@Override
+public int hashCode() {
+return 1;
+}
+}
+```
+
+8
+调用：
+
+```
+User user = new User();
+```
+
+2
+
+```
+System.out.println(user.hashCode());
+System.out.println(
+System.identityHashCode(user)
+);
+```
+
 7
 两个结果可能不同。
 适合：
@@ -331,80 +520,150 @@ System 提供：
 ## 9.30 IdentityHashMap
 
 普通 HashMap 使用：
-1 hashCode()
-2 +
-3 equals()
+
+```
+hashCode()
++
+equals()
+```
+
 4
 判断键。
 IdentityHashMap 使用：
-1 引用身份
-2 ==
+
+```
+引用身份
+==
+```
+
 3
 判断键。
 示例：
-1 String a = new String("Java");
-2 String b = new String("Java");
+
+```
+String a = new String("Java");
+String b = new String("Java");
+```
+
 3
 普通 HashMap：
-1 Map<String, Integer> map =
-2 new HashMap<>();
+
+```
+Map<String, Integer> map =
+new HashMap<>();
+```
+
 3
-4 map.put(a, 1);
-5 map.put(b, 2);
+
+```
+map.put(a, 1);
+map.put(b, 2);
+```
+
 6
-7 System.out.println(map.size());
+
+```
+System.out.println(map.size());
+```
+
 8
 通常为：
-1 1
+
+```
+1
+```
 
 2
 因为：
-1 a.equals(b) == true
+
+```
+a.equals(b) == true
+```
+
 2
 IdentityHashMap：
-1 Map<String, Integer> map =
-2 new IdentityHashMap<>();
+
+```
+Map<String, Integer> map =
+new IdentityHashMap<>();
+```
+
 3
-4 map.put(a, 1);
-5 map.put(b, 2);
+
+```
+map.put(a, 1);
+map.put(b, 2);
+```
+
 6
-7 System.out.println(map.size());
+
+```
+System.out.println(map.size());
+```
+
 8
 通常为：
-1 2
+
+```
+2
+```
+
 2
 因为：
-1 a != b
+
+```
+a != b
+```
+
 2
 IdentityHashMap 适合少数需要身份语义的场景，不应替代普通 HashMap。
 
 ## 9.31 equals 与继承的设计难题
 
 假设父类 equals 使用：
-1 instanceof Parent
+
+```
+instanceof Parent
+```
+
 2
 那么子类对象可能与父类对象相等。
 但子类新增字段后：
-1 class Child extends Parent {
+
+```
+class Child extends Parent {
+```
+
 2
-3 private String extra;
-4 }
+
+```java
+private String extra;
+}
+```
+
 5
 会出现问题：
 忽略 extra：子类不同状态可能被判相等
 比较 extra：可能破坏与父类的对称性
 限定同类型：父类与子类不再可相等
-
 因此，对具有值语义的类型，常见建议是：
-1 final 类
-2 +
-3 不可变字段
-4 +
-5 明确 equals/hashCode
+
+```
+final 类
++
+不可变字段
++
+明确 equals/hashCode
+```
+
 6
 例如：
-1 public final class Money {
-2 }
+
+```
+public final class Money {
+}
+```
+
 3
 避免在可扩展继承体系中定义复杂值相等性。
 
@@ -412,36 +671,55 @@ IdentityHashMap 适合少数需要身份语义的场景，不应替代普通 Has
 
 某些继承体系会使用 canEqual() 尝试维护对称性。
 父类：
-1 public class Point {
+
+```java
+public class Point {
+```
+
 2
-3 protected boolean canEqual(
-4 Object other
-5 ) {
-6 return other instanceof Point;
-7 }
+
+```
+protected boolean canEqual(
+Object other
+) {
+return other instanceof Point;
+}
+```
+
 8
-9 @Override
-10 public boolean equals(Object other) {
-11 if (!(other instanceof Point point)) {
-12 return false;
-13 }
+
+```
+@Override
+public boolean equals(Object other) {
+if (!(other instanceof Point point)) {
+return false;
+}
+```
+
 14
-15 return point.canEqual(this)
-16 && x == point.x
-17 && y == point.y;
-18 }
-19 }
+
+```
+return point.canEqual(this)
+&& x == point.x
+&& y == point.y;
+}
+}
+```
+
 20
 子类重写：
-1 @Override
-2 protected boolean canEqual(
-3 Object other
-4 ) {
-5 return other instanceof ColorPoint;
-6 }
+
+```
+@Override
+protected boolean canEqual(
+Object other
+) {
+return other instanceof ColorPoint;
+}
+```
+
 7
 这种方式可以处理部分继承相等性问题，但设计复杂。
-
 普通业务代码更推荐：
 值对象禁止继承
 使用组合
@@ -451,10 +729,18 @@ IdentityHashMap 适合少数需要身份语义的场景，不应替代普通 Has
 ## 9.33 Lombok 与自动生成 equals/hashCode
 
 Lombok 可以通过注解生成：
-1 @EqualsAndHashCode
+
+```
+@EqualsAndHashCode
+```
+
 2
 或者：
-1 @Data
+
+```
+@Data
+```
+
 2
 但自动生成前必须确认：
 哪些字段参与相等性
@@ -467,7 +753,11 @@ Lombok 可以通过注解生成：
 是否包含大集合
 不应因为方便就机械生成全部字段相等性。
 例如实体对象包含：
-1 List<OrderItem> items
+
+```
+List<OrderItem> items
+```
+
 2
 如果自动加入 equals/hashCode：
 比较成本可能很高
@@ -479,39 +769,68 @@ Lombok 可以通过注解生成：
 ## 9.34 实体对象的相等性设计
 
 实体强调：
-1 同一身份
+
+```
+同一身份
+```
+
 2
 而不是所有字段相同。
 例如订单：
 
-1 public class Order {
+```java
+public class Order {
+```
+
 2
-3 private final OrderId orderId;
-4 private OrderStatus status;
-5 }
+
+```java
+private final OrderId orderId;
+private OrderStatus status;
+}
+```
+
 6
 即使状态变化：
-1 CREATED
-2 → PROCESSING
-3 → COMPLETED
+
+```
+CREATED
+→ PROCESSING
+→ COMPLETED
+```
+
 4
 仍然是同一个订单。
 因此实体相等性通常基于：
-1 稳定业务 ID
+
+```
+稳定业务 ID
+```
+
 2
 而不是所有可变字段。
-### 9.34.1 业务 ID 优于可变字段
+
+**9.34.1 业务 ID 优于可变字段**
+
 不推荐：
-1 return Objects.equals(status, other.status)
-2 && Objects.equals(items, other.items)
-3 && Objects.equals(address, other.address);
+
+```
+return Objects.equals(status, other.status)
+&& Objects.equals(items, other.items)
+&& Objects.equals(address, other.address);
+```
+
 4
 这些字段可能随业务变化。
 更合理：
-1 return Objects.equals(
-2 orderId,
-3 other.orderId
-4 );
+
+```
+return Objects.equals(
+orderId,
+other.orderId
+);
+```
+
 5
 前提是 orderId：
 创建时就存在
@@ -523,20 +842,35 @@ Lombok 可以通过注解生成：
 
 值对象强调：
 
-1 所有业务值相同
+```
+所有业务值相同
+```
+
 2
 例如：
-1 public final class Address {
+
+```
+public final class Address {
+```
+
 2
-3 private final String province;
-4 private final String city;
-5 private final String detail;
-6 }
+
+```java
+private final String province;
+private final String city;
+private final String detail;
+}
+```
+
 7
 相等性可以基于：
-1 province
-2 city
-3 detail
+
+```
+province
+city
+detail
+```
+
 4
 值对象通常适合：
 final 类
@@ -544,28 +878,45 @@ final 字段
 不可变
 完整重写 equals/hashCode
 修改时创建新对象
-### 9.35.1 值对象没有独立身份
+
+**9.35.1 值对象没有独立身份**
+
 两个分别创建的地址对象：
-1 Address a =
-2 new Address(
-3 "广东",
-4 "深圳",
-5 "南山区"
-6 );
+
+```
+Address a =
+new Address(
+"广东",
+"深圳",
+"南山区"
+);
+```
+
 7
-8 Address b =
-9 new Address(
-10 "广东",
-11 "深圳",
-12 "南山区"
-13 );
+
+```
+Address b =
+new Address(
+"广东",
+"深圳",
+"南山区"
+);
+```
+
 14
 虽然：
-1 a != b
+
+```
+a != b
+```
+
 2
 但业务上：
 
-1 a.equals(b)
+```
+a.equals(b)
+```
+
 2
 应为 true。
 
@@ -586,37 +937,68 @@ HashSet 去重
 先比较成本较低的字段
 先使用 this == other
 例如：
-1 return id == other.id
-2 && Objects.equals(code, other.code)
-3 && Objects.equals(details, other.details);
+
+```
+return id == other.id
+&& Objects.equals(code, other.code)
+&& Objects.equals(details, other.details);
+```
+
 4
 可以先比较：
-1 便宜且区分度高的字段
+
+```
+便宜且区分度高的字段
+```
+
 2
 再比较复杂字段。
 
 ## 9.37 toString、equals、hashCode 中的循环引用
 
 双向关联：
-1 class Parent {
+
+```
+class Parent {
+```
+
 2
-3 private List<Child> children;
-4 }
+
+```java
+private List<Child> children;
+}
+```
+
 5
-1 class Child {
+
+```
+class Child {
+```
+
 2
-3 private Parent parent;
-4 }
+
+```java
+private Parent parent;
+}
+```
 
 5
 如果自动生成 toString：
-1 Parent.toString()
-2 → Child.toString()
-3 → Parent.toString()
-4 → ...
+
+```
+Parent.toString()
+→ Child.toString()
+→ Parent.toString()
+→ ...
+```
+
 5
 可能导致：
-1 StackOverflowError
+
+```
+StackOverflowError
+```
+
 2
 equals/hashCode 同样可能递归。
 因此：
@@ -629,311 +1011,605 @@ equals/hashCode 同样可能递归。
 ## 9.38 建议实验
 
 实验一：默认 equals 是身份比较
-1 public class DefaultEqualsDemo {
+
+```java
+public class DefaultEqualsDemo {
+```
+
 2
-3 public static void main(String[] args) {
-4 User user1 = new User("A");
-5 User user2 = new User("A");
+
+```java
+public static void main(String[] args) {
+User user1 = new User("A");
+User user2 = new User("A");
+```
+
 6
-7 System.out.println(user1 == user2);
-8 System.out.println(
-9 user1.equals(user2)
-10 );
-11 }
+
+```
+System.out.println(user1 == user2);
+System.out.println(
+user1.equals(user2)
+);
+}
+```
+
 12
-13 static class User {
+
+```
+static class User {
+```
+
 14
-15 private final String name;
+
+```java
+private final String name;
+```
+
 16
-17 User(String name) {
-18 this.name = name;
-19 }
-20 }
-21 }
+
+```
+User(String name) {
+this.name = name;
+}
+}
+}
+```
+
 22
 预期：
 
-1 false
-2 false
+```
+false
+false
+```
+
 3
 实验二：重写 equals
-1 public class EqualsDemo {
-2
-3 public static void main(String[] args) {
-4 User user1 = new User("U001");
-5 User user2 = new User("U001");
-6
-7 System.out.println(
-8 user1.equals(user2)
-9 );
-10 }
-11
-12 static final class User {
-13
-14 private final String userId;
-15
-16 User(String userId) {
-17 this.userId = userId;
-18 }
-19
-20 @Override
-21 public boolean equals(Object other) {
-22 if (this == other) {
-23 return true;
-24 }
-25
-26 if (!(other instanceof User user)) {
-27 return false;
-28 }
-29
-30 return Objects.equals(
-31 userId,
-32 user.userId
-33 );
-34 }
-35
-36 @Override
-37 public int hashCode() {
-38 return Objects.hash(userId);
-39 }
-40 }
-41 }
-42
-预期：
-1 true
+
+```java
+public class EqualsDemo {
+```
+
 2
 
+```java
+public static void main(String[] args) {
+User user1 = new User("U001");
+User user2 = new User("U001");
+```
+
+6
+
+```
+System.out.println(
+user1.equals(user2)
+);
+}
+```
+
+11
+
+```
+static final class User {
+```
+
+13
+
+```java
+private final String userId;
+```
+
+15
+
+```
+User(String userId) {
+this.userId = userId;
+}
+```
+
+19
+
+```
+@Override
+public boolean equals(Object other) {
+if (this == other) {
+return true;
+}
+```
+
+25
+
+```
+if (!(other instanceof User user)) {
+return false;
+}
+```
+
+29
+
+```
+return Objects.equals(
+userId,
+user.userId
+);
+}
+```
+
+35
+
+```
+@Override
+public int hashCode() {
+return Objects.hash(userId);
+}
+}
+}
+```
+
+42
+预期：
+
+```
+true
+```
+
+2
 实验三：只重写 equals 的 HashSet 问题
 创建一个只重写 equals、不重写 hashCode 的类：
-1 static class User {
+
+```
+static class User {
+```
+
 2
-3 private final String userId;
+
+```java
+private final String userId;
+```
+
 4
-5 User(String userId) {
-6 this.userId = userId;
-7 }
+
+```
+User(String userId) {
+this.userId = userId;
+}
+```
+
 8
-9 @Override
-10 public boolean equals(Object other) {
-11 if (!(other instanceof User user)) {
-12 return false;
-13 }
+
+```
+@Override
+public boolean equals(Object other) {
+if (!(other instanceof User user)) {
+return false;
+}
+```
+
 14
-15 return Objects.equals(
-16 userId,
-17 user.userId
-18 );
-19 }
-20 }
+
+```
+return Objects.equals(
+userId,
+user.userId
+);
+}
+}
+```
+
 21
 执行：
-1 Set<User> users = new HashSet<>();
+
+```
+Set<User> users = new HashSet<>();
+```
+
 2
-3 users.add(new User("U001"));
-4 users.add(new User("U001"));
+
+```
+users.add(new User("U001"));
+users.add(new User("U001"));
+```
+
 5
-6 System.out.println(users.size());
+
+```
+System.out.println(users.size());
+```
+
 7
 观察结果，理解为什么逻辑相等对象仍可能同时存在。
 实验四：可变 Key 失效
-1 public class MutableKeyDemo {
+
+```java
+public class MutableKeyDemo {
+```
+
 2
-3 public static void main(String[] args) {
-4 UserKey key = new UserKey("U001");
+
+```java
+public static void main(String[] args) {
+UserKey key = new UserKey("U001");
+```
+
 5
-6 Map<UserKey, String> map =
-7 new HashMap<>();
+
+```
+Map<UserKey, String> map =
+new HashMap<>();
+```
+
 8
-9 map.put(key, "data");
+
+```
+map.put(key, "data");
+```
+
 10
-11 System.out.println(map.get(key));
+
+```
+System.out.println(map.get(key));
+```
+
 12
-13 key.userId = "U002";
+
+```
+key.userId = "U002";
+```
+
 14
 
-15 System.out.println(map.get(key));
-16 }
+```
+System.out.println(map.get(key));
+}
+```
+
 17
-18 static class UserKey {
+
+```
+static class UserKey {
+```
+
 19
-20 private String userId;
+
+```java
+private String userId;
+```
+
 21
-22 UserKey(String userId) {
-23 this.userId = userId;
-24 }
+
+```
+UserKey(String userId) {
+this.userId = userId;
+}
+```
+
 25
-26 @Override
-27 public boolean equals(Object other) {
-28 if (!(other instanceof UserKey key)) {
-29 return false;
-30 }
+
+```
+@Override
+public boolean equals(Object other) {
+if (!(other instanceof UserKey key)) {
+return false;
+}
+```
+
 31
-32 return Objects.equals(
-33 userId,
-34 key.userId
-35 );
-36 }
+
+```
+return Objects.equals(
+userId,
+key.userId
+);
+}
+```
+
 37
-38 @Override
-39 public int hashCode() {
-40 return Objects.hash(userId);
-41 }
-42 }
-43 }
+
+```
+@Override
+public int hashCode() {
+return Objects.hash(userId);
+}
+}
+}
+```
+
 44
 观察修改字段后 Map 查找失败。
 实验五：数组 equals
-1 public class ArrayEqualsDemo {
+
+```java
+public class ArrayEqualsDemo {
+```
+
 2
-3 public static void main(String[] args) {
-4 int[] a = {1, 2, 3};
-5 int[] b = {1, 2, 3};
+
+```java
+public static void main(String[] args) {
+int[] a = {1, 2, 3};
+int[] b = {1, 2, 3};
+```
+
 6
-7 System.out.println(a.equals(b));
+
+```
+System.out.println(a.equals(b));
+```
+
 8
-9 System.out.println(
-10 Arrays.equals(a, b)
-11 );
-12 }
-13 }
+
+```
+System.out.println(
+Arrays.equals(a, b)
+);
+}
+}
+```
+
 14
 预期：
-1 false
-2 true
-3
 
+```
+false
+true
+```
+
+3
 实验六：String 的 == 与 equals
-1 public class StringEqualsDemo {
+
+```java
+public class StringEqualsDemo {
+```
+
 2
-3 public static void main(String[] args) {
-4 String a = new String("Java");
-5 String b = new String("Java");
+
+```java
+public static void main(String[] args) {
+String a = new String("Java");
+String b = new String("Java");
+```
+
 6
-7 System.out.println(a == b);
-8 System.out.println(a.equals(b));
-9 }
-10 }
+
+```
+System.out.println(a == b);
+System.out.println(a.equals(b));
+}
+}
+```
+
 11
 预期：
-1 false
-2 true
+
+```
+false
+true
+```
+
 3
 实验七：BigDecimal equals 与 compareTo
-1 public class BigDecimalEqualsDemo {
+
+```java
+public class BigDecimalEqualsDemo {
+```
+
 2
-3 public static void main(String[] args) {
-4 BigDecimal a =
-5 new BigDecimal("1.0");
+
+```java
+public static void main(String[] args) {
+BigDecimal a =
+new BigDecimal("1.0");
+```
+
 6
-7 BigDecimal b =
-8 new BigDecimal("1.00");
+
+```
+BigDecimal b =
+new BigDecimal("1.00");
+```
+
 9
-10 System.out.println(a.equals(b));
+
+```
+System.out.println(a.equals(b));
+```
+
 11
-12 System.out.println(
-13 a.compareTo(b) == 0
-14 );
-15 }
-16 }
+
+```
+System.out.println(
+a.compareTo(b) == 0
+);
+}
+}
+```
+
 17
 预期：
-1 false
-2 true
+
+```
+false
+true
+```
+
 3
 实验八：toString 敏感信息泄露
 
-1 public class ToStringDemo {
+```java
+public class ToStringDemo {
+```
+
 2
-3 static class User {
+
+```
+static class User {
+```
+
 4
-5 private String username;
-6 private String password;
-7 private String token;
+
+```java
+private String username;
+private String password;
+private String token;
+```
+
 8
-9 @Override
-10 public String toString() {
-11 return "User{"
-12 + "username='" + username + '\''
-13 + ", password='" + password + '\''
-14 + ", token='" + token + '\''
-15 + '}';
-16 }
-17 }
-18 }
+
+```
+@Override
+public String toString() {
+return "User{"
++ "username='" + username + '\''
++ ", password='" + password + '\''
++ ", token='" + token + '\''
++ '}';
+}
+}
+}
+```
+
 19
 分析该实现为什么不适合生产日志。
 改为：
-1 @Override
-2 public String toString() {
-3 return "User{"
-4 + "username='" + username + '\''
-5 + '}';
-6 }
+
+```
+@Override
+public String toString() {
+return "User{"
++ "username='" + username + '\''
++ '}';
+}
+```
+
 7
 实验九：浅克隆共享内部对象
-1 public class CloneDemo {
-2
-3 public static void main(String[] args) {
-4 Order source = new Order();
-5 source.items.add("A");
-6
-7 Order copy = source.clone();
-8 copy.items.add("B");
-9
-10 System.out.println(source.items);
-11 System.out.println(copy.items);
-12 }
-13
-14 static class Order implements Cloneable {
-15
-16 private List<String> items =
-17 new ArrayList<>();
-18
-19 @Override
-20 public Order clone() {
-21 try {
 
-22 return (Order) super.clone();
-23 } catch (
-24 CloneNotSupportedException exception
-25 ) {
-26 throw new AssertionError(exception);
-27 }
-28 }
-29 }
-30 }
+```java
+public class CloneDemo {
+```
+
+2
+
+```java
+public static void main(String[] args) {
+Order source = new Order();
+source.items.add("A");
+```
+
+6
+
+```
+Order copy = source.clone();
+copy.items.add("B");
+```
+
+9
+
+```
+System.out.println(source.items);
+System.out.println(copy.items);
+}
+```
+
+13
+
+```
+static class Order implements Cloneable {
+```
+
+15
+
+```java
+private List<String> items =
+new ArrayList<>();
+```
+
+18
+
+```
+@Override
+public Order clone() {
+try {
+return (Order) super.clone();
+} catch (
+CloneNotSupportedException exception
+) {
+throw new AssertionError(exception);
+}
+}
+}
+}
+```
+
 31
 预期两个对象都看到：
-1 [A, B]
+
+```
+[A, B]
+```
+
 2
 说明默认 clone 是浅拷贝。
 实验十：IdentityHashMap
-1 public class IdentityMapDemo {
+
+```java
+public class IdentityMapDemo {
+```
+
 2
-3 public static void main(String[] args) {
-4 String a = new String("Java");
-5 String b = new String("Java");
+
+```java
+public static void main(String[] args) {
+String a = new String("Java");
+String b = new String("Java");
+```
+
 6
-7 Map<String, Integer> normal =
-8 new HashMap<>();
+
+```
+Map<String, Integer> normal =
+new HashMap<>();
+```
+
 9
-10 normal.put(a, 1);
-11 normal.put(b, 2);
+
+```
+normal.put(a, 1);
+normal.put(b, 2);
+```
+
 12
-13 Map<String, Integer> identity =
-14 new IdentityHashMap<>();
+
+```
+Map<String, Integer> identity =
+new IdentityHashMap<>();
+```
+
 15
-16 identity.put(a, 1);
-17 identity.put(b, 2);
+
+```
+identity.put(a, 1);
+identity.put(b, 2);
+```
+
 18
-19 System.out.println(normal.size());
-20 System.out.println(identity.size());
-21 }
-22 }
+
+```
+System.out.println(normal.size());
+System.out.println(identity.size());
+}
+}
+```
+
 23
 预期：
-1 1
-2 2
+
+```
+1
+2
+```
+
 3
 
 ## 9.39 高频面试题
@@ -993,7 +1669,9 @@ equals/hashCode 同样可能递归。
 误区一：Object 是接口
 错误。
 Object 是 Java 类体系的根类。
-### 9.40.2 基本类型也是 Object 子类
+
+**9.40.2 基本类型也是 Object 子类**
+
 错误。
 基本类型不是对象。
 赋值给 Object 时会发生自动装箱。
@@ -1025,7 +1703,6 @@ equals 不相等的对象可以拥有相同 hashCode。
 误区十一：BigDecimal 数值相等时 equals 一定为 true
 错误。
 BigDecimal.equals 还会比较 scale。
-
 误区十二：final 类可以彻底解决 equals 设计
 不完整。
 final 可以避免继承破坏相等性，但仍需正确选择字段并维护 hashCode 契约。
@@ -1056,18 +1733,32 @@ getClass 返回对象的运行时类型。
 
 ## 9.41 工程实践建议
 
-### 9.41.1 值对象优先设计为不可变
+**9.41.1 值对象优先设计为不可变**
+
 推荐：
-1 public final class OrderId {
+
+```
+public final class OrderId {
+```
+
 2
-3 private final String value;
-4 }
+
+```java
+private final String value;
+}
+```
 
 5
 配合稳定的 equals/hashCode。
-### 9.41.2 实体相等性优先使用稳定业务 ID
+
+**9.41.2 实体相等性优先使用稳定业务 ID**
+
 推荐：
-1 private final OrderId orderId;
+
+```java
+private final OrderId orderId;
+```
+
 2
 避免使用：
 status
@@ -1076,31 +1767,47 @@ status
 数据库延迟生成 ID
 随机变化字段
 作为相等性基础。
-### 9.41.3 equals 和 hashCode 使用同一组字段
-1 @Override
-2 public boolean equals(Object other) {
-3 // userId、tenantId
-4 }
+
+**9.41.3 equals 和 hashCode 使用同一组字段**
+
+```
+@Override
+public boolean equals(Object other) {
+// userId、tenantId
+}
+```
+
 5
-6 @Override
-7 public int hashCode() {
-8 return Objects.hash(
-9 userId,
-10 tenantId
-11 );
-12 }
+
+```
+@Override
+public int hashCode() {
+return Objects.hash(
+userId,
+tenantId
+);
+}
+```
+
 13
 避免字段集合不一致。
-### 9.41.4 Map Key 应保持不可变
+
+**9.41.4 Map Key 应保持不可变**
+
 推荐：
-1 public record InventoryKey(
-2 String warehouseCode,
-3 String skuCode
-4 ) {
-5 }
+
+```
+public record InventoryKey(
+String warehouseCode,
+String skuCode
+) {
+}
+```
+
 6
 不推荐使用可以随时修改字段的普通 JavaBean 作为 Key。
-### 9.41.5 toString 只输出定位所需信息
+
+**9.41.5 toString 只输出定位所需信息**
 
 推荐输出：
 业务 ID
@@ -1114,20 +1821,32 @@ Token
 二进制内容
 完整对象图
 懒加载关联
-### 9.41.6 不要在 equals 中访问外部资源
+
+**9.41.6 不要在 equals 中访问外部资源**
+
 禁止：
-1 @Override
-2 public boolean equals(Object other) {
-3 return repository.exists(...);
-4 }
+
+```
+@Override
+public boolean equals(Object other) {
+return repository.exists(...);
+}
+```
+
 5
 equals 应：
-1 快速
-2 稳定
-3 纯内存
-4 无副作用
+
+```
+快速
+稳定
+纯内存
+无副作用
+```
+
 5
-### 9.41.7 不要机械使用 @Data
+
+**9.41.7 不要机械使用 @Data**
+
 对于实体、聚合根、双向关联对象，谨慎使用会自动生成：
 equals
 hashCode
@@ -1139,65 +1858,108 @@ Setter
 日志字段
 状态修改入口
 关联对象
-### 9.41.8 复制对象优先使用明确 API
-推荐：
-1 Order copy = Order.copyOf(source);
-2
 
+**9.41.8 复制对象优先使用明确 API**
+
+推荐：
+
+```
+Order copy = Order.copyOf(source);
+```
+
+2
 或者：
-1 Order copy = new Order(source);
+
+```
+Order copy = new Order(source);
+```
+
 2
 优于依赖 clone 的隐式复制语义。
 
 ## 9.42 本章知识链路
 
-1 Object 是所有普通类的根类
-2 ↓
-3 对象默认拥有基础协议
-4 ↓
-5 == 比较值或引用身份
-6 ↓
-7 Object.equals 默认仍是身份比较
-8 ↓
-9 业务对象重写 equals 定义逻辑相等
-10 ↓
-11 equals 必须满足五项契约
-12 ↓
-13 同时重写 hashCode
-14 ↓
-15 哈希容器先定位桶，再调用 equals
-16 ↓
-17 相等性依赖字段必须稳定
-18 ↓
-19 实体和值对象采用不同相等策略
+```
+Object 是所有普通类的根类
+↓
+对象默认拥有基础协议
+↓
+== 比较值或引用身份
+↓
+Object.equals 默认仍是身份比较
+↓
+业务对象重写 equals 定义逻辑相等
+↓
+equals 必须满足五项契约
+↓
+同时重写 hashCode
+↓
+哈希容器先定位桶，再调用 equals
+↓
+相等性依赖字段必须稳定
+↓
+实体和值对象采用不同相等策略
+```
+
 20
 == 与 equals：
-1 基本类型 ==
-2 → 数值比较
+
+```
+基本类型 ==
+→ 数值比较
+```
+
 3
-4 引用类型 ==
-5 → 对象身份比较
+
+```
+引用类型 ==
+→ 对象身份比较
+```
+
 6
-7 equals
-8 → 由类定义逻辑相等语义
+
+```
+equals
+→ 由类定义逻辑相等语义
+```
+
 9
 equals 与 hashCode：
-1 equals 相等
-2 → hashCode 必须相等
+
+```
+equals 相等
+→ hashCode 必须相等
+```
+
 3
-4 hashCode 相等
-5 → equals 不一定相等
+
+```
+hashCode 相等
+→ equals 不一定相等
+```
+
 6
 对象设计：
 
-1 实体对象
-2 → 使用稳定身份判断相等
+```
+实体对象
+→ 使用稳定身份判断相等
+```
+
 3
-4 值对象
-5 → 使用全部业务值判断相等
+
+```
+值对象
+→ 使用全部业务值判断相等
+```
+
 6
-7 HashMap Key
-8 → 相等性字段尽量不可变
+
+```
+HashMap Key
+→ 相等性字段尽量不可变
+```
+
 9
 面试口述版：
 Object 是 Java 普通类体系的根类，默认提供 equals、hashCode、toString、getClass、clone 以及线程协作相关方法。对于基本类型， == 比较数值；对于引用类

@@ -1,4 +1,4 @@
-# 第8章：final 与常量设计
+# final 与常量设计
 
 ## 8.15 final 的基本含义
 
@@ -9,86 +9,164 @@ final 可以修饰：
 类
 方法参数
 不同位置语义不同：
-1 final 变量
-2 → 只能赋值一次
+
+```
+final 变量
+→ 只能赋值一次
+```
+
 3
-4 final 方法
-5 → 不能被子类重写
+
+```
+final 方法
+→ 不能被子类重写
+```
+
 6
-7 final 类
-8 → 不能被继承
+
+```
+final 类
+→ 不能被继承
+```
+
 9
 
 ## 8.16 final 局部变量
 
-1 final int value = 10;
+```
+final int value = 10;
+```
+
 2
 初始化后不能再次赋值：
-1 value = 20;
+
+```
+value = 20;
+```
+
 2
 编译失败。
 
-### 8.16.1 final 表示只能赋值一次
+**8.16.1 final 表示只能赋值一次**
+
 final 不一定要求声明时立刻赋值：
-1 final int value;
+
+```
+final int value;
+```
+
 2
-3 if (condition) {
-4 value = 10;
-5 } else {
-6 value = 20;
-7 }
+
+```
+if (condition) {
+value = 10;
+} else {
+value = 20;
+}
+```
+
 8
 只要编译器能够确定：
-1 所有正常路径上都会完成赋值
-2 并且最多赋值一次
+
+```
+所有正常路径上都会完成赋值
+并且最多赋值一次
+```
+
 3
 就可以编译。
-### 8.16.2 final 局部变量必须确定赋值
+
+**8.16.2 final 局部变量必须确定赋值**
+
 错误：
-1 final int value;
+
+```
+final int value;
+```
+
 2
-3 if (condition) {
-4 value = 10;
-5 }
+
+```
+if (condition) {
+value = 10;
+}
+```
+
 6
-7 System.out.println(value);
+
+```
+System.out.println(value);
+```
+
 8
 因为当 condition == false 时， value 没有初始化。
-### 8.16.3 循环中的 final 变量
-1 for (int i = 0; i < 10; i++) {
-2 final int value = i;
-3 }
+
+**8.16.3 循环中的 final 变量**
+
+```
+for (int i = 0; i < 10; i++) {
+final int value = i;
+}
+```
+
 4
 每次循环都会创建一个新的 value 变量，因此合法。
 但：
-1 final int value;
+
+```
+final int value;
+```
+
 2
-3 for (int i = 0; i < 10; i++) {
-4 value = i;
-5 }
+
+```
+for (int i = 0; i < 10; i++) {
+value = i;
+}
+```
 
 6
 通常无法编译，因为同一个 final 变量可能被多次赋值。
 
 ## 8.17 final 引用变量
 
-1 final List<String> list =
-2 new ArrayList<>();
+```
+final List<String> list =
+new ArrayList<>();
+```
+
 3
 允许：
-1 list.add("Java");
-2 list.clear();
+
+```
+list.add("Java");
+list.clear();
+```
+
 3
 不允许：
-1 list = new ArrayList<>();
+
+```
+list = new ArrayList<>();
+```
+
 2
 原因：
-1 final 限制的是引用变量中的引用值不能改变
-2 不限制引用对象的内部状态
+
+```
+final 限制的是引用变量中的引用值不能改变
+不限制引用对象的内部状态
+```
+
 3
-### 8.17.1 final 引用不等于不可变对象
-1 final User user = new User();
-2 user.setName("Java");
+
+**8.17.1 final 引用不等于不可变对象**
+
+```
+final User user = new User();
+user.setName("Java");
+```
+
 3
 合法。
 因为 user 仍然指向同一个 User 对象，只是对象内部字段变化。
@@ -98,138 +176,261 @@ final 不一定要求声明时立刻赋值：
 防御性复制
 不暴露内部可变对象
 修改操作返回新对象
-### 8.17.2 final 集合仍然可以修改
-1 private final List<String> items =
-2 new ArrayList<>();
+
+**8.17.2 final 集合仍然可以修改**
+
+```java
+private final List<String> items =
+new ArrayList<>();
+```
 
 3
 表示：
-1 items 不能重新指向另一个列表
+
+```
+items 不能重新指向另一个列表
+```
+
 2
 不表示：
-1 列表内容不能变化
+
+```
+列表内容不能变化
+```
+
 2
 如果希望列表不可修改：
-1 private final List<String> items;
+
+```java
+private final List<String> items;
+```
+
 2
-3 public Order(List<String> items) {
-4 this.items = List.copyOf(items);
-5 }
+
+```
+public Order(List<String> items) {
+this.items = List.copyOf(items);
+}
+```
+
 6
 
 ## 8.18 final 字段
 
 实例字段可以声明为 final：
-1 public class User {
+
+```java
+public class User {
+```
+
 2
-3 private final String userId;
-4 }
+
+```java
+private final String userId;
+}
+```
+
 5
 final 实例字段必须在对象构造完成前被赋值。
 可以在：
 1.声明处初始化
 2.实例代码块中初始化
 3.每个构造方法中初始化
-### 8.18.1 声明处初始化
-1 private final String type = "DEFAULT";
-2
-每个对象的 type 初始化为 "DEFAULT" 。
-### 8.18.2 构造方法初始化
-1 public class User {
+
+**8.18.1 声明处初始化**
+
+```java
+private final String type = "DEFAULT";
+```
 
 2
-3 private final String userId;
+每个对象的 type 初始化为 "DEFAULT" 。
+
+**8.18.2 构造方法初始化**
+
+```java
+public class User {
+```
+
+2
+
+```java
+private final String userId;
+```
+
 4
-5 public User(String userId) {
-6 this.userId = userId;
-7 }
-8 }
+
+```
+public User(String userId) {
+this.userId = userId;
+}
+}
+```
+
 9
 每个构造方法必须保证 userId 被赋值。
 错误：
-1 public User() {
-2 }
+
+```
+public User() {
+}
+```
+
 3
 如果没有其他初始化方式，会编译失败。
-### 8.18.3 实例代码块初始化
-1 public class User {
+
+**8.18.3 实例代码块初始化**
+
+```java
+public class User {
+```
+
 2
-3 private final String id;
+
+```java
+private final String id;
+```
+
 4
-5 {
-6 id = UUID.randomUUID().toString();
-7 }
-8 }
+
+```
+{
+id = UUID.randomUUID().toString();
+}
+}
+```
+
 9
 所有构造方法执行前，实例代码块会初始化 id 。
 但业务代码通常优先使用声明处或构造方法，意图更清晰。
-### 8.18.4 final 字段不能重复赋值
-1 public User(String userId) {
-2 this.userId = userId;
-3 this.userId = "other";
-4 }
+
+**8.18.4 final 字段不能重复赋值**
+
+```
+public User(String userId) {
+this.userId = userId;
+this.userId = "other";
+}
+```
+
 5
 编译失败。
 
 ## 8.19 static final 字段
 
 static final 表示类级变量只能赋值一次：
-1 public static final int TIMEOUT = 30;
+
+```java
+public static final int TIMEOUT = 30;
+```
+
 2
 通常用于定义常量。
-
 推荐命名：
-1 全大写
-2 单词之间使用下划线
+
+```
+全大写
+单词之间使用下划线
+```
+
 3
 例如：
-1 public static final int DEFAULT_TIMEOUT = 30;
-2 public static final String SYSTEM_USER = "SYSTEM";
+
+```java
+public static final int DEFAULT_TIMEOUT = 30;
+public static final String SYSTEM_USER = "SYSTEM";
+```
+
 3
-### 8.19.1 static final 不一定是编译期常量
+
+**8.19.1 static final 不一定是编译期常量**
+
 编译期常量：
-1 public static final int TIMEOUT = 30;
+
+```java
+public static final int TIMEOUT = 30;
+```
+
 2
 运行时常量：
-1 public static final int TIMEOUT =
-2 Integer.parseInt("30");
+
+```java
+public static final int TIMEOUT =
+Integer.parseInt("30");
+```
+
 3
 二者都是 static final ，但只有前者属于典型编译期常量。
-### 8.19.2 编译期常量的条件
+
+**8.19.2 编译期常量的条件**
+
 通常需要满足：
 基本类型或 String
 使用 final
 在声明处初始化
 初始化表达式是常量表达式
 例如：
-1 public static final int A = 10;
-2 public static final int B = A + 20;
-3 public static final String NAME = "Java";
+
+```java
+public static final int A = 10;
+public static final int B = A + 20;
+public static final String NAME = "Java";
+```
+
 4
 属于编译期常量。
 但：
-1 public static final Integer VALUE = 10;
+
+```java
+public static final Integer VALUE = 10;
+```
+
 2
 类型是包装类，不属于 Java 语言规范意义上的基本类型或 String 编译期常量。
 
-### 8.19.3 编译期常量内联风险
+**8.19.3 编译期常量内联风险**
+
 依赖模块 A：
-1 public class Constants {
+
+```java
+public class Constants {
+```
+
 2
-3 public static final int TIMEOUT = 30;
-4 }
+
+```java
+public static final int TIMEOUT = 30;
+}
+```
+
 5
 模块 B 编译时使用：
-1 int timeout = Constants.TIMEOUT;
+
+```
+int timeout = Constants.TIMEOUT;
+```
+
 2
 编译器可能把它直接编译成：
-1 int timeout = 30;
+
+```
+int timeout = 30;
+```
+
 2
 后来只更新模块 A：
-1 TIMEOUT = 60;
+
+```
+TIMEOUT = 60;
+```
+
 2
 但没有重新编译模块 B，模块 B 可能仍然使用旧值：
-1 30
+
+```
+30
+```
+
 2
 因此：
 跨模块可能变化的配置，不应设计为会被编译器内联的 public 编译期常量。
@@ -243,14 +444,25 @@ static final 表示类级变量只能赋值一次：
 ## 8.20 空白 final
 
 没有在声明时初始化的 final 字段称为空白 final。
-1 public class User {
+
+```java
+public class User {
+```
+
 2
-3 private final String userId;
+
+```java
+private final String userId;
+```
+
 4
-5 public User(String userId) {
-6 this.userId = userId;
-7 }
-8 }
+
+```
+public User(String userId) {
+this.userId = userId;
+}
+}
+```
 
 9
 空白 final 的价值：
@@ -258,16 +470,29 @@ static final 表示类级变量只能赋值一次：
 初始化后不能再改变
 支持不可变对象设计
 强制构造过程完整
-### 8.20.1 静态空白 final
-1 public class Config {
+
+**8.20.1 静态空白 final**
+
+```java
+public class Config {
+```
+
 2
-3 private static final String ENVIRONMENT;
+
+```java
+private static final String ENVIRONMENT;
+```
+
 4
-5 static {
-6 ENVIRONMENT =
-7 System.getProperty("environment");
-8 }
-9 }
+
+```
+static {
+ENVIRONMENT =
+System.getProperty("environment");
+}
+}
+```
+
 10
 静态空白 final 必须在：
 声明处
@@ -277,27 +502,43 @@ static final 表示类级变量只能赋值一次：
 
 ## 8.21 final 方法参数
 
-1 public void execute(final User user) {
-2 }
+```
+public void execute(final User user) {
+}
+```
+
 3
 方法内部不能重新给参数赋值：
-1 user = new User();
+
+```
+user = new User();
+```
+
 2
 编译失败。
 但可以修改对象：
-1 user.setName("Java");
+
+```
+user.setName("Java");
+```
+
 2
 因此：
 final 参数只限制形参变量，不能保证传入对象不可变。
-### 8.21.1 final 参数的工程价值
-可能用于：
 
+**8.21.1 final 参数的工程价值**
+
+可能用于：
 明确参数不会重新赋值
 避免误操作
 早期匿名内部类捕获
 团队编码规范
 现代 Java 中，局部变量和参数被 Lambda 捕获时只要求：
-1 final 或 effectively final
+
+```
+final 或 effectively final
+```
+
 2
 不一定必须显式写 final 。
 
@@ -306,18 +547,34 @@ final 参数只限制形参变量，不能保证传入对象不可变。
 有效 final 表示：
 变量虽然没有显式使用 final，但初始化后从未重新赋值。
 例如：
-1 String name = "Java";
+
+```
+String name = "Java";
+```
+
 2
-3 Runnable task = () ->
-4 System.out.println(name);
+
+```
+Runnable task = () ->
+System.out.println(name);
+```
+
 5
 name 没有重新赋值，因此是 effectively final。
 如果之后重新赋值：
-1 String name = "Java";
-2 name = "JVM";
+
+```
+String name = "Java";
+name = "JVM";
+```
+
 3
-4 Runnable task = () ->
-5 System.out.println(name);
+
+```
+Runnable task = () ->
+System.out.println(name);
+```
+
 6
 编译失败。
 Lambda 的完整捕获规则放在现代 Java 章节。
@@ -326,23 +583,39 @@ effectively final 是行为上的不再赋值，而不是使用了 final 关键�
 
 ## 8.23 final 方法
 
-1 public class Account {
-2
-3 public final void validate() {
-4 }
-5 }
-6
-子类不能重写：
-1 public class SavingsAccount extends Account {
+```java
+public class Account {
+```
+
 2
 
-3 @Override
-4 public void validate() {
-5 }
-6 }
+```
+public final void validate() {
+}
+}
+```
+
+6
+子类不能重写：
+
+```java
+public class SavingsAccount extends Account {
+```
+
+2
+
+```
+@Override
+public void validate() {
+}
+}
+```
+
 7
 编译失败。
-### 8.23.1 final 方法的适用场景
+
+**8.23.1 final 方法的适用场景**
+
 适合：
 固定核心安全校验
 固定状态维护逻辑
@@ -350,57 +623,103 @@ effectively final 是行为上的不再赋值，而不是使用了 final 关键�
 防止子类破坏父类不变量
 明确行为不允许扩展
 例如：
-1 public abstract class ImportTemplate {
+
+```
+public abstract class ImportTemplate {
+```
+
 2
-3 public final void execute() {
-4 validate();
-5 read();
-6 process();
-7 finish();
-8 }
+
+```
+public final void execute() {
+validate();
+read();
+process();
+finish();
+}
+```
+
 9
-10 protected abstract void read();
+
+```
+protected abstract void read();
+```
+
 11
-12 protected abstract void process();
+
+```
+protected abstract void process();
+```
+
 13
-14 private void validate() {
-15 }
+
+```java
+private void validate() {
+}
+```
+
 16
-17 private void finish() {
-18 }
-19 }
+
+```java
+private void finish() {
+}
+}
+```
+
 20
-### 8.23.2 private 方法不需要 final
+
+**8.23.2 private 方法不需要 final**
+
 private 方法对子类不可见，本身不能被重写。
 因此：
-1 private final void validate() {
-2 }
+
+```java
+private final void validate() {
+}
+```
+
 3
 虽然可能语法允许，但 final 没有额外价值。
 直接写：
-1 private void validate() {
-2 }
+
+```java
+private void validate() {
+}
+```
 
 3
 即可。
-### 8.23.3 static final 方法
+
+**8.23.3 static final 方法**
+
 静态方法不参与重写，只能被隐藏。
 因此静态方法通常不需要使用 final 防止重写。
 
 ## 8.24 final 类
 
-1 public final class String {
-2 }
+```
+public final class String {
+}
+```
+
 3
 final 类不能被继承：
-1 public class CustomString extends String {
-2 }
+
+```java
+public class CustomString extends String {
+}
+```
+
 3
 编译失败。
-### 8.24.1 final 类中的方法
+
+**8.24.1 final 类中的方法**
+
 final 类不能有子类，因此其中的实例方法不会被外部子类重写。
 不需要为每个方法再机械添加 final。
-### 8.24.2 final 类的适用场景
+
+**8.24.2 final 类的适用场景**
+
 适合：
 不可变值对象
 安全敏感类型
@@ -409,19 +728,35 @@ final 类不能有子类，因此其中的实例方法不会被外部子类重�
 类语义完整，不适合作为父类
 防止继承破坏对象不变量
 例如：
-1 public final class Money {
-2 }
+
+```
+public final class Money {
+}
+```
+
 3
-### 8.24.3 final 类不等于不可变类
-1 public final class User {
+
+**8.24.3 final 类不等于不可变类**
+
+```
+public final class User {
+```
+
 2
-3 private String name;
+
+```java
+private String name;
+```
+
 4
 
-5 public void setName(String name) {
-6 this.name = name;
-7 }
-8 }
+```
+public void setName(String name) {
+this.name = name;
+}
+}
+```
+
 9
 该类不能被继承，但对象仍然可变。
 不可变需要同时控制：
@@ -434,72 +769,128 @@ final 类不能有子类，因此其中的实例方法不会被外部子类重�
 ## 8.25 final 与不可变对象
 
 一个典型不可变对象：
-1 public final class Money {
+
+```
+public final class Money {
+```
+
 2
-3 private final BigDecimal amount;
-4 private final Currency currency;
+
+```java
+private final BigDecimal amount;
+private final Currency currency;
+```
+
 5
-6 public Money(
-7 BigDecimal amount,
-8 Currency currency
-9 ) {
-10 this.amount =
-11 Objects.requireNonNull(amount);
-12 this.currency =
-13 Objects.requireNonNull(currency);
-14 }
+
+```
+public Money(
+BigDecimal amount,
+Currency currency
+) {
+this.amount =
+Objects.requireNonNull(amount);
+this.currency =
+Objects.requireNonNull(currency);
+}
+```
+
 15
-16 public BigDecimal amount() {
-17 return amount;
-18 }
+
+```
+public BigDecimal amount() {
+return amount;
+}
+```
+
 19
-20 public Currency currency() {
-21 return currency;
-22 }
+
+```
+public Currency currency() {
+return currency;
+}
+```
+
 23
-24 public Money add(Money other) {
-25 if (!currency.equals(other.currency)) {
-26 throw new IllegalArgumentException(
-27 "币种不一致"
-28 );
-29 }
+
+```
+public Money add(Money other) {
+if (!currency.equals(other.currency)) {
+throw new IllegalArgumentException(
+"币种不一致"
+);
+}
+```
+
 30
-31 return new Money(
-32 amount.add(other.amount),
-33 currency
-34 );
-35 }
-36 }
+
+```
+return new Money(
+amount.add(other.amount),
+currency
+);
+}
+}
+```
+
 37
 关键点：
-
 类使用 final
 字段使用 private final
 构造时完成初始化
 不提供 Setter
 修改操作返回新对象
 引用字段本身应不可变或进行防御性复制
-### 8.25.1 private final 仍然不够
-1 public final class Order {
+
+**8.25.1 private final 仍然不够**
+
+```
+public final class Order {
+```
+
 2
-3 private final List<String> items;
+
+```java
+private final List<String> items;
+```
+
 4
-5 public Order(List<String> items) {
-6 this.items = items;
-7 }
-8 }
+
+```
+public Order(List<String> items) {
+this.items = items;
+}
+}
+```
+
 9
 外部仍然可以：
-1 List<String> source =
-2 new ArrayList<>();
+
+```
+List<String> source =
+new ArrayList<>();
+```
+
 3
-4 Order order = new Order(source);
+
+```
+Order order = new Order(source);
+```
+
 5
-6 source.clear();
+
+```
+source.clear();
+```
+
 7
 导致对象内部变化。
 应使用：
-1 this.items = List.copyOf(items);
+
+```
+this.items = List.copyOf(items);
+```
+
 2
 并避免直接返回内部可变集合。
 
@@ -508,21 +899,36 @@ final 类不能有子类，因此其中的实例方法不会被外部子类重�
 实例字段通常随对象生命周期存在。
 静态字段通常随类及其类加载器生命周期存在。
 可以简化为：
-1 实例字段
-2 → 对象可达时存在
-3 → 对象不可达后可能被回收
-4
-5 静态字段
-6 → 类初始化后存在
-7 → 通常持续到类加载器被卸载
-8
 
+```
+实例字段
+→ 对象可达时存在
+→ 对象不可达后可能被回收
+```
+
+4
+
+```
+静态字段
+→ 类初始化后存在
+→ 通常持续到类加载器被卸载
+```
+
+8
 因此静态字段可能长期持有对象引用：
-1 private static final List<Object> CACHE =
-2 new ArrayList<>();
+
+```java
+private static final List<Object> CACHE =
+new ArrayList<>();
+```
+
 3
 如果持续添加：
-1 CACHE.add(object);
+
+```
+CACHE.add(object);
+```
+
 2
 这些对象会一直被静态引用持有，可能无法被垃圾回收。
 这会产生：
@@ -530,9 +936,14 @@ final 类不能有子类，因此其中的实例方法不会被外部子类重�
 类加载器泄漏
 缓存无限增长
 测试污染
-### 8.26.1 静态集合必须考虑生命周期
-1 private static final Map<String, Object> CACHE =
-2 new ConcurrentHashMap<>();
+
+**8.26.1 静态集合必须考虑生命周期**
+
+```java
+private static final Map<String, Object> CACHE =
+new ConcurrentHashMap<>();
+```
+
 3
 至少需要考虑：
 最大容量
@@ -546,28 +957,51 @@ final 类不能有子类，因此其中的实例方法不会被外部子类重�
 ## 8.27 static 与线程安全
 
 static 只表示类级共享，不表示线程安全。
-1 public class Counter {
+
+```java
+public class Counter {
+```
+
 2
-3 private static int count;
+
+```java
+private static int count;
+```
+
 4
-5 public static void increment() {
-6 count++;
-7 }
-8 }
+
+```java
+public static void increment() {
+count++;
+}
+}
+```
+
 9
 多个线程同时执行：
-1 Counter.increment();
+
+```
+Counter.increment();
+```
 
 2
 可能发生丢失更新。
 因为：
-1 count++;
+
+```
+count++;
+```
+
 2
 不是原子操作。
 可以拆成：
-1 读取 count
-2 加 1
-3 写回 count
+
+```
+读取 count
+加 1
+写回 count
+```
+
 4
 多个线程可能互相覆盖。
 解决方式可能包括：
@@ -583,10 +1017,18 @@ static 增加了共享范围，但不提供任何并发安全保证。
 ## 8.28 static 与多态
 
 实例方法适合表达可替换行为：
-1 PaymentProcessor processor =
-2 new AlipayProcessor();
+
+```
+PaymentProcessor processor =
+new AlipayProcessor();
+```
+
 3
-4 processor.pay();
+
+```
+processor.pay();
+```
+
 5
 静态方法不具备这种动态替换能力。
 如果业务需要：
@@ -597,42 +1039,69 @@ static 增加了共享范围，但不提供任何并发安全保证。
 依赖注入
 不应将核心能力设计成静态方法。
 不推荐：
-1 PaymentUtils.pay(order);
+
+```
+PaymentUtils.pay(order);
+```
+
 2
 更适合：
 
-1 paymentProcessor.pay(order);
+```
+paymentProcessor.pay(order);
+```
+
 2
 前者是固定类调用，后者可以通过接口实现多态。
 
 ## 8.29 静态工厂方法
 
 静态方法也可以承担对象创建职责：
-1 public class Order {
+
+```java
+public class Order {
+```
+
 2
-3 private final String orderNo;
-4 private OrderStatus status;
+
+```java
+private final String orderNo;
+private OrderStatus status;
+```
+
 5
-6 private Order(
-7 String orderNo,
-8 OrderStatus status
-9 ) {
-10 this.orderNo = orderNo;
-11 this.status = status;
-12 }
+
+```java
+private Order(
+String orderNo,
+OrderStatus status
+) {
+this.orderNo = orderNo;
+this.status = status;
+}
+```
+
 13
-14 public static Order create(
-15 String orderNo
-16 ) {
-17 return new Order(
-18 orderNo,
-19 OrderStatus.CREATED
-20 );
-21 }
-22 }
+
+```java
+public static Order create(
+String orderNo
+) {
+return new Order(
+orderNo,
+OrderStatus.CREATED
+);
+}
+}
+```
+
 23
 调用：
-1 Order order = Order.create(orderNo);
+
+```
+Order order = Order.create(orderNo);
+```
+
 2
 静态工厂方法可以：
 使用有意义的名称
@@ -646,12 +1115,19 @@ static 增加了共享范围，但不提供任何并发安全保证。
 ## 8.30 静态内部类概览
 
 类中可以声明静态嵌套类：
-1 public class Outer {
+
+```java
+public class Outer {
+```
+
 2
 
-3 public static class Nested {
-4 }
-5 }
+```java
+public static class Nested {
+}
+}
+```
+
 6
 静态嵌套类：
 不持有外部类实例引用
@@ -659,26 +1135,51 @@ static 增加了共享范围，但不提供任何并发安全保证。
 只能直接访问外部类静态成员
 常用于 Builder、结果对象、辅助结构
 创建：
-1 Outer.Nested nested =
-2 new Outer.Nested();
+
+```
+Outer.Nested nested =
+new Outer.Nested();
+```
+
 3
 内部类完整规则放在高级语言特性笔记。
-### 8.30.1 静态内部类单例思想
-1 public class Singleton {
+
+**8.30.1 静态内部类单例思想**
+
+```java
+public class Singleton {
+```
+
 2
-3 private Singleton() {
-4 }
+
+```java
+private Singleton() {
+}
+```
+
 5
-6 private static class Holder {
+
+```java
+private static class Holder {
+```
+
 7
-8 private static final Singleton INSTANCE =
-9 new Singleton();
-10 }
+
+```java
+private static final Singleton INSTANCE =
+new Singleton();
+}
+```
+
 11
-12 public static Singleton getInstance() {
-13 return Holder.INSTANCE;
-14 }
-15 }
+
+```java
+public static Singleton getInstance() {
+return Holder.INSTANCE;
+}
+}
+```
+
 16
 其思路是：
 外部类初始化时不一定初始化 Holder
@@ -691,13 +1192,20 @@ INSTANCE 只初始化一次
 
 JVM 会保证同一个类的初始化过程由一个线程执行。
 当多个线程同时首次使用某个类时：
-1 一个线程执行类初始化逻辑
-2 其他线程等待初始化完成
-3
 
+```
+一个线程执行类初始化逻辑
+其他线程等待初始化完成
+```
+
+3
 因此静态初始化常用于安全发布不可变对象：
-1 private static final Config INSTANCE =
-2 new Config();
+
+```java
+private static final Config INSTANCE =
+new Config();
+```
+
 3
 但需要注意：
 初始化过程本身不应阻塞过久
@@ -713,112 +1221,199 @@ JVM 会保证同一个类的初始化过程由一个线程执行。
 ## 8.32 类初始化循环依赖
 
 示例：
-1 public class A {
+
+```java
+public class A {
+```
+
 2
-3 static int value = B.value + 1;
-4 }
+
+```
+static int value = B.value + 1;
+}
+```
+
 5
-1 public class B {
+
+```java
+public class B {
+```
+
 2
-3 static int value = A.value + 1;
-4 }
+
+```
+static int value = A.value + 1;
+}
+```
+
 5
 访问：
-1 System.out.println(A.value);
+
+```
+System.out.println(A.value);
+```
+
 2
 可能得到不符合直觉的结果。
 简化过程：
-1 开始初始化 A
-2 ↓
-3 A.value 先为 0
-4 ↓
-5 读取 B.value
-6 ↓
-7 开始初始化 B
-8 ↓
-9 B.value 先为 0
-10 ↓
 
-11 读取正在初始化中的 A.value
-12 ↓
-13 得到默认值 0
-14 ↓
-15 B.value = 1
-16 ↓
-17 A.value = 2
+```
+开始初始化 A
+↓
+A.value 先为 0
+↓
+读取 B.value
+↓
+开始初始化 B
+↓
+B.value 先为 0
+↓
+读取正在初始化中的 A.value
+↓
+得到默认值 0
+↓
+B.value = 1
+↓
+A.value = 2
+```
+
 18
 因此可能出现：
-1 A.value = 2
-2 B.value = 1
+
+```
+A.value = 2
+B.value = 1
+```
+
 3
 核心原则：
 避免静态初始化之间形成复杂双向依赖。
 
 ## 8.33 常量设计
 
-### 8.33.1 常量应表达稳定语义
+**8.33.1 常量应表达稳定语义**
+
 适合：
-1 public static final int MAX_RETRY_COUNT = 3;
-2 public static final String SYSTEM_OPERATOR =
-3 "SYSTEM";
+
+```java
+public static final int MAX_RETRY_COUNT = 3;
+public static final String SYSTEM_OPERATOR =
+"SYSTEM";
+```
+
 4
 不适合：
-1 public static final int CURRENT_TIMEOUT = 30;
+
+```java
+public static final int CURRENT_TIMEOUT = 30;
+```
+
 2
 如果该值可能需要通过配置动态修改，就不应硬编码为编译期常量。
-### 8.33.2 避免魔法值
+
+**8.33.2 避免魔法值**
+
 不推荐：
-1 if (status == 30) {
-2 }
+
+```
+if (status == 30) {
+}
+```
+
 3
 可以定义：
-1 private static final int COMPLETED_STATUS = 30;
+
+```java
+private static final int COMPLETED_STATUS = 30;
+```
+
 2
 但如果值集合具有明确类型和行为，更推荐枚举：
 
-1 public enum OrderStatus {
+```
+public enum OrderStatus {
+```
+
 2
-3 CREATED(10),
-4 PROCESSING(20),
-5 COMPLETED(30);
+
+```
+CREATED(10),
+PROCESSING(20),
+COMPLETED(30);
+```
+
 6
-7 private final int code;
-8 }
+
+```java
+private final int code;
+}
+```
+
 9
-### 8.33.3 常量的可见性
+
+**8.33.3 常量的可见性**
+
 不是所有常量都应为 public：
-1 private static final int BATCH_SIZE = 100;
+
+```java
+private static final int BATCH_SIZE = 100;
+```
+
 2
 如果只在当前类内部使用，应保持 private。
 只有构成公共协议的一部分时，才考虑 public。
-### 8.33.4 避免可变 public static final
-1 public static final List<String> VALUES =
-2 new ArrayList<>();
+
+**8.33.4 避免可变 public static final**
+
+```java
+public static final List<String> VALUES =
+new ArrayList<>();
+```
+
 3
 虽然引用不能重新赋值，但外部可以：
-1 VALUES.clear();
-2 VALUES.add("invalid");
+
+```
+VALUES.clear();
+VALUES.add("invalid");
+```
+
 3
 这不是安全常量。
 应使用：
-1 public static final List<String> VALUES =
-2 List.of("A", "B");
+
+```java
+public static final List<String> VALUES =
+List.of("A", "B");
+```
+
 3
 或者使用私有字段加只读访问。
 
 ## 8.34 单例与静态工具类的区别
 
 静态工具类：
-1 public final class Calculator {
+
+```
+public final class Calculator {
+```
+
 2
-3 private Calculator() {
-4 }
+
+```java
+private Calculator() {
+}
+```
 
 5
-6 public static int add(int a, int b) {
-7 return a + b;
-8 }
-9 }
+
+```java
+public static int add(int a, int b) {
+return a + b;
+}
+}
+```
+
 10
 特点：
 没有对象身份
@@ -826,18 +1421,34 @@ JVM 会保证同一个类的初始化过程由一个线程执行。
 无多态
 直接通过类调用
 单例对象：
-1 public final class ConfigService {
+
+```
+public final class ConfigService {
+```
+
 2
-3 private static final ConfigService INSTANCE =
-4 new ConfigService();
+
+```java
+private static final ConfigService INSTANCE =
+new ConfigService();
+```
+
 5
-6 private ConfigService() {
-7 }
+
+```java
+private ConfigService() {
+}
+```
+
 8
-9 public static ConfigService getInstance() {
-10 return INSTANCE;
-11 }
-12 }
+
+```java
+public static ConfigService getInstance() {
+return INSTANCE;
+}
+}
+```
+
 13
 特点：
 仍然是对象
@@ -851,304 +1462,578 @@ JVM 会保证同一个类的初始化过程由一个线程执行。
 ## 8.35 建议实验
 
 实验一：静态字段共享
-1 public class StaticFieldDemo {
+
+```java
+public class StaticFieldDemo {
+```
+
 2
-3 public static void main(String[] args) {
-4 User user1 = new User();
-5 User user2 = new User();
+
+```java
+public static void main(String[] args) {
+User user1 = new User();
+User user2 = new User();
+```
+
 6
-7 user1.increment();
-8 user2.increment();
+
+```
+user1.increment();
+user2.increment();
+```
+
 9
-10 System.out.println(User.getCount());
-11 }
+
+```
+System.out.println(User.getCount());
+}
+```
+
 12
-13 static class User {
+
+```
+static class User {
+```
+
 14
 
-15 private static int count;
+```java
+private static int count;
+```
+
 16
-17 void increment() {
-18 count++;
-19 }
+
+```
+void increment() {
+count++;
+}
+```
+
 20
-21 static int getCount() {
-22 return count;
-23 }
-24 }
-25 }
+
+```
+static int getCount() {
+return count;
+}
+}
+}
+```
+
 26
 预期：
-1 2
+
+```
+2
+```
+
 2
 实验二：静态方法不能访问实例成员
-1 public class StaticMethodDemo {
+
+```java
+public class StaticMethodDemo {
+```
+
 2
-3 private String name = "Java";
+
+```java
+private String name = "Java";
+```
+
 4
-5 public static void print() {
-6 // System.out.println(name);
-7 // 编译错误
-8 }
-9 }
+
+```java
+public static void print() {
+// System.out.println(name);
+// 编译错误
+}
+}
+```
+
 10
 修改为：
-1 public static void print(
-2 StaticMethodDemo demo
-3 ) {
-4 System.out.println(demo.name);
-5 }
+
+```java
+public static void print(
+StaticMethodDemo demo
+) {
+System.out.println(demo.name);
+}
+```
+
 6
 验证可以通过对象引用访问实例字段。
 实验三：静态初始化顺序
-1 public class StaticInitializationDemo {
-2
-3 private static int first =
-4 print("first", 1);
-5
-6 static {
-7 System.out.println("block 1");
 
-8 }
+```java
+public class StaticInitializationDemo {
+```
+
+2
+
+```java
+private static int first =
+print("first", 1);
+```
+
+5
+
+```
+static {
+System.out.println("block 1");
+}
+```
+
 9
-10 private static int second =
-11 print("second", 2);
+
+```java
+private static int second =
+print("second", 2);
+```
+
 12
-13 static {
-14 System.out.println("block 2");
-15 }
+
+```
+static {
+System.out.println("block 2");
+}
+```
+
 16
-17 private static int print(
-18 String name,
-19 int value
-20 ) {
-21 System.out.println(name);
-22 return value;
-23 }
+
+```java
+private static int print(
+String name,
+int value
+) {
+System.out.println(name);
+return value;
+}
+```
+
 24
-25 public static void main(String[] args) {
-26 System.out.println("main");
-27 }
-28 }
+
+```java
+public static void main(String[] args) {
+System.out.println("main");
+}
+}
+```
+
 29
 预期：
-1 first
-2 block 1
-3 second
-4 block 2
-5 main
+
+```
+first
+block 1
+second
+block 2
+main
+```
+
 6
 实验四：父子类初始化顺序
-1 public class ParentChildInitializationDemo {
+
+```java
+public class ParentChildInitializationDemo {
+```
+
 2
-3 public static void main(String[] args) {
-4 new Child();
-5 }
+
+```java
+public static void main(String[] args) {
+new Child();
+}
+```
+
 6
-7 static class Parent {
+
+```
+static class Parent {
+```
+
 8
-9 static {
-10 System.out.println("父类静态");
-11 }
+
+```
+static {
+System.out.println("父类静态");
+}
+```
+
 12
-13 {
-14 System.out.println("父类实例");
-15 }
+
+```
+{
+System.out.println("父类实例");
+}
+```
+
 16
-17 Parent() {
-18 System.out.println("父类构造");
-19 }
-20 }
+
+```
+Parent() {
+System.out.println("父类构造");
+}
+}
+```
+
 21
 
-22 static class Child extends Parent {
+```
+static class Child extends Parent {
+```
+
 23
-24 static {
-25 System.out.println("子类静态");
-26 }
+
+```
+static {
+System.out.println("子类静态");
+}
+```
+
 27
-28 {
-29 System.out.println("子类实例");
-30 }
+
+```
+{
+System.out.println("子类实例");
+}
+```
+
 31
-32 Child() {
-33 System.out.println("子类构造");
-34 }
-35 }
-36 }
+
+```
+Child() {
+System.out.println("子类构造");
+}
+}
+}
+```
+
 37
 预期：
-1 父类静态
-2 子类静态
-3 父类实例
-4 父类构造
-5 子类实例
-6 子类构造
+
+```
+父类静态
+子类静态
+父类实例
+父类构造
+子类实例
+子类构造
+```
+
 7
 实验五：编译期常量不触发初始化
-1 public class ConstantInitializationDemo {
+
+```java
+public class ConstantInitializationDemo {
+```
+
 2
-3 static class Constants {
+
+```
+static class Constants {
+```
+
 4
-5 static {
-6 System.out.println(
-7 "Constants initialized"
-8 );
-9 }
+
+```
+static {
+System.out.println(
+"Constants initialized"
+);
+}
+```
+
 10
-11 static final int VALUE = 10;
-12 }
+
+```
+static final int VALUE = 10;
+}
+```
+
 13
-14 public static void main(String[] args) {
-15 System.out.println(Constants.VALUE);
-16 }
-17 }
+
+```java
+public static void main(String[] args) {
+System.out.println(Constants.VALUE);
+}
+}
+```
+
 18
 观察是否输出静态初始化信息。
 然后改为：
-1 static final int VALUE =
-2 Integer.parseInt("10");
+
+```
+static final int VALUE =
+Integer.parseInt("10");
+```
 
 3
 再次观察差异。
 实验六：通过子类访问父类静态字段
-1 public class ParentStaticFieldDemo {
+
+```java
+public class ParentStaticFieldDemo {
+```
+
 2
-3 static class Parent {
+
+```
+static class Parent {
+```
+
 4
-5 static {
-6 System.out.println("Parent");
-7 }
+
+```
+static {
+System.out.println("Parent");
+}
+```
+
 8
-9 static int value = 10;
-10 }
+
+```
+static int value = 10;
+}
+```
+
 11
-12 static class Child extends Parent {
+
+```
+static class Child extends Parent {
+```
+
 13
-14 static {
-15 System.out.println("Child");
-16 }
-17 }
+
+```
+static {
+System.out.println("Child");
+}
+}
+```
+
 18
-19 public static void main(String[] args) {
-20 System.out.println(Child.value);
-21 }
-22 }
+
+```java
+public static void main(String[] args) {
+System.out.println(Child.value);
+}
+}
+```
+
 23
 预期：
-1 Parent
-2 10
+
+```
+Parent
+10
+```
+
 3
 通常不会输出 Child。
 实验七：final 引用对象仍然可变
-1 public class FinalReferenceDemo {
-2
-3 public static void main(String[] args) {
-4 final List<String> values =
-5 new ArrayList<>();
-6
-7 values.add("A");
-8 values.add("B");
-9
-10 System.out.println(values);
-11
-12 // values = new ArrayList<>();
-13 // 编译错误
 
-14 }
-15 }
+```java
+public class FinalReferenceDemo {
+```
+
+2
+
+```java
+public static void main(String[] args) {
+final List<String> values =
+new ArrayList<>();
+```
+
+6
+
+```
+values.add("A");
+values.add("B");
+```
+
+9
+
+```
+System.out.println(values);
+```
+
+11
+
+```
+// values = new ArrayList<>();
+// 编译错误
+}
+}
+```
+
 16
 预期：
-1 [A, B]
+
+```
+[A, B]
+```
+
 2
 实验八：static final 不一定是编译期常量
-1 public class RuntimeConstantDemo {
+
+```java
+public class RuntimeConstantDemo {
+```
+
 2
-3 static class Config {
+
+```
+static class Config {
+```
+
 4
-5 static {
-6 System.out.println(
-7 "Config initialized"
-8 );
-9 }
+
+```
+static {
+System.out.println(
+"Config initialized"
+);
+}
+```
+
 10
-11 static final int COMPILE_TIME = 10;
+
+```
+static final int COMPILE_TIME = 10;
+```
+
 12
-13 static final int RUNTIME =
-14 Integer.parseInt("20");
-15 }
+
+```
+static final int RUNTIME =
+Integer.parseInt("20");
+}
+```
+
 16
-17 public static void main(String[] args) {
-18 System.out.println(
-19 Config.COMPILE_TIME
-20 );
+
+```java
+public static void main(String[] args) {
+System.out.println(
+Config.COMPILE_TIME
+);
+```
+
 21
-22 System.out.println(
-23 Config.RUNTIME
-24 );
-25 }
-26 }
+
+```
+System.out.println(
+Config.RUNTIME
+);
+}
+}
+```
+
 27
 观察：
 访问 COMPILE_TIME 时可能不初始化 Config
 访问 RUNTIME 时会初始化 Config
 实验九：静态初始化循环依赖
-1 public class CircularInitializationDemo {
+
+```java
+public class CircularInitializationDemo {
+```
+
 2
-3 static class A {
+
+```
+static class A {
+```
+
 4
-5 static int value = B.value + 1;
-6 }
+
+```
+static int value = B.value + 1;
+}
+```
+
 7
 
-8 static class B {
+```
+static class B {
+```
+
 9
-10 static int value = A.value + 1;
-11 }
+
+```
+static int value = A.value + 1;
+}
+```
+
 12
-13 public static void main(String[] args) {
-14 System.out.println(A.value);
-15 System.out.println(B.value);
-16 }
-17 }
+
+```java
+public static void main(String[] args) {
+System.out.println(A.value);
+System.out.println(B.value);
+}
+}
+```
+
 18
 观察结果并分析默认值参与初始化的过程。
 实验十：静态代码块初始化失败
-1 public class InitializationFailureDemo {
+
+```java
+public class InitializationFailureDemo {
+```
+
 2
-3 static class Config {
+
+```
+static class Config {
+```
+
 4
-5 static {
-6 if (System.currentTimeMillis() > 0) {
-7 throw new RuntimeException(
-8 "初始化失败"
-9 );
-10 }
-11 }
-12 }
+
+```
+static {
+if (System.currentTimeMillis() > 0) {
+throw new RuntimeException(
+"初始化失败"
+);
+}
+}
+}
+```
+
 13
-14 public static void main(String[] args) {
-15 for (int i = 0; i < 2; i++) {
-16 try {
-17 System.out.println(
-18 Config.class
-19 );
+
+```java
+public static void main(String[] args) {
+for (int i = 0; i < 2; i++) {
+try {
+System.out.println(
+Config.class
+);
+```
+
 20
-21 Class.forName(
-22 Config.class.getName(),
-23 true,
-24 Config.class
-25 .getClassLoader()
-26 );
-27 } catch (Throwable throwable) {
-28 System.out.println(
-29 throwable.getClass()
-30 .getSimpleName()
-31 );
-32 }
-33 }
-34 }
-35 }
+
+```
+Class.forName(
+Config.class.getName(),
+true,
+Config.class
+.getClassLoader()
+);
+} catch (Throwable throwable) {
+System.out.println(
+throwable.getClass()
+.getSimpleName()
+);
+}
+}
+}
+}
+```
+
 36
 观察第一次和后续使用失败类时的异常差异。
 
@@ -1241,7 +2126,6 @@ static 成员属于类，只是所有对象都可以访问同一个类级成员�
 错误。
 可以在构造方法、初始化代码块或确定赋值路径中完成初始化。
 误区十二：final 引用表示对象不可变
-
 错误。
 final 只限制引用变量不能重新赋值。
 误区十三：final 类一定是不可变类
@@ -1276,18 +2160,32 @@ static 只表示共享范围，反而可能扩大并发竞争。
 
 ## 8.38 工程实践建议
 
-### 8.38.1 静态字段优先保持不可变
+**8.38.1 静态字段优先保持不可变**
+
 推荐：
-1 private static final DateTimeFormatter FORMATTER =
-2 DateTimeFormatter.ISO_LOCAL_DATE;
+
+```java
+private static final DateTimeFormatter FORMATTER =
+DateTimeFormatter.ISO_LOCAL_DATE;
+```
 
 3
 谨慎：
-1 private static Map<String, Object> globalState;
+
+```java
+private static Map<String, Object> globalState;
+```
+
 2
-### 8.38.2 不要使用静态变量保存请求级数据
+
+**8.38.2 不要使用静态变量保存请求级数据**
+
 错误：
-1 private static String currentUserId;
+
+```java
+private static String currentUserId;
+```
+
 2
 在 Web 服务中多个请求线程共享该字段，容易发生用户数据串扰。
 请求级数据应通过：
@@ -1296,97 +2194,189 @@ static 只表示共享范围，反而可能扩大并发竞争。
 明确作用域对象
 必要时 ThreadLocal
 传递。
-### 8.38.3 静态初始化保持简单
+
+**8.38.3 静态初始化保持简单**
+
 推荐：
-1 private static final Set<String> SUPPORTED_TYPES =
-2 Set.of("A", "B", "C");
+
+```java
+private static final Set<String> SUPPORTED_TYPES =
+Set.of("A", "B", "C");
+```
+
 3
 谨慎：
-1 static {
-2 // 访问数据库
-3 // 远程请求
-4 // 启动线程
-5 // 获取复杂锁
-6 }
-7
-### 8.38.4 工具类保持无状态
-推荐：
-1 public static String normalize(
-2 String value
-3 ) {
-4 return value == null
-5 ? null
-6 : value.trim();
 
-7 }
+```
+static {
+// 访问数据库
+// 远程请求
+// 启动线程
+// 获取复杂锁
+}
+```
+
+7
+
+**8.38.4 工具类保持无状态**
+
+推荐：
+
+```java
+public static String normalize(
+String value
+) {
+return value == null
+? null
+: value.trim();
+}
+```
+
 8
 避免：
-1 private static String lastValue;
+
+```java
+private static String lastValue;
+```
+
 2
-### 8.38.5 可替换行为不要设计成静态方法
+
+**8.38.5 可替换行为不要设计成静态方法**
+
 需要测试和扩展时：
-1 public interface MessageSender {
+
+```
+public interface MessageSender {
+```
+
 2
-3 void send(Message message);
-4 }
+
+```
+void send(Message message);
+}
+```
+
 5
 优于：
-1 MessageUtils.send(message);
+
+```
+MessageUtils.send(message);
+```
+
 2
-### 8.38.6 常量只暴露必要范围
+
+**8.38.6 常量只暴露必要范围**
+
 类内使用：
-1 private static final int BATCH_SIZE = 100;
+
+```java
+private static final int BATCH_SIZE = 100;
+```
+
 2
 包内使用可考虑包级可见性。
 只有对外协议需要时才使用：
-1 public static final
+
+```java
+public static final
+```
+
 2
-### 8.38.7 可变集合不要公开暴露
+
+**8.38.7 可变集合不要公开暴露**
+
 不推荐：
-1 public static final List<String> VALUES =
-2 new ArrayList<>();
+
+```java
+public static final List<String> VALUES =
+new ArrayList<>();
+```
+
 3
 推荐：
 
-1 public static final List<String> VALUES =
-2 List.of("A", "B");
+```java
+public static final List<String> VALUES =
+List.of("A", "B");
+```
+
 3
 或者：
-1 private static final List<String> VALUES =
-2 List.of("A", "B");
+
+```java
+private static final List<String> VALUES =
+List.of("A", "B");
+```
+
 3
-4 public static List<String> values() {
-5 return VALUES;
-6 }
+
+```java
+public static List<String> values() {
+return VALUES;
+}
+```
+
 7
-### 8.38.8 可能变化的配置不要使用编译期常量
+
+**8.38.8 可能变化的配置不要使用编译期常量**
+
 不推荐：
-1 public static final int TIMEOUT = 30;
+
+```java
+public static final int TIMEOUT = 30;
+```
+
 2
 如果业务上需要动态调整，应使用：
-1 config.getTimeout();
+
+```
+config.getTimeout();
+```
+
 2
 或配置中心、环境变量、配置文件。
-### 8.38.9 不可变对象要进行防御性复制
-1 public final class Order {
+
+**8.38.9 不可变对象要进行防御性复制**
+
+```
+public final class Order {
+```
+
 2
-3 private final List<OrderItem> items;
+
+```java
+private final List<OrderItem> items;
+```
+
 4
-5 public Order(List<OrderItem> items) {
-6 this.items = List.copyOf(items);
-7 }
+
+```
+public Order(List<OrderItem> items) {
+this.items = List.copyOf(items);
+}
+```
+
 8
-9 public List<OrderItem> getItems() {
-10 return items;
-11 }
-12 }
+
+```
+public List<OrderItem> getItems() {
+return items;
+}
+}
+```
+
 13
 还需确认 OrderItem 本身是否可变。
-### 8.38.10 避免静态状态污染测试
+
+**8.38.10 避免静态状态污染测试**
+
 如果测试需要：
 
-1 GlobalCache.clear();
-2 GlobalConfig.reset();
+```
+GlobalCache.clear();
+GlobalConfig.reset();
+```
+
 3
 说明代码可能依赖全局可变状态。
 可以考虑：
@@ -1398,50 +2388,76 @@ static 只表示共享范围，反而可能扩大并发竞争。
 
 ## 8.39 本章知识链路
 
-1 类定义完成
-2 ↓
-3 静态字段先获得默认值
-4 ↓
-5 类被主动使用
-6 ↓
-7 父类先初始化
-8 ↓
-9 按源码顺序执行静态字段初始化
-10 和静态代码块
-11 ↓
-12 类级状态建立完成
-13 ↓
-14 new 创建对象
-15 ↓
-16 执行实例字段初始化和构造方法
+```
+类定义完成
+↓
+静态字段先获得默认值
+↓
+类被主动使用
+↓
+父类先初始化
+↓
+按源码顺序执行静态字段初始化
+和静态代码块
+↓
+类级状态建立完成
+↓
+new 创建对象
+↓
+执行实例字段初始化和构造方法
+```
+
 17
 static 知识链：
-1 static
-2 → 属于类
-3 → 所有对象共享
-4 → 不依赖具体对象
-5 → 没有 this
-6 → 不具有实例多态
-7 → 可变状态需要考虑并发和生命周期
+
+```
+static
+→ 属于类
+→ 所有对象共享
+→ 不依赖具体对象
+→ 没有 this
+→ 不具有实例多态
+→ 可变状态需要考虑并发和生命周期
+```
+
 8
 final 知识链：
-1 final 变量
-2 → 只能赋值一次
-3
-4 final 引用
-5 → 引用值不变
-6 → 对象状态仍可能变化
-7
-8 final 方法
 
-9 → 不能重写
+```
+final 变量
+→ 只能赋值一次
+```
+
+3
+
+```
+final 引用
+→ 引用值不变
+→ 对象状态仍可能变化
+```
+
+7
+
+```
+final 方法
+→ 不能重写
+```
+
 10
-11 final 类
-12 → 不能继承
+
+```
+final 类
+→ 不能继承
+```
+
 13
-14 不可变对象
-15 → 不仅需要 final
-16 → 还需要封装和防御性复制
+
+```
+不可变对象
+→ 不仅需要 final
+→ 还需要封装和防御性复制
+```
+
 17
 面试口述版：
 static 表示成员属于类级别，而不是某个具体对象。静态字段通常只有一份，由该类的所有实例共享；静态方法没有 this，因此不能直接访问实例成员，也不参与实例
