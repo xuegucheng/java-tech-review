@@ -173,19 +173,55 @@ java 命令主要负责：
 - 加载指定主类
 - 寻找 main 方法
 - 执行程序
-- 标准入口：
+传统类文件中最通用、兼容 Java 8 及以上版本、企业工程最常见的程序入口是：
 
 ```java
 public static void main(String[] args) {
 }
 ```
 
-可以解释各部分：
+对于传统入口签名：
 
-- public ：JVM 可以访问
-- static ：无需创建对象即可调用
-- void ：不向 JVM 返回结果
-- String[] args ：接收命令行参数
+- `public`：JVM 可以访问
+- `static`：无需创建对象即可调用
+- `void`：不向 JVM 返回结果
+- `String[] args`：接收命令行参数
+
+### Java 25 的简化程序入口
+
+Java 25 正式交付 Compact Source Files and Instance Main Methods（JEP 512）。这意味着 Java 程序入口不再只限于传统的 `public static void main(String[] args)` 形式。
+
+传统静态入口：
+
+```java
+public class Main {
+    public static void main(String[] args) {
+        System.out.println("Hello");
+    }
+}
+```
+
+Java 25 实例 `main`：
+
+```java
+class Main {
+    void main() {
+        System.out.println("Hello");
+    }
+}
+```
+
+Java 25 紧凑源文件：
+
+```java
+void main() {
+    System.out.println("Hello");
+}
+```
+
+紧凑源文件适合入门、脚本式程序和简单示例。企业项目、框架启动类和需要兼容旧版本的代码仍优先采用传统 `public static void main(String[] args)`。
+
+本章仍以传统入口作为工程基础。紧凑源文件、实例 main 方法和隐式导入将在现代 Java 特性章节进一步展开。
 
 无需讨论“main 能不能重载”等低价值问题，最多放入易错题。
 
@@ -383,26 +419,46 @@ int 溢出语义属于 Java 语言规范。
 
 **1.9.1 Java SE 版本**
 
-例如：
+| Java 版本 | 类型 | 复习定位 |
+|---|---|---|
+| Java 8 | 历史长期基线 | 大量存量项目仍在使用 |
+| Java 11 | LTS | 模块化之后的重要长期支持版本 |
+| Java 17 | LTS | 当前大量企业项目使用 |
+| Java 21 | LTS | 上一代现代 LTS |
+| Java 25 | LTS | 当前语言特性复习基线 |
+| Java 26 | 非 LTS | 后续功能版本，用于跟踪新特性 |
 
-- Java 8
-- Java 11
-- Java 17
-- Java 21
-- 在日常表达中，“Java 17”和“JDK 17”常被混用，但概念上：
+基础语言语义以 Java 8 为起点；现代 Java 特性以 Java 25 为主要基线；Java 26 作为最新非 LTS 版本列出。
+
+在日常表达中，“Java 17”和“JDK 17”常被混用，但概念上：
 
 Java SE 17 表示平台规范版本。
 JDK 17 表示对应版本的开发工具包实现。
 
-**1.9.2 LTS 与非 LTS**
+**1.9.2 三个概念的区分**
 
-只需要建立概念：
+需要区分三个概念：
 
-- LTS：长期支持版本
-- 非 LTS：生命周期较短，但可能包含新特性
-- 企业项目通常优先选择成熟的 LTS 版本
+- Java SE 版本：平台规范版本，例如 Java SE 25。
+- JDK 版本：对应版本的开发工具包实现，例如 JDK 25。
+- JDK 发行版：不同厂商基于同一 JDK 版本构建的具体产品，例如 Temurin 25 / Oracle JDK 25 / Corretto 25。
+
+```
+Java SE 25：平台规范版本
+JDK 25：对应版本的开发工具包实现
+Temurin 25 / Oracle JDK 25 / Corretto 25：不同厂商发行版
+```
+
+Java 版本和 JDK 发行厂商是两个不同维度。在日常表达中，"Java 17"和"JDK 17"常被混用，但概念上：Java SE 17 表示平台规范版本，JDK 17 表示对应版本的开发工具包实现。
 
 **1.9.3 OpenJDK 与 Oracle JDK**
+
+核心结论：
+
+- OpenJDK 是 Java SE 的开源参考实现和主要开发基础。
+- Oracle JDK 基于 OpenJDK 构建。
+- 还存在其他厂商发行版。
+- 企业项目通常优先选择成熟的 LTS 版本。
 
 核心结论：
 

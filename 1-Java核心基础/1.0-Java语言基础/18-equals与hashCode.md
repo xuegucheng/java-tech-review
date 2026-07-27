@@ -1859,3 +1859,342 @@ equals/hashCode 同样可能递归。
 实体优先使用稳定 ID
 日志只输出必要摘要
 避免打印完整对象图
+
+实验一：默认 equals 是身份比较
+
+```java
+public class DefaultEqualsDemo {
+    public static void main(String[] args) {
+        User user1 = new User("A");
+        User user2 = new User("A");
+        System.out.println(user1 == user2);
+        System.out.println(
+        user1.equals(user2)
+        );
+    }
+    static class User {
+        private final String name;
+        User(String name) {
+            this.name = name;
+        }
+    }
+}
+```
+
+预期：
+
+```
+false
+false
+```
+
+实验二：重写 equals
+
+```java
+public class EqualsDemo {
+    public static void main(String[] args) {
+        User user1 = new User("U001");
+        User user2 = new User("U001");
+        System.out.println(
+        user1.equals(user2)
+        );
+    }
+    static final class User {
+        private final String userId;
+        User(String userId) {
+            this.userId = userId;
+        }
+        @Override
+        public boolean equals(Object other) {
+            if (this == other) {
+                return true;
+            }
+            if (!(other instanceof User user)) {
+                return false;
+            }
+            return Objects.equals(
+            userId,
+            user.userId
+            );
+        }
+        @Override
+        public int hashCode() {
+            return Objects.hash(userId);
+        }
+    }
+}
+```
+
+预期：
+
+```
+true
+```
+
+实验三：只重写 equals 的 HashSet 问题
+创建一个只重写 equals、不重写 hashCode 的类：
+
+```java
+static class User {
+    private final String userId;
+    User(String userId) {
+        this.userId = userId;
+    }
+    @Override
+    public boolean equals(Object other) {
+        if (!(other instanceof User user)) {
+            return false;
+        }
+        return Objects.equals(
+        userId,
+        user.userId
+        );
+    }
+}
+```
+
+执行：
+
+```java
+Set<User> users = new HashSet<>();
+users.add(new User("U001"));
+users.add(new User("U001"));
+System.out.println(users.size());
+```
+
+观察结果，理解为什么逻辑相等对象仍可能同时存在。
+实验四：可变 Key 失效
+
+```java
+public class MutableKeyDemo {
+    public static void main(String[] args) {
+        UserKey key = new UserKey("U001");
+        Map<UserKey, String> map =
+        new HashMap<>();
+        map.put(key, "data");
+        System.out.println(map.get(key));
+        key.userId = "U002";
+        System.out.println(map.get(key));
+    }
+    static class UserKey {
+        private String userId;
+        UserKey(String userId) {
+            this.userId = userId;
+        }
+        @Override
+        public boolean equals(Object other) {
+            if (!(other instanceof UserKey key)) {
+                return false;
+            }
+            return Objects.equals(
+            userId,
+            key.userId
+            );
+        }
+        @Override
+        public int hashCode() {
+            return Objects.hash(userId);
+        }
+    }
+}
+```
+
+观察修改字段后 Map 查找失败。
+实验五：数组 equals
+
+```java
+public class ArrayEqualsDemo {
+    public static void main(String[] args) {
+        int[] a = {1, 2, 3};
+        int[] b = {1, 2, 3};
+        System.out.println(a.equals(b));
+        System.out.println(
+        Arrays.equals(a, b)
+        );
+    }
+}
+```
+
+预期：
+
+```
+false
+true
+```
+
+实验六：String 的 == 与 equals
+
+```java
+public class StringEqualsDemo {
+    public static void main(String[] args) {
+        String a = new String("Java");
+        String b = new String("Java");
+        System.out.println(a == b);
+        System.out.println(a.equals(b));
+    }
+}
+```
+
+预期：
+
+```
+false
+true
+```
+
+实验七：BigDecimal equals 与 compareTo
+
+```java
+public class BigDecimalEqualsDemo {
+    public static void main(String[] args) {
+        BigDecimal a =
+        new BigDecimal("1.0");
+        BigDecimal b =
+        new BigDecimal("1.00");
+        System.out.println(a.equals(b));
+        System.out.println(
+        a.compareTo(b) == 0
+        );
+    }
+}
+```
+
+预期：
+
+```
+false
+true
+```
+
+
+
+## 18.32 高频面试题
+
+本章建议保留以下问题：
+
+- 1.Object 是什么？
+- 2.所有 Java 类都继承 Object 吗？
+- 3.Object 有哪些常见方法？
+- 4.基本类型和引用类型使用 == 分别比较什么？
+- 5. == 与 equals() 有什么区别？
+- 6.Object 默认 equals 比较什么？
+- 7.什么情况下应该重写 equals？
+- 8.equals 必须满足哪些契约？
+- 9.什么是 equals 的自反性？
+- 10.什么是 equals 的对称性？
+- 11.什么是 equals 的传递性？
+- 12.equals 为什么不能依赖随机值和外部状态？
+- 13. x.equals(null) 应该返回什么？
+- 14.equals 中使用 instanceof 和 getClass() 有什么区别？
+- 15.为什么可继承类的 equals 很难设计？
+- 16.为什么重写 equals 后必须重写 hashCode？
+- 17.equals 与 hashCode 的契约是什么？
+- 18.hashCode 相等是否代表 equals 相等？
+- 19.equals 相等时 hashCode 是否必须相等？
+- 20.hashCode 是否是对象内存地址？
+- 21.hashCode 是否保证唯一？
+- 22.HashMap 如何使用 hashCode 和 equals？
+- 23.为什么不能只使用 hashCode 判断对象相等？
+- 24.为什么可变对象不适合作为 HashMap Key？
+- 25.哪些字段适合参与 equals 和 hashCode？
+- 27.数据库自增 ID 参与 equals 有什么问题？
+- 28.String 的 == 和 equals 有什么区别？
+- 29.包装类型应该如何比较？
+- 30.BigDecimal 的 equals 和 compareTo 有什么区别？
+- 31.数组应该如何比较内容？
+- 32. Objects.equals() 有什么作用？
+- 33. Objects.deepEquals() 有什么作用？
+- 48.双向关联为什么可能导致 toString 或 equals 栈溢出？
+
+
+## 18.33 易错点
+
+- 误区：Object 是接口。错误，Object 是类体系的根类。
+- 误区：基本类型也是 Object 子类。错误，基本类型不是对象，赋值给 Object 时发生自动装箱。
+- 误区：引用类型的 == 比较对象内容。错误，== 比较是否指向同一对象。
+- 误区：所有类默认 equals 都比较字段内容。错误，Object 默认 equals 近似于 this == obj。
+- 误区：重写 equals 就足够了。错误，必须同步重写 hashCode。
+- 误区：hashCode 相等代表对象相等。错误，哈希冲突允许不同对象有相同 hashCode。
+- 误区：对象不相等时 hashCode 必须不同。错误，equals 不相等的对象可以有相同 hashCode。
+- 误区：hashCode 就是对象地址。错误，规范不要求 hashCode 等于内存地址。
+- 误区：Map Key 修改字段后不影响查找。错误，修改参与 hashCode 的字段后可能找不到。
+- 误区：数组 equals 比较数组内容。错误，数组没有按元素重写 equals，应使用 Arrays.equals。
+- 误区：BigDecimal 数值相等时 equals 一定为 true。错误，BigDecimal.equals 还会比较 scale。
+- 误区：final 类可以彻底解决 equals 设计。不完整，仍需正确选择字段并维护 hashCode 契约。
+- 误区：自动生成 equals/hashCode 永远安全。错误，可能错误包含可变字段、集合、懒加载或双向关联。
+
+## 18.34 工程实践建议
+
+- 重写 equals 必须同步重写 hashCode，使用同一组字段。
+- 只使用稳定字段参与 equals/hashCode。
+- 避免可变字段作为 Map Key 相等性基础。
+- 实体优先使用稳定业务 ID 判断相等性。
+- 值对象优先设计为不可变，按全部业务值判断相等。
+- 不在 equals/hashCode 中访问数据库、网络或懒加载大对象图。
+- Lombok 生成前审查字段：排除可变字段、集合、懒加载和双向关联。
+- 双向关联中至少一侧排除递归，避免 toString/equals/hashCode 栈溢出。
+- 使用 EqualsVerifier 等工具只能作为辅助，不能替代语义设计。
+
+## 18.35 本章总结
+
+```
+Object 是所有普通类的根类
+↓
+对象默认拥有基础协议
+↓
+== 比较值或引用身份
+↓
+Object.equals 默认仍是身份比较
+↓
+业务对象重写 equals 定义逻辑相等
+↓
+equals 必须满足五项契约
+↓
+同时重写 hashCode
+↓
+哈希容器先定位桶，再调用 equals
+↓
+相等性依赖字段必须稳定
+↓
+```
+
+== 与 equals：
+
+```
+基本类型 ==
+→ 数值比较
+引用类型 ==
+→ 对象身份比较
+equals
+→ 由类定义逻辑相等语义
+```
+
+equals 与 hashCode：
+
+```
+equals 相等
+→ hashCode 必须相等
+hashCode 相等
+→ equals 不一定相等
+```
+
+对象设计：
+
+```
+实体对象
+→ 使用稳定身份判断相等
+值对象
+→ 使用全部业务值判断相等
+HashMap Key
+→ 相等性字段尽量不可变
+```
+
+面试口述版：
+
+- Object 是 Java 普通类体系的根类，默认提供 equals、hashCode、toString、getClass、clone 以及线程协作相关方法。对于基本类型， == 比较数值；对于引用类
+- 型， == 比较两个引用是否指向同一对象。Object 默认的 equals 本质上也是身份比较，业务对象需要根据自身语义决定是否重写。equals 必须满足自反性、对称
+- 性、传递性、一致性和非空性。重写 equals 后必须同步重写 hashCode，并保证 equals 相等的对象 hashCode 一定相等。HashMap 和 HashSet 会先通过 hashCode
+- 定位候选位置，再通过 equals 确认逻辑相等，因此参与 equals 和 hashCode 的字段应保持稳定，尤其不应随意修改作为 Map Key 的对象。值对象通常按全部业务值
+- toString 应提供有用的调试信息，但不能泄露敏感数据；clone 默认是浅拷贝，工程上通常更推荐拷贝构造方法或
+
+静态复制工厂。
