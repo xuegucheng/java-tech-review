@@ -543,7 +543,8 @@ class User {
     public int hashCode() { return 42; }
 }
 User u = new User();
-System.out.println(System.identityHashCode(u)); // 原始身份哈希，不是 42
+System.out.println(user.hashCode());                 // 固定返回 42
+System.out.println(System.identityHashCode(user));   // 不受重写的 hashCode() 影响
 ```
 
 `identityHashCode` 不受重写的 `hashCode` 影响，返回对象身份级别的哈希值。
@@ -586,6 +587,19 @@ System.out.println(System.identityHashCode(u)); // 原始身份哈希，不是 4
 - 误区七：System.identityHashCode 是业务唯一 ID
 - 错误。
 - 它只适合对象身份相关的底层或调试场景，不保证全局唯一。
+
+**误区八：调用 `wait()` 或 `notify()` 时不需要持有对象监视器**
+
+**错误。**
+
+未持有对应对象监视器时会抛出 `IllegalMonitorStateException`。
+
+**误区九：对象终结机制可以可靠释放文件、连接等资源**
+
+**错误。**
+
+对象终结执行时间不确定，甚至可能不执行。资源管理应使用 `try-with-resources` 或明确关闭。
+
 ## 19.11 工程实践建议
 
 1. `toString` 轻量、无副作用并做好脱敏。
