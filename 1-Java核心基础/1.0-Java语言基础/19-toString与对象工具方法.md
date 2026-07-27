@@ -538,16 +538,28 @@ System.out.println(a.getClass().getSimpleName()); // Dog
 实验四：identityHashCode 不受重写 hashCode 影响
 
 ```java
-class User {
-    @Override
-    public int hashCode() { return 42; }
+public class IdentityHashCodeDemo {
+
+    static class User {
+
+        @Override
+        public int hashCode() {
+            return 42;
+        }
+    }
+
+    public static void main(String[] args) {
+        User user = new User();
+
+        System.out.println(user.hashCode());                 // 固定返回 42
+        System.out.println(System.identityHashCode(user));   // 不受重写的 hashCode() 影响
+    }
 }
-User u = new User();
-System.out.println(user.hashCode());                 // 固定返回 42
-System.out.println(System.identityHashCode(user));   // 不受重写的 hashCode() 影响
 ```
 
-`identityHashCode` 不受重写的 `hashCode` 影响，返回对象身份级别的哈希值。
+`user.hashCode()` 固定返回重写方法中的 `42`。`System.identityHashCode(user)` 使用对象身份语义，不受重写后的 `hashCode()` 控制。
+
+两者通常不同，但规范并不保证 `System.identityHashCode(user)` 的结果一定不等于 `42`。关键区别是 identityHashCode 的结果不由当前类重写的 hashCode 方法决定。
 
 ## 19.9 高频面试题
 
@@ -567,38 +579,59 @@ System.out.println(System.identityHashCode(user));   // 不受重写的 hashCode
 
 ## 19.10 易错点
 
-- 误区一：toString 可以随意打印所有字段
-- 错误。
-- 敏感字段和大型对象图不应输出。
-- 误区二：toString 适合作为业务数据协议
-- 错误。
-- toString 主要用于人类可读描述，格式不应视为稳定协议。
-- 误区三：clone 会自动深拷贝
-- 错误。
-- Object.clone 默认更接近字段级浅拷贝。
-- 误区四：Cloneable 定义了 clone 方法
-- 错误。
-- Cloneable 是标记接口，本身没有声明方法。
-- 误区五：getClass 返回变量声明类型
-- 错误。
-- getClass 返回对象的运行时类型。
-- 误区六：wait 和 notify 属于 Thread
-- 错误。
-- 误区七：System.identityHashCode 是业务唯一 ID
-- 错误。
-- 它只适合对象身份相关的底层或调试场景，不保证全局唯一。
+**误区一：`toString()` 可以随意打印所有字段**
+
+**错误。**
+
+敏感字段、大型集合、懒加载关联和递归对象图不应直接输出。
+
+**误区二：`toString()` 适合作为稳定的数据协议**
+
+**错误。**
+
+`toString()` 主要用于人类可读描述，其格式可能随实现调整，不应作为序列化、存储、签名或网络协议。
+
+**误区三：`getClass()` 返回变量的声明类型**
+
+**错误。**
+
+`getClass()` 返回对象的运行时类型。例如变量声明为 `Animal`、实际对象为 `Dog` 时，返回的是 `Dog.class`。
+
+**误区四：`clone()` 会自动执行深拷贝**
+
+**错误。**
+
+`Object.clone()` 默认更接近字段级浅拷贝，内部引用字段通常仍然指向同一对象。
+
+**误区五：`Cloneable` 接口声明了 `clone()` 方法**
+
+**错误。**
+
+`Cloneable` 是标记接口，本身没有声明任何方法。真正的 `clone()` 方法定义在 `Object` 中。
+
+**误区六：调用 `clone()` 会像普通对象创建一样执行构造器**
+
+**错误。**
+
+`Object.clone()` 通常不会按照普通 `new` 对象的方式执行构造器，因此复制语义更难维护。
+
+**误区七：`wait()` 和 `notify()` 属于 `Thread` 类**
+
+**错误。**
+
+它们定义在 `Object` 中，因为任意对象都可以作为 Java 监视器锁。
 
 **误区八：调用 `wait()` 或 `notify()` 时不需要持有对象监视器**
 
 **错误。**
 
-未持有对应对象监视器时会抛出 `IllegalMonitorStateException`。
+未持有对应对象监视器时调用这些方法，会抛出 `IllegalMonitorStateException`。
 
 **误区九：对象终结机制可以可靠释放文件、连接等资源**
 
 **错误。**
 
-对象终结执行时间不确定，甚至可能不执行。资源管理应使用 `try-with-resources` 或明确关闭。
+对象终结的执行时间不确定，甚至可能永远不执行。文件、连接、Socket 等资源应使用 `try-with-resources` 或显式关闭。
 
 ## 19.11 工程实践建议
 
