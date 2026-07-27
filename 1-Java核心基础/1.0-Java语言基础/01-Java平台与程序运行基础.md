@@ -417,6 +417,8 @@ Java 版本：8 / 11 / 17 / 21 / 25 / 26
 JDK 发行版：Oracle JDK / Temurin / Corretto / Zulu 等
 ```
 
+Java 版本和 JDK 发行厂商是两个不同维度。
+
 ## 1.10 classpath、包与主类启动
 
 **1.10.1 包名**

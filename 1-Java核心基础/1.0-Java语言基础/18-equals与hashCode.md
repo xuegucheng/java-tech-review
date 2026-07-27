@@ -1,6 +1,6 @@
 # equals 与 hashCode
 
-## 9.1 本章定位
+## 18.1 本章定位
 
 java.lang.Object 是 Java 类体系的根类。
 如果一个类没有显式继承其他类：
@@ -54,19 +54,6 @@ equals 与 hashCode 必须保持一致
 形成稳定的对象相等性契约
 ```
 
-## 9.22 Objects.deepEquals()
-
-Objects.deepEquals(a, b) 可以处理数组：
-
-```java
-int[] a = {1, 2};
-int[] b = {1, 2};
-System.out.println(Objects.deepEquals(a, b));
-```
-
-结果为 true。
-对于普通对象，则仍然依赖 equals。
-
 本章暂不深入：
 
 - HashMap 的哈希桶、红黑树和扩容机制：放在集合框架。
@@ -75,7 +62,7 @@ System.out.println(Objects.deepEquals(a, b));
 - Java Record 自动生成的 equals/hashCode：放在现代 Java 特性。
 - ORM 实体代理与 equals 的复杂问题：放在框架实战部分。
 
-## 9.2 Object 是类体系的根类
+## 18.2 Object 是类体系的根类
 
 Java 普通类最终都继承自 Object：
 
@@ -118,7 +105,7 @@ Object value2 = Integer.valueOf(10);
 
 基本类型本身不是 Object 的子类，但对应的包装类型是对象。
 
-**9.2.1 Object 提供的核心方法**
+**18.2.1 Object 提供的核心方法**
 
 Object 中最常见的方法包括：
 
@@ -151,11 +138,11 @@ notifyAll()
 └── notifyAll()
 ```
 
-## 9.3 == 运算符
+## 18.3 == 运算符
 
 == 的语义取决于操作数类型。
 
-**9.3.1 基本类型的 ==**
+**18.3.1 基本类型的 ==**
 
 对于基本类型， == 比较数值是否相等：
 
@@ -175,7 +162,7 @@ System.out.println(a == b); // true
 
 这里 a 会提升为 long 后再比较。
 
-**9.3.2 引用类型的 ==**
+**18.3.2 引用类型的 ==**
 
 对于引用类型， == 比较：
 两个引用值是否指向同一个对象。
@@ -212,7 +199,7 @@ user1 == user3
 
 仍然是 false 。
 
-**9.3.3 null 比较**
+**18.3.3 null 比较**
 
 引用可以与 null 比较：
 
@@ -236,7 +223,7 @@ user.equals(null)
 
 因为当 user == null 时，调用方法会抛出 NullPointerException 。
 
-## 9.4 equals() 方法
+## 18.4 equals() 方法
 
 Object 定义了：
 
@@ -269,7 +256,7 @@ false
 
 因为默认 equals 仍然判断是否为同一个对象。
 
-**9.4.1 身份相等与逻辑相等**
+**18.4.1 身份相等与逻辑相等**
 
 - 对象可以有两种不同的相等概念。
 - 身份相等
@@ -306,7 +293,7 @@ money1 == money2 // false
 money1.equals(money2) // true
 ```
 
-## 9.5 什么时候应该重写 equals()
+## 18.5 什么时候应该重写 equals()
 
 适合重写 equals 的典型对象：
 
@@ -337,7 +324,7 @@ Money 的相等性通常由：
 
 共同决定。
 
-**9.5.1 不一定需要重写 equals 的对象**
+**18.5.1 不一定需要重写 equals 的对象**
 
 部分对象更强调唯一身份：
 
@@ -353,7 +340,7 @@ Money 的相等性通常由：
 不是所有类都必须重写 equals 和 hashCode。
 相等性必须根据对象语义设计。
 
-## 9.6 equals() 的基本实现
+## 18.6 equals() 的基本实现
 
 示例：
 
@@ -381,7 +368,7 @@ public final class User {
 
 可以分为三个步骤。
 
-**9.6.1 第一步：判断是否为同一对象**
+**18.6.1 第一步：判断是否为同一对象**
 
 ```
 if (this == other) {
@@ -396,7 +383,7 @@ return true;
 - 提高常见场景性能
 - 正确处理自身比较
 
-**9.6.2 第二步：判断类型**
+**18.6.2 第二步：判断类型**
 
 ```
 if (!(other instanceof User user)) {
@@ -417,7 +404,7 @@ null instanceof User
 
 结果是 false 。
 
-**9.6.3 第三步：比较关键字段**
+**18.6.3 第三步：比较关键字段**
 
 ```
 return Objects.equals(userId, user.userId)
@@ -438,7 +425,7 @@ Objects.equals("A", "A") // true
 a == b || (a != null && a.equals(b))
 ```
 
-## 9.7 equals() 的契约
+## 18.7 equals() 的契约
 
 正确的 equals 必须满足以下性质：
 
@@ -450,7 +437,7 @@ a == b || (a != null && a.equals(b))
 非空性
 ```
 
-**9.7.1 自反性**
+**18.7.1 自反性**
 
 任何非 null 对象都必须与自身相等：
 
@@ -469,7 +456,7 @@ public boolean equals(Object other) {
 
 这会直接破坏集合和业务判断。
 
-**9.7.2 对称性**
+**18.7.2 对称性**
 
 如果：
 
@@ -490,7 +477,7 @@ x 认为 y 相等
 y 认为 x 不相等
 ```
 
-**9.7.3 传递性**
+**18.7.3 传递性**
 
 如果：
 
@@ -507,7 +494,7 @@ x.equals(z) == true
 
 否则集合中的去重、查找和分组可能产生不一致结果。
 
-**9.7.4 一致性**
+**18.7.4 一致性**
 
 只要参与 equals 比较的字段没有变化，多次调用结果应保持一致：
 
@@ -529,7 +516,7 @@ public boolean equals(Object other) {
 
 也不应把当前时间、随机数或外部可变状态放入 equals。
 
-**9.7.5 非空性**
+**18.7.5 非空性**
 
 任何非 null 对象都必须满足：
 
@@ -539,7 +526,7 @@ x.equals(null) == false
 
 不应抛异常，也不能返回 true。
 
-## 9.8 对称性破坏示例
+## 18.8 对称性破坏示例
 
 父类：
 
@@ -607,11 +594,11 @@ colorPoint.equals(point) // false
 这说明：
 可扩展类中的值相等性设计非常困难。
 
-## 9.9 getClass() 与 instanceof
+## 18.9 getClass() 与 instanceof
 
 equals 类型判断常见两种写法。
 
-**9.9.1 使用 instanceof**
+**18.9.1 使用 instanceof**
 
 ```
 if (!(other instanceof User user)) {
@@ -626,7 +613,7 @@ return false;
 - 更灵活
 - 容易因子类增加字段破坏对称性或传递性
 
-**9.9.2 使用 getClass()**
+**18.9.2 使用 getClass()**
 
 ```
 if (other == null
@@ -661,7 +648,7 @@ public boolean equals(Object other) {
 }
 ```
 
-**9.9.3 如何选择**
+**18.9.3 如何选择**
 
 对于不可继承的值对象：
 
@@ -687,7 +674,7 @@ getClass() == other.getClass()
 工程上更简单的方式是：
 需要稳定值相等性的类，优先设计成 final 不可变类。
 
-## 9.10 equals 中选择哪些字段
+## 18.10 equals 中选择哪些字段
 
 equals 不应该机械比较所有字段。
 应选择：
@@ -712,7 +699,7 @@ currency
 - 懒加载对象
 - 运行时计算结果
 
-**9.10.1 值对象**
+**18.10.1 值对象**
 
 值对象没有独立身份，其相等性由全部业务值决定。
 例如坐标：
@@ -732,7 +719,7 @@ x 相等
 y 相等
 ```
 
-**9.10.2 实体对象**
+**18.10.2 实体对象**
 
 实体通常具有稳定身份：
 
@@ -760,7 +747,7 @@ order1.equals(order2)
 
 是否相等，通常取决于二者是否代表同一业务订单。
 
-**9.10.3 数据库自增 ID 的问题**
+**18.10.3 数据库自增 ID 的问题**
 
 实体创建前，数据库 ID 可能为空：
 
@@ -807,7 +794,7 @@ public boolean equals(Object other) {
 
 但这仍然要与 hashCode 设计保持一致。
 
-## 9.11 hashCode()
+## 18.11 hashCode()
 
 Object 定义：
 
@@ -827,7 +814,7 @@ hashCode() 返回一个整数散列值。
 
 哈希值用于快速缩小查找范围，但不直接代表对象唯一身份。
 
-**9.11.1 hashCode 不是对象内存地址**
+**18.11.1 hashCode 不是对象内存地址**
 
 不应机械认为：
 
@@ -840,7 +827,7 @@ Java 规范不要求 hashCode 必须等于内存地址。
 更准确的说法：
 Object 默认 hashCode 通常与对象身份有关，但具体生成方式由 JVM 实现决定。
 
-**9.11.2 hashCode 不保证唯一**
+**18.11.2 hashCode 不保证唯一**
 
 不同对象可能拥有相同 hashCode：
 
@@ -861,7 +848,7 @@ a.hashCode() == b.hashCode()
 a.equals(b)
 ```
 
-## 9.12 equals 与 hashCode 的契约
+## 18.12 equals 与 hashCode 的契约
 
 核心规则：
 如果两个对象通过 equals 判断相等，它们的 hashCode 必须相同。
@@ -891,7 +878,7 @@ a.equals(b) == true
 
 因为哈希冲突允许存在。
 
-**9.12.1 契约总结**
+**18.12.1 契约总结**
 
 ```
 equals 相等
@@ -902,7 +889,7 @@ equals 不相等
 → hashCode 可以相同，也可以不同
 ```
 
-## 9.13 为什么重写 equals 后必须重写 hashCode
+## 18.13 为什么重写 equals 后必须重写 hashCode
 
 错误示例：
 
@@ -964,7 +951,7 @@ false
 原因是 HashSet 通常先根据 hashCode 定位桶，再使用 equals 比较。
 两个对象进入不同哈希位置后，可能根本不会互相比较。
 
-## 9.14 正确重写 hashCode
+## 18.14 正确重写 hashCode
 
 可以使用：
 
@@ -1011,7 +998,7 @@ public final class User {
 关键原则：
 equals 使用哪些字段，hashCode 通常也应该使用同一组字段。
 
-**9.14.1 手动计算 hashCode**
+**18.14.1 手动计算 hashCode**
 
 经典形式：
 
@@ -1042,7 +1029,7 @@ Objects.hash(...)
 或 IDE 自动生成。
 对极端性能敏感的场景，再考虑减少可变参数数组创建等开销。
 
-## 9.15 HashMap 如何使用 hashCode 和 equals
+## 18.15 HashMap 如何使用 hashCode 和 equals
 
 假设：
 
@@ -1085,7 +1072,7 @@ map.get(user2);
 |---|---|
 | equals() | 用于最终确认逻辑相等 |
 
-**9.15.1 为什么不能只使用 equals**
+**18.15.1 为什么不能只使用 equals**
 
 如果集合中有一百万个对象，每次查找都逐个调用 equals：
 
@@ -1095,12 +1082,12 @@ map.get(user2);
 
 通过 hashCode，可以先快速定位少量候选对象。
 
-**9.15.2 为什么不能只使用 hashCode**
+**18.15.2 为什么不能只使用 hashCode**
 
 - 因为不同对象可能拥有相同 hashCode。
 - 哈希冲突时，仍然需要 equals 判断是否为同一个逻辑键。
 
-## 9.16 可变对象作为 HashMap Key 的风险
+## 18.16 可变对象作为 HashMap Key 的风险
 
 定义：
 
@@ -1164,7 +1151,7 @@ hashCode 基于 U002
 因此：
 作为 HashMap Key 或 HashSet 元素的对象，其 equals/hashCode 依赖字段应尽量保持不可变。
 
-**9.16.1 安全 Key 设计**
+**18.16.1 安全 Key 设计**
 
 推荐：
 
@@ -1200,7 +1187,7 @@ public final class UserKey {
 - 相等性稳定
 - 适合作为 Map Key
 
-## 9.17 BigDecimal 的 equals 特殊性
+## 18.17 BigDecimal 的 equals 特殊性
 
 ```
 BigDecimal a =
@@ -1259,7 +1246,7 @@ a.compareTo(b)
 这也说明：
 equals 的语义由具体类定义，不能假设所有对象的 equals 都只比较数学值。
 
-## 9.18 数组的 equals
+## 18.18 数组的 equals
 
 数组继承 Object，但没有重写为元素内容比较。
 
@@ -1288,7 +1275,7 @@ Arrays.equals(a, b)
 Arrays.deepEquals(a, b)
 ```
 
-**9.18.1 数组 hashCode**
+**18.18.1 数组 hashCode**
 
 数组默认 hashCode 通常也是身份语义。
 计算元素内容哈希应使用：
@@ -1303,7 +1290,7 @@ Arrays.hashCode(array)
 Arrays.deepHashCode(array)
 ```
 
-## 9.19 集合的 equals
+## 18.19 集合的 equals
 
 Java 集合通常已经定义了内容相等语义。
 例如 List：
@@ -1328,7 +1315,7 @@ List 通常比较：
 - 元素顺序
 - 每个位置的元素是否相等
 
-**9.19.1 Set 的 equals**
+**18.19.1 Set 的 equals**
 
 ```
 Set<String> a =
@@ -1350,7 +1337,7 @@ Set 更关注：
 - 元素集合是否相同
 - 不关心元素顺序
 
-**9.19.2 Map 的 equals**
+**18.19.2 Map 的 equals**
 
 Map 通常比较：
 
@@ -1362,7 +1349,7 @@ Map 通常比较：
 这体现：
 equals 描述的是抽象数据语义，不一定要求具体实现类相同。
 
-## 9.20 包装类型的 equals
+## 18.20 包装类型的 equals
 
 包装类型通常按包装值比较：
 
@@ -1393,7 +1380,7 @@ a.equals(b)
 
 不要依赖缓存范围判断 == 。
 
-## 9.21 String 的 equals
+## 18.21 String 的 equals
 
 String 重写了 equals，比较字符序列内容：
 
@@ -1414,7 +1401,7 @@ equals → 字符内容是否相同
 字符串常量池会让部分 == 结果看起来为 true，但不应使用 == 判断字符串内容。
 字符串完整机制放到高级语言特性笔记。
 
-## 9.22 Objects.equals()
+## 18.22 Objects.equals()
 
 直接调用：
 
@@ -1442,7 +1429,7 @@ Objects.equals(a, b)
 Objects.equals(expected, actual)
 ```
 
-**9.22.1 常量放前面的写法**
+**18.22.1 常量放前面的写法**
 
 传统上常见：
 
@@ -1464,3 +1451,411 @@ Objects.equals(status, "SUCCESS")
 ```
 
 但状态值更适合使用枚举而不是字符串魔法值。
+
+## 18.23 Objects.deepEquals()
+
+Objects.deepEquals(a, b) 可以处理数组：
+
+```java
+int[] a = {1, 2};
+int[] b = {1, 2};
+System.out.println(Objects.deepEquals(a, b));
+```
+
+结果为 true。
+对于普通对象，则仍然依赖 equals。
+
+## 18.24 IdentityHashMap
+
+普通 HashMap 使用：
+
+```
+hashCode()
++
+equals()
+```
+
+判断键。
+IdentityHashMap 使用：
+
+```
+引用身份
+==
+```
+
+判断键。
+示例：
+
+```
+String a = new String("Java");
+String b = new String("Java");
+```
+
+普通 HashMap：
+
+```java
+Map<String, Integer> map =
+new HashMap<>();
+map.put(a, 1);
+map.put(b, 2);
+System.out.println(map.size());
+```
+
+通常为：
+
+```
+1
+```
+
+因为：
+
+```
+a.equals(b) == true
+```
+
+IdentityHashMap：
+
+```java
+Map<String, Integer> map =
+new IdentityHashMap<>();
+map.put(a, 1);
+map.put(b, 2);
+System.out.println(map.size());
+```
+
+通常为：
+
+```
+2
+```
+
+因为：
+
+```
+a != b
+```
+
+IdentityHashMap 适合少数需要身份语义的场景，不应替代普通 HashMap。
+
+## 18.25 equals 与继承的设计难题
+
+假设父类 equals 使用：
+
+```
+instanceof Parent
+```
+
+那么子类对象可能与父类对象相等。
+但子类新增字段后：
+
+```java
+class Child extends Parent {
+    private String extra;
+}
+```
+
+会出现问题：
+
+- 忽略 extra：子类不同状态可能被判相等
+- 比较 extra：可能破坏与父类的对称性
+- 限定同类型：父类与子类不再可相等
+- 因此，对具有值语义的类型，常见建议是：
+
+```
+final 类
++
+不可变字段
++
+明确 equals/hashCode
+```
+
+例如：
+
+```java
+public final class Money {
+}
+```
+
+避免在可扩展继承体系中定义复杂值相等性。
+
+## 18.26 canEqual 模式概览
+
+某些继承体系会使用 canEqual() 尝试维护对称性。
+父类：
+
+```java
+public class Point {
+    protected boolean canEqual(
+    Object other
+    ) {
+        return other instanceof Point;
+    }
+    @Override
+    public boolean equals(Object other) {
+        if (!(other instanceof Point point)) {
+            return false;
+        }
+        return point.canEqual(this)
+        && x == point.x
+        && y == point.y;
+    }
+}
+```
+
+子类重写：
+
+```java
+@Override
+protected boolean canEqual(
+Object other
+) {
+return other instanceof ColorPoint;
+}
+```
+
+这种方式可以处理部分继承相等性问题，但设计复杂。
+
+普通业务代码更推荐：
+
+- 值对象禁止继承
+- 使用组合
+- 不同类型不互相相等
+- 使用明确业务 ID 判断实体身份
+
+## 18.27 Lombok 与自动生成 equals/hashCode
+
+Lombok 可以通过注解生成：
+
+```
+@EqualsAndHashCode
+```
+
+或者：
+
+```
+@Data
+```
+
+但自动生成前必须确认：
+
+- 哪些字段参与相等性
+- 是否包含父类字段
+- 是否包含可变字段
+- 是否存在懒加载字段
+- 是否是 ORM 实体
+- 是否可能用作 HashMap Key
+- 是否存在循环引用
+- 是否包含大集合
+
+不应因为方便就机械生成全部字段相等性。
+例如实体对象包含：
+
+```
+List<OrderItem> items
+```
+
+如果自动加入 equals/hashCode：
+
+- 比较成本可能很高
+- 懒加载可能被触发
+- 集合修改会改变 hashCode
+- 双向关联可能递归
+- 日志和调试可能出现栈溢出
+
+## 18.28 实体对象的相等性设计
+
+实体强调：
+
+```
+同一身份
+```
+
+而不是所有字段相同。
+例如订单：
+
+```java
+public class Order {
+    private final OrderId orderId;
+    private OrderStatus status;
+}
+```
+
+即使状态变化：
+
+```
+CREATED
+→ PROCESSING
+→ COMPLETED
+```
+
+仍然是同一个订单。
+因此实体相等性通常基于：
+
+```
+稳定业务 ID
+```
+
+而不是所有可变字段。
+
+**18.28.1 业务 ID 优于可变字段**
+
+不推荐：
+
+```
+return Objects.equals(status, other.status)
+&& Objects.equals(items, other.items)
+&& Objects.equals(address, other.address);
+```
+
+这些字段可能随业务变化。
+更合理：
+
+```
+return Objects.equals(
+orderId,
+other.orderId
+);
+```
+
+前提是 orderId：
+
+- 创建时就存在
+- 全局或业务范围唯一
+- 生命周期内不改变
+- 不依赖数据库持久化后才生成
+
+## 18.29 值对象的相等性设计
+
+值对象强调：
+
+```
+所有业务值相同
+```
+
+例如：
+
+```java
+public final class Address {
+    private final String province;
+    private final String city;
+    private final String detail;
+}
+```
+
+相等性可以基于：
+
+```
+province
+city
+detail
+```
+
+值对象通常适合：
+
+- final 类
+- final 字段
+- 不可变
+- 完整重写 equals/hashCode
+- 修改时创建新对象
+
+**18.29.1 值对象没有独立身份**
+
+两个分别创建的地址对象：
+
+```
+Address a =
+new Address(
+"广东",
+"深圳",
+"南山区"
+);
+Address b =
+new Address(
+"广东",
+"深圳",
+"南山区"
+);
+```
+
+虽然：
+
+```
+a != b
+```
+
+但业务上：
+
+```
+a.equals(b)
+```
+
+应为 true。
+
+## 18.30 equals 的性能考虑
+
+equals 可能被频繁调用，例如：
+
+- HashMap 查找
+- HashSet 去重
+- 集合 contains
+- 列表 remove
+- 单元测试断言
+- 因此 equals 应尽量：
+- 无副作用
+- 不访问数据库
+- 不进行网络请求
+- 不依赖外部服务
+- 不执行超大对象图比较
+- 先比较成本较低的字段
+- 先使用 this == other
+- 例如：
+
+```
+return id == other.id
+&& Objects.equals(code, other.code)
+&& Objects.equals(details, other.details);
+```
+
+可以先比较：
+
+```
+便宜且区分度高的字段
+```
+
+再比较复杂字段。
+
+## 18.31 toString、equals、hashCode 中的循环引用
+
+双向关联：
+
+```java
+class Parent {
+    private List<Child> children;
+}
+class Child {
+    private Parent parent;
+}
+```
+
+如果自动生成 toString：
+
+```
+Parent.toString()
+→ Child.toString()
+→ Parent.toString()
+→ ...
+```
+
+可能导致：
+
+```
+StackOverflowError
+```
+
+equals/hashCode 同样可能递归。
+因此：
+不要机械包含全部关联字段
+双向关系中至少一侧排除
+实体优先使用稳定 ID
+日志只输出必要摘要
+避免打印完整对象图

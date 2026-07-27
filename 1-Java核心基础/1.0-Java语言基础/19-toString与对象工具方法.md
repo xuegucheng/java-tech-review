@@ -1,6 +1,21 @@
 # toString 与对象工具方法
 
-## 9.23 toString()
+## 19.1 本章定位
+
+本章讨论 Object 中不属于 equals/hashCode 主线的基础方法及相关工程风险。
+
+主要问题：
+
+- toString 默认输出什么？
+- 如何安全重写 toString？
+- getClass 返回什么？
+- clone 为什么默认是浅拷贝？
+- 为什么通常推荐拷贝构造方法而不是 clone？
+- wait/notify 为什么定义在 Object？
+- 为什么不应依赖对象终结机制？
+- identityHashCode 有什么用途？
+
+## 19.2 toString()
 
 Object 默认的 toString() 通常生成类似：
 
@@ -18,7 +33,7 @@ com.example.User@1a2b3c
 
 但不应依赖默认格式作为稳定协议。
 
-**9.24.1 为什么重写 toString**
+**19.2.1 为什么重写 toString**
 
 默认输出缺乏业务信息：
 
@@ -58,7 +73,7 @@ User{userId='U001', name='Java'}
 - IDE 查看对象
 - 问题定位
 
-**9.24.2 toString 不应泄露敏感信息**
+**19.2.2 toString 不应泄露敏感信息**
 
 不应输出：
 
@@ -85,7 +100,7 @@ public String toString() {
 
 日志可能长期保存并被多人访问。
 
-**9.24.3 toString 不应承担业务序列化协议**
+**19.2.3 toString 不应承担业务序列化协议**
 
 不建议把 toString() 当成：
 
@@ -104,7 +119,7 @@ public String toString() {
 - 协议对象
 - 专用 format 方法
 
-**9.24.4 toString 应避免复杂副作用**
+**19.2.4 toString 应避免复杂副作用**
 
 不推荐在 toString 中：
 
@@ -124,7 +139,7 @@ public String toString() {
 无副作用
 ```
 
-## 9.25 getClass()
+## 19.3 getClass()
 
 Object 定义：
 
@@ -198,7 +213,7 @@ dog.getClass() == Animal.class // false
 - 对象不能伪造自己的实际运行时 Class。
 - Class 与反射机制后续单独展开。
 
-## 9.26 clone()
+## 19.4 clone()
 
 Object 提供：
 
@@ -209,7 +224,7 @@ throws CloneNotSupportedException;
 
 clone 用于复制对象，但其设计存在较多限制。
 
-**9.26.1 Cloneable 标记接口**
+**19.4.1 Cloneable 标记接口**
 
 要正常调用 Object.clone()，类通常需要实现：
 
@@ -243,7 +258,7 @@ Cloneable 本身没有声明 clone 方法，它只是告诉 Object.clone：
 
 这是一种标记接口。
 
-**9.26.2 clone 默认是浅拷贝**
+**19.4.2 clone 默认是浅拷贝**
 
 ```java
 public class Order implements Cloneable {
@@ -271,7 +286,7 @@ clonedOrder.getItems().add("B");
 
 可能影响原对象。
 
-**9.26.3 为什么通常不推荐 clone**
+**19.4.3 为什么通常不推荐 clone**
 
 clone 的问题包括：
 
@@ -313,7 +328,7 @@ OrderCopyMapper.copy(source);
 
 这些方式的复制语义更清晰。
 
-## 9.27 wait()、notify() 与 notifyAll()
+## 19.5 wait()、notify() 与 notifyAll()
 
 Object 定义了：
 
@@ -359,7 +374,7 @@ IllegalMonitorStateException
 
 它们属于 Object，是因为任意对象都可以充当同步监视器。
 
-## 9.28 对象终结机制
+## 19.6 对象终结机制
 
 历史上 Object 提供过对象终结相关机制，但它存在：
 
@@ -396,7 +411,7 @@ Files.newInputStream(path)
 
 对象终结机制只作为历史知识了解，不应作为现代资源管理方案。
 
-## 9.29 identityHashCode()
+## 19.7 identityHashCode()
 
 System 提供：
 
@@ -437,402 +452,7 @@ System.identityHashCode(user)
 
 不应把它作为业务唯一 ID。
 
-## 9.30 IdentityHashMap
-
-普通 HashMap 使用：
-
-```
-hashCode()
-+
-equals()
-```
-
-判断键。
-IdentityHashMap 使用：
-
-```
-引用身份
-==
-```
-
-判断键。
-示例：
-
-```
-String a = new String("Java");
-String b = new String("Java");
-```
-
-普通 HashMap：
-
-```java
-Map<String, Integer> map =
-new HashMap<>();
-map.put(a, 1);
-map.put(b, 2);
-System.out.println(map.size());
-```
-
-通常为：
-
-```
-1
-```
-
-因为：
-
-```
-a.equals(b) == true
-```
-
-IdentityHashMap：
-
-```java
-Map<String, Integer> map =
-new IdentityHashMap<>();
-map.put(a, 1);
-map.put(b, 2);
-System.out.println(map.size());
-```
-
-通常为：
-
-```
-2
-```
-
-因为：
-
-```
-a != b
-```
-
-IdentityHashMap 适合少数需要身份语义的场景，不应替代普通 HashMap。
-
-## 9.31 equals 与继承的设计难题
-
-假设父类 equals 使用：
-
-```
-instanceof Parent
-```
-
-那么子类对象可能与父类对象相等。
-但子类新增字段后：
-
-```java
-class Child extends Parent {
-    private String extra;
-}
-```
-
-会出现问题：
-
-- 忽略 extra：子类不同状态可能被判相等
-- 比较 extra：可能破坏与父类的对称性
-- 限定同类型：父类与子类不再可相等
-- 因此，对具有值语义的类型，常见建议是：
-
-```
-final 类
-+
-不可变字段
-+
-明确 equals/hashCode
-```
-
-例如：
-
-```java
-public final class Money {
-}
-```
-
-避免在可扩展继承体系中定义复杂值相等性。
-
-## 9.32 canEqual 模式概览
-
-某些继承体系会使用 canEqual() 尝试维护对称性。
-父类：
-
-```java
-public class Point {
-    protected boolean canEqual(
-    Object other
-    ) {
-        return other instanceof Point;
-    }
-    @Override
-    public boolean equals(Object other) {
-        if (!(other instanceof Point point)) {
-            return false;
-        }
-        return point.canEqual(this)
-        && x == point.x
-        && y == point.y;
-    }
-}
-```
-
-子类重写：
-
-```java
-@Override
-protected boolean canEqual(
-Object other
-) {
-return other instanceof ColorPoint;
-}
-```
-
-这种方式可以处理部分继承相等性问题，但设计复杂。
-
-普通业务代码更推荐：
-
-- 值对象禁止继承
-- 使用组合
-- 不同类型不互相相等
-- 使用明确业务 ID 判断实体身份
-
-## 9.33 Lombok 与自动生成 equals/hashCode
-
-Lombok 可以通过注解生成：
-
-```
-@EqualsAndHashCode
-```
-
-或者：
-
-```
-@Data
-```
-
-但自动生成前必须确认：
-
-- 哪些字段参与相等性
-- 是否包含父类字段
-- 是否包含可变字段
-- 是否存在懒加载字段
-- 是否是 ORM 实体
-- 是否可能用作 HashMap Key
-- 是否存在循环引用
-- 是否包含大集合
-
-不应因为方便就机械生成全部字段相等性。
-例如实体对象包含：
-
-```
-List<OrderItem> items
-```
-
-如果自动加入 equals/hashCode：
-
-- 比较成本可能很高
-- 懒加载可能被触发
-- 集合修改会改变 hashCode
-- 双向关联可能递归
-- 日志和调试可能出现栈溢出
-
-## 9.34 实体对象的相等性设计
-
-实体强调：
-
-```
-同一身份
-```
-
-而不是所有字段相同。
-例如订单：
-
-```java
-public class Order {
-    private final OrderId orderId;
-    private OrderStatus status;
-}
-```
-
-即使状态变化：
-
-```
-CREATED
-→ PROCESSING
-→ COMPLETED
-```
-
-仍然是同一个订单。
-因此实体相等性通常基于：
-
-```
-稳定业务 ID
-```
-
-而不是所有可变字段。
-
-**9.34.1 业务 ID 优于可变字段**
-
-不推荐：
-
-```
-return Objects.equals(status, other.status)
-&& Objects.equals(items, other.items)
-&& Objects.equals(address, other.address);
-```
-
-这些字段可能随业务变化。
-更合理：
-
-```
-return Objects.equals(
-orderId,
-other.orderId
-);
-```
-
-前提是 orderId：
-
-- 创建时就存在
-- 全局或业务范围唯一
-- 生命周期内不改变
-- 不依赖数据库持久化后才生成
-
-## 9.35 值对象的相等性设计
-
-值对象强调：
-
-```
-所有业务值相同
-```
-
-例如：
-
-```java
-public final class Address {
-    private final String province;
-    private final String city;
-    private final String detail;
-}
-```
-
-相等性可以基于：
-
-```
-province
-city
-detail
-```
-
-值对象通常适合：
-
-- final 类
-- final 字段
-- 不可变
-- 完整重写 equals/hashCode
-- 修改时创建新对象
-
-**9.35.1 值对象没有独立身份**
-
-两个分别创建的地址对象：
-
-```
-Address a =
-new Address(
-"广东",
-"深圳",
-"南山区"
-);
-Address b =
-new Address(
-"广东",
-"深圳",
-"南山区"
-);
-```
-
-虽然：
-
-```
-a != b
-```
-
-但业务上：
-
-```
-a.equals(b)
-```
-
-应为 true。
-
-## 9.36 equals 的性能考虑
-
-equals 可能被频繁调用，例如：
-
-- HashMap 查找
-- HashSet 去重
-- 集合 contains
-- 列表 remove
-- 单元测试断言
-- 因此 equals 应尽量：
-- 无副作用
-- 不访问数据库
-- 不进行网络请求
-- 不依赖外部服务
-- 不执行超大对象图比较
-- 先比较成本较低的字段
-- 先使用 this == other
-- 例如：
-
-```
-return id == other.id
-&& Objects.equals(code, other.code)
-&& Objects.equals(details, other.details);
-```
-
-可以先比较：
-
-```
-便宜且区分度高的字段
-```
-
-再比较复杂字段。
-
-## 9.37 toString、equals、hashCode 中的循环引用
-
-双向关联：
-
-```java
-class Parent {
-    private List<Child> children;
-}
-class Child {
-    private Parent parent;
-}
-```
-
-如果自动生成 toString：
-
-```
-Parent.toString()
-→ Child.toString()
-→ Parent.toString()
-→ ...
-```
-
-可能导致：
-
-```
-StackOverflowError
-```
-
-equals/hashCode 同样可能递归。
-因此：
-不要机械包含全部关联字段
-双向关系中至少一侧排除
-实体优先使用稳定 ID
-日志只输出必要摘要
-避免打印完整对象图
-
-## 9.38 建议实验
+## 19.8 建议实验
 
 实验一：默认 equals 是身份比较
 
@@ -1108,35 +728,7 @@ public class CloneDemo {
 ```
 
 说明默认 clone 是浅拷贝。
-实验十：IdentityHashMap
-
-```java
-public class IdentityMapDemo {
-    public static void main(String[] args) {
-        String a = new String("Java");
-        String b = new String("Java");
-        Map<String, Integer> normal =
-        new HashMap<>();
-        normal.put(a, 1);
-        normal.put(b, 2);
-        Map<String, Integer> identity =
-        new IdentityHashMap<>();
-        identity.put(a, 1);
-        identity.put(b, 2);
-        System.out.println(normal.size());
-        System.out.println(identity.size());
-    }
-}
-```
-
-预期：
-
-```
-1
-2
-```
-
-## 9.39 高频面试题
+## 19.9 高频面试题
 
 本章建议保留以下问题：
 
@@ -1165,7 +757,6 @@ public class IdentityMapDemo {
 - 23.为什么不能只使用 hashCode 判断对象相等？
 - 24.为什么可变对象不适合作为 HashMap Key？
 - 25.哪些字段适合参与 equals 和 hashCode？
-- 26.实体和值对象的相等性有什么区别？
 - 27.数据库自增 ID 参与 equals 有什么问题？
 - 28.String 的 == 和 equals 有什么区别？
 - 29.包装类型应该如何比较？
@@ -1185,11 +776,9 @@ public class IdentityMapDemo {
 - 43.wait、notify 为什么定义在 Object 中？
 - 44.调用 wait、notify 为什么必须持有对象锁？
 - 45.System.identityHashCode 有什么作用？
-- 46.IdentityHashMap 与 HashMap 有什么区别？
-- 47.Lombok 自动生成 equals/hashCode 有什么风险？
 - 48.双向关联为什么可能导致 toString 或 equals 栈溢出？
 
-## 9.40 易错点
+## 19.10 易错点
 
 **误区一：Object 是接口**
 
@@ -1258,7 +847,7 @@ Object 是 Java 类体系的根类。
 - 错误。
 - 自动生成可能错误包含可变字段、集合、懒加载属性或双向关联。
 
-## 9.41 工程实践建议
+## 19.11 工程实践建议
 
 **9.41.1 值对象优先设计为不可变**
 
@@ -1392,7 +981,7 @@ Order copy = new Order(source);
 
 优于依赖 clone 的隐式复制语义。
 
-## 9.42 本章知识链路
+## 19.12 本章总结
 
 ```
 Object 是所有普通类的根类
@@ -1413,7 +1002,6 @@ equals 必须满足五项契约
 ↓
 相等性依赖字段必须稳定
 ↓
-实体和值对象采用不同相等策略
 ```
 
 == 与 equals：
@@ -1453,6 +1041,6 @@ HashMap Key
 - 型， == 比较两个引用是否指向同一对象。Object 默认的 equals 本质上也是身份比较，业务对象需要根据自身语义决定是否重写。equals 必须满足自反性、对称
 - 性、传递性、一致性和非空性。重写 equals 后必须同步重写 hashCode，并保证 equals 相等的对象 hashCode 一定相等。HashMap 和 HashSet 会先通过 hashCode
 - 定位候选位置，再通过 equals 确认逻辑相等，因此参与 equals 和 hashCode 的字段应保持稳定，尤其不应随意修改作为 Map Key 的对象。值对象通常按全部业务值
-- 判断相等，实体对象通常按稳定业务身份判断相等。toString 应提供有用的调试信息，但不能泄露敏感数据；clone 默认是浅拷贝，工程上通常更推荐拷贝构造方法或
+- toString 应提供有用的调试信息，但不能泄露敏感数据；clone 默认是浅拷贝，工程上通常更推荐拷贝构造方法或
 
 静态复制工厂。
