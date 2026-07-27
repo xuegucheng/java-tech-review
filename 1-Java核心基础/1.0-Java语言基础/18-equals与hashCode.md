@@ -1860,6 +1860,8 @@ equals/hashCode 同样可能递归。
 日志只输出必要摘要
 避免打印完整对象图
 
+## 18.32 建议实验
+
 实验一：默认 equals 是身份比较
 
 ```java
@@ -2068,7 +2070,9 @@ true
 
 
 
-## 18.32 高频面试题
+## 18.33 高频面试题
+
+
 
 本章建议保留以下问题：
 
@@ -2097,17 +2101,18 @@ true
 - 23.为什么不能只使用 hashCode 判断对象相等？
 - 24.为什么可变对象不适合作为 HashMap Key？
 - 25.哪些字段适合参与 equals 和 hashCode？
-- 27.数据库自增 ID 参与 equals 有什么问题？
-- 28.String 的 == 和 equals 有什么区别？
-- 29.包装类型应该如何比较？
-- 30.BigDecimal 的 equals 和 compareTo 有什么区别？
-- 31.数组应该如何比较内容？
-- 32. Objects.equals() 有什么作用？
-- 33. Objects.deepEquals() 有什么作用？
-- 48.双向关联为什么可能导致 toString 或 equals 栈溢出？
+- 26.数据库自增 ID 参与 equals 有什么问题？
+- 27.String 的 == 和 equals 有什么区别？
+- 28.包装类型应该如何比较？
+- 29.BigDecimal 的 equals 和 compareTo 有什么区别？
+- 30.数组应该如何比较内容？
+- 31. Objects.equals() 有什么作用？
+- 32. Objects.deepEquals() 有什么作用？
+- 33.双向关联为什么可能导致 toString 或 equals 栈溢出？
 
 
-## 18.33 易错点
+
+## 18.34 易错点
 
 - 误区：Object 是接口。错误，Object 是类体系的根类。
 - 误区：基本类型也是 Object 子类。错误，基本类型不是对象，赋值给 Object 时发生自动装箱。
@@ -2123,7 +2128,7 @@ true
 - 误区：final 类可以彻底解决 equals 设计。不完整，仍需正确选择字段并维护 hashCode 契约。
 - 误区：自动生成 equals/hashCode 永远安全。错误，可能错误包含可变字段、集合、懒加载或双向关联。
 
-## 18.34 工程实践建议
+## 18.35 工程实践建议
 
 - 重写 equals 必须同步重写 hashCode，使用同一组字段。
 - 只使用稳定字段参与 equals/hashCode。
@@ -2135,7 +2140,7 @@ true
 - 双向关联中至少一侧排除递归，避免 toString/equals/hashCode 栈溢出。
 - 使用 EqualsVerifier 等工具只能作为辅助，不能替代语义设计。
 
-## 18.35 本章总结
+## 18.36 本章总结
 
 ```
 Object 是所有普通类的根类
@@ -2191,10 +2196,10 @@ HashMap Key
 
 面试口述版：
 
-- Object 是 Java 普通类体系的根类，默认提供 equals、hashCode、toString、getClass、clone 以及线程协作相关方法。对于基本类型， == 比较数值；对于引用类
 - 型， == 比较两个引用是否指向同一对象。Object 默认的 equals 本质上也是身份比较，业务对象需要根据自身语义决定是否重写。equals 必须满足自反性、对称
 - 性、传递性、一致性和非空性。重写 equals 后必须同步重写 hashCode，并保证 equals 相等的对象 hashCode 一定相等。HashMap 和 HashSet 会先通过 hashCode
 - 定位候选位置，再通过 equals 确认逻辑相等，因此参与 equals 和 hashCode 的字段应保持稳定，尤其不应随意修改作为 Map Key 的对象。值对象通常按全部业务值
-- toString 应提供有用的调试信息，但不能泄露敏感数据；clone 默认是浅拷贝，工程上通常更推荐拷贝构造方法或
 
 静态复制工厂。
+实体和值对象采用不同相等性语义
+```

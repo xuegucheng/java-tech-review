@@ -451,29 +451,14 @@ Temurin 25 / Oracle JDK 25 / Corretto 25：不同厂商发行版
 
 Java 版本和 JDK 发行厂商是两个不同维度。在日常表达中，"Java 17"和"JDK 17"常被混用，但概念上：Java SE 17 表示平台规范版本，JDK 17 表示对应版本的开发工具包实现。
 
-**1.9.3 OpenJDK 与 Oracle JDK**
+**1.9.3 OpenJDK、Oracle JDK 与其他发行版**
 
 核心结论：
 
 - OpenJDK 是 Java SE 的开源参考实现和主要开发基础。
 - Oracle JDK 基于 OpenJDK 构建。
-- 还存在其他厂商发行版。
+- 还存在其他厂商发行版，例如 Temurin、Corretto、Zulu 等。
 - 企业项目通常优先选择成熟的 LTS 版本。
-
-核心结论：
-
-- OpenJDK 是 Java SE 的开源参考实现和主要开发基础。
-- Oracle JDK 基于 OpenJDK 构建。
-- 还存在其他厂商发行版。
-- Java 版本和 JDK 发行厂商是两个维度。
-
-```
-Java 版本：8 / 11 / 17 / 21 / 25 / 26
-+
-JDK 发行版：Oracle JDK / Temurin / Corretto / Zulu 等
-```
-
-Java 版本和 JDK 发行厂商是两个不同维度。
 
 ## 1.10 classpath、包与主类启动
 

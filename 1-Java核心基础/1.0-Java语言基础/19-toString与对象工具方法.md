@@ -454,7 +454,7 @@ System.identityHashCode(user)
 
 ## 19.8 建议实验
 
-实验八：toString 敏感信息泄露
+实验一：toString 敏感信息泄露
 
 ```java
 public class ToStringDemo {
@@ -486,7 +486,7 @@ public String toString() {
 }
 ```
 
-实验九：浅克隆共享内部对象
+实验二：浅克隆共享内部对象
 
 ```java
 public class CloneDemo {
@@ -522,86 +522,81 @@ public class CloneDemo {
 ```
 
 说明默认 clone 是浅拷贝。
+
+实验三：getClass 返回运行时类型
+
+```java
+class Animal {}
+class Dog extends Animal {}
+
+Animal a = new Dog();
+System.out.println(a.getClass().getSimpleName()); // Dog
+```
+
+`getClass()` 返回对象的运行时类型，不是变量声明类型。
+
+实验四：identityHashCode 不受重写 hashCode 影响
+
+```java
+class User {
+    @Override
+    public int hashCode() { return 42; }
+}
+User u = new User();
+System.out.println(System.identityHashCode(u)); // 原始身份哈希，不是 42
+```
+
+`identityHashCode` 不受重写的 `hashCode` 影响，返回对象身份级别的哈希值。
+
 ## 19.9 高频面试题
-- 34. toString() 的默认格式是什么？
-- 35.为什么需要重写 toString？
-- 36.toString 中为什么不能输出密码和 Token？
-- 37.toString 能否作为稳定序列化协议？
-- 38.getClass() 返回编译时类型还是运行时类型？
-- 39. instanceof 与 getClass 精确判断有什么区别？
-- 40.clone 默认是深拷贝还是浅拷贝？
-- 41.Cloneable 接口中是否定义了 clone 方法？
-- 42.为什么通常不推荐使用 clone？
-- 43.wait、notify 为什么定义在 Object 中？
-- 44.调用 wait、notify 为什么必须持有对象锁？
-- 45.System.identityHashCode 有什么作用？
+
+
+- 1. toString() 的默认格式是什么？
+- 2.为什么需要重写 toString？
+- 3.toString 中为什么不能输出密码和 Token？
+- 4.toString 能否作为稳定序列化协议？
+- 5.getClass() 返回编译时类型还是运行时类型？
+- 6. instanceof 与 getClass 精确判断有什么区别？
+- 7.clone 默认是深拷贝还是浅拷贝？
+- 8.Cloneable 接口中是否定义了 clone 方法？
+- 9.为什么通常不推荐使用 clone？
+- 10.wait、notify 为什么定义在 Object 中？
+- 11.调用 wait、notify 为什么必须持有对象锁？
+- 12.System.identityHashCode 有什么作用？
+
 ## 19.10 易错点
 
-- 误区十三：toString 可以随意打印所有字段
+- 误区一：toString 可以随意打印所有字段
 - 错误。
 - 敏感字段和大型对象图不应输出。
-- 误区十四：toString 适合作为业务数据协议
+- 误区二：toString 适合作为业务数据协议
 - 错误。
 - toString 主要用于人类可读描述，格式不应视为稳定协议。
-- 误区十五：clone 会自动深拷贝
+- 误区三：clone 会自动深拷贝
 - 错误。
 - Object.clone 默认更接近字段级浅拷贝。
-- 误区十六：Cloneable 定义了 clone 方法
+- 误区四：Cloneable 定义了 clone 方法
 - 错误。
 - Cloneable 是标记接口，本身没有声明方法。
-- 误区十七：getClass 返回变量声明类型
+- 误区五：getClass 返回变量声明类型
 - 错误。
 - getClass 返回对象的运行时类型。
-- 误区十八：wait 和 notify 属于 Thread
+- 误区六：wait 和 notify 属于 Thread
 - 错误。
-- 误区十九：System.identityHashCode 是业务唯一 ID
+- 误区七：System.identityHashCode 是业务唯一 ID
 - 错误。
 - 它只适合对象身份相关的底层或调试场景，不保证全局唯一。
 ## 19.11 工程实践建议
 
-**toString 只输出定位所需信息**
+1. `toString` 轻量、无副作用并做好脱敏。
+2. 避免打印完整递归对象图。
+3. 不把 `toString` 作为序列化协议。
+4. 复制对象优先使用拷贝构造、复制工厂或 Mapper。
+5. 明确浅拷贝和深拷贝语义。
+6. 资源释放使用 try-with-resources。
+7. `wait`/`notify` 的完整机制见并发模块。
+8. `identityHashCode` 只用于调试或身份语义。
 
-推荐输出：
-
-- 业务 ID
-- 类型
-- 关键状态
-- 少量必要字段
-- 避免输出：
-- 密码
-- Token
-- 大型集合
-- 二进制内容
-- 完整对象图
-- 懒加载关联
-
-- toString
-- Setter
-
-的注解。
-
-应明确控制：
-
-- 相等字段
-- 日志字段
-- 状态修改入口
-- 关联对象
-
-**复制对象优先使用明确 API**
-
-推荐：
-
-```
-Order copy = Order.copyOf(source);
-```
-
-或者：
-
-```
-Order copy = new Order(source);
-```
-
-优于依赖 clone 的隐式复制语义。
 ## 19.12 本章总结
 
 ```
