@@ -8,11 +8,12 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Java-8%2B-orange?logo=openjdk&logoColor=white" alt="Java 8+">
+  <img src="https://img.shields.io/badge/Baseline-Java%208-orange?logo=openjdk&logoColor=white" alt="Baseline Java 8">
+  <img src="https://img.shields.io/badge/Modern-Java%2025-purple?logo=openjdk&logoColor=white" alt="Modern Java 25">
   <img src="https://img.shields.io/badge/Status-Actively%20Maintained-brightgreen" alt="status">
   <img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="license">
   <img src="https://img.shields.io/badge/Content-370%2B%20pages-9cf" alt="pages">
-  <img src="https://img.shields.io/badge/Chapters-9-red" alt="chapters">
+  <img src="https://img.shields.io/badge/Topics-19-blue" alt="topics">
 </p>
 
 ---
@@ -21,7 +22,7 @@
 
 这是一套**系统化、结构化的 Java 技术复习笔记**，由有道云笔记导出后经过拆分、润色和重新组织而成。
 
-三篇 PDF、370 页、21 万字——拆分为 **19 个独立知识点文件**，每个文件聚焦一个完整主题，适合碎片化时间分块复习。
+拆分为 **19 个独立知识点文件**，每个文件聚焦一个完整主题，适合碎片化时间分块复习。
 
 > 不只是罗列语法，每篇笔记都包含：**定位说明 → 核心知识 → 面试口述版 → 高频面试题 → 易错点 → 工程实践建议**。
 
@@ -32,7 +33,7 @@
 - **Java 初学者** —— 从平台基础到 OOP 高级特性，按序号顺序学习即可
 - **技术管理者** —— 用于团队新人培训和技术规范对齐
 
-## 🗂️ 项目结��
+## 🗂️ 项目结构
 
 ```
 java-tech-review/
@@ -62,7 +63,7 @@ java-tech-review/
 │   └── 1.2-并发编程/                   ← 计划中
 ├── 2-框架与生态/                        ← 计划中
 ├── 3-数据库与缓存/                       ← 计划中
-├─�� 4-中间件/                            ← 计划中
+├── 4-中间件/                            ← 计划中
 ├── 5-分布式与微服务/                      ← 计划中
 ├── 6-架构设计与设计模式/                   ← 计划中
 ├── 7-DevOps与工具/                      ← 计划中
@@ -194,9 +195,12 @@ code java-tech-review
 | 优先级 | 模块 | 内容 | 状态 |
 |--------|------|------|------|
 | P0 | 1.0 Java 语言基础 | 类型系统、OOP、核心机制 | ✅ 已完成 |
+| P0 | 1.1 集合框架 | List、Set、Map、Queue、迭代器 | 📋 计划中 |
 | P0 | 1.2 并发编程 | 线程模型、锁、JUC、线程池 | 📋 计划中 |
+| P0 | 1.3 JVM | 类加载、内存模型、GC、调优 | 📋 计划中 |
 | P0 | 3. 数据库与缓存 | MySQL、Redis、分库分表 | 📋 计划中 |
 | P1 | 2. 框架与生态 | Spring、Spring Boot、MyBatis | 📋 计划中 |
+| P1 | 1.4 Java 高级语言特性 | Lambda、Stream、泛型、注解、反射 | 📋 计划中 |
 | P1 | 5. 分布式与微服务 | 分布式理论、RPC、消息队列 | 📋 计划中 |
 | P1 | 8. 计算机基础 | 网络、操作系统、数据结构 | 📋 计划中 |
 | P2 | 4. 中间件 | Kafka、RocketMQ、Elasticsearch | 📋 计划中 |
@@ -223,5 +227,5 @@ MIT License — 自由使用、修改、分发。
 ---
 
 <p align="center">
-  <sub>Built with ❤️ by <a href="https://github.com/xuegucheng">@xuegucheng</a> | Powered by WorkBuddy</sub>
+  <sub>Built with ❤️ by <a href="https://github.com/xuegucheng">@xuegucheng</a></sub>
 </p>

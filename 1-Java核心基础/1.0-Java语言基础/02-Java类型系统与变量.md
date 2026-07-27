@@ -577,17 +577,19 @@ user1.count;
 
 实例变量和静态变量会获得默认值：
 
-- 类型 默认值
-- byte 0
-- short 0
-- int 0
-- long 0L
-- float 0.0F
-- double 0.0D
-- char '\u0000'
-- boolean false
-- 引用类型 null
-- 示例：
+| 类型 | 默认值 |
+|---|---|
+| byte | 0 |
+| short | 0 |
+| int | 0 |
+| long | 0L |
+| float | 0.0F |
+| double | 0.0D |
+| char | '\u0000' |
+| boolean | false |
+| 引用类型 | null |
+
+示例：
 
 ```java
 public class User {

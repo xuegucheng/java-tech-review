@@ -115,10 +115,11 @@ JDK ⊃ JRE ⊃ JVM
 
 **1.3.4 三者对比**
 
-- 名称 定位 主要内容 主要使用者
-- JVM 字节码执行引擎 类加载、执行、内存管理、GC Java 程序
-- JRE 运行环境 JVM + 运行类库 只运行程序的环境
-- JDK 开发工具包 运行环境 + 编译、调试、诊断工具 开发人员
+| 名称 | 定位 | 主要内容 | 主要使用者 |
+|---|---|---|---|
+| JVM | 字节码执行引擎 | 类加载、执行、内存管理、GC | Java 程序 |
+| JRE | 运行环境 | JVM + 运行类库 | 只运行程序的环境 |
+| JDK | 开发工具包 | 运行环境 + 编译、调试、诊断工具 | 开发人员 |
 
 ## 1.4 Java 程序从源码到运行
 
@@ -411,7 +412,7 @@ JDK 17 表示对应版本的开发工具包实现。
 - Java 版本和 JDK 发行厂商是两个维度。
 
 ```
-Java 版本：8 / 11 / 17 / 21
+Java 版本：8 / 11 / 17 / 21 / 25 / 26
 +
 JDK 发行版：Oracle JDK / Temurin / Corretto / Zulu 等
 ```
@@ -454,9 +455,10 @@ java -cp target/classes com.example.demo.Main
 
 **1.10.3 PATH 与 classpath 区别**
 
-- 配置 用途
-- PATH 操作系统寻找 java 、 javac 等可执行程序
-- classpath JVM 或编译器寻找 Java 类
+| 配置 | 用途 |
+|---|---|
+| PATH | 操作系统寻找 java 、 javac 等可执行程序 |
+| classpath | JVM 或编译器寻找 Java 类 |
 
 ## 1.11 本章总结
 

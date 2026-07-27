@@ -1,21 +1,6 @@
 # toString 与对象工具方法
 
-## 9.23 Objects.deepEquals()
-
-Objects.deepEquals(a, b) 可以处理数组：
-
-```java
-int[] a = {1, 2};
-int[] b = {1, 2};
-System.out.println(
-Objects.deepEquals(a, b)
-);
-```
-
-结果通常为 true。
-对于普通对象，则仍然依赖 equals。
-
-## 9.24 toString()
+## 9.23 toString()
 
 Object 默认的 toString() 通常生成类似：
 

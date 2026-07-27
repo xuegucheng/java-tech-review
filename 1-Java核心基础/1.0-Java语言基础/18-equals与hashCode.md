@@ -31,10 +31,10 @@ public class User extends Object {
 - 哪些字段适合参与对象相等性判断？
 - 可变字段参与 hashCode() 会有什么风险？
 - getClass() 与 instanceof 在 equals 中如何选择？
-- toString() 应该输出哪些内容？
-- clone() 为什么通常不推荐直接使用？
-- getClass() 、 wait() 、 notify() 等 Object 方法分别有什么作用？
 - 实体对象和值对象的相等性应该如何设计？
+- 可变字段作为 HashMap Key 有什么风险？
+
+toString()、clone()、getClass()、wait()/notify() 等方法放在 19。
 
 本章核心主线：
 
@@ -53,6 +53,19 @@ equals 与 hashCode 必须保持一致
 ↓
 形成稳定的对象相等性契约
 ```
+
+## 9.22 Objects.deepEquals()
+
+Objects.deepEquals(a, b) 可以处理数组：
+
+```java
+int[] a = {1, 2};
+int[] b = {1, 2};
+System.out.println(Objects.deepEquals(a, b));
+```
+
+结果为 true。
+对于普通对象，则仍然依赖 equals。
 
 本章暂不深入：
 
