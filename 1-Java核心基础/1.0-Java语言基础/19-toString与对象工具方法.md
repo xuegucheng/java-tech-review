@@ -413,35 +413,33 @@ Files.newInputStream(path)
 
 ## 19.7 identityHashCode()
 
-System 提供：
-
-```
-System.identityHashCode(object)
-```
-
-它用于获得基于对象身份的哈希值，不受类重写 hashCode 影响。
-例如：
+`System.identityHashCode(Object)` 返回基于对象身份的哈希值，不受类重写的 `hashCode()` 影响。
 
 ```java
-public class User {
-    @Override
-    public int hashCode() {
-        return 1;
+public class IdentityHashCodeDemo {
+
+    static class User {
+
+        @Override
+        public int hashCode() {
+            return 42;
+        }
+    }
+
+    public static void main(String[] args) {
+        User user = new User();
+
+        System.out.println(user.hashCode());
+        System.out.println(System.identityHashCode(user));
     }
 }
 ```
 
-调用：
+`user.hashCode()` 固定返回重写方法中的 42。
 
-```java
-User user = new User();
-System.out.println(user.hashCode());
-System.out.println(
-System.identityHashCode(user)
-);
-```
+`System.identityHashCode(user)` 使用对象身份语义，不受当前类重写后的 `hashCode()` 控制。
 
-两个结果可能不同。
+两者通常不同，但规范并不保证身份哈希值一定不等于 42。关键区别是该值不由重写后的 `hashCode()` 方法决定。
 
 适合：
 
