@@ -1,6 +1,6 @@
 # static 与类初始化
 
-## 8.1 本章定位
+## 16.1 本章定位
 
 前面的章节已经讨论了：
 
@@ -48,9 +48,8 @@
 - 单例模式完整实现：放在设计模式或并发模块。
 - 常量池和字符串池：放在 String 章节。
 
-final 的完整语义见 17-final 与常量设计。
 
-## 8.2 static 的基本含义
+## 16.2 static 的基本含义
 
 static 表示成员属于类级别，而不是某个具体对象。
 例如：
@@ -91,7 +90,7 @@ user2 ──→ User 对象2
 └── name
 ```
 
-**8.2.1 静态成员不依赖对象存在**
+**16.2.1 静态成员不依赖对象存在**
 
 即使没有创建任何对象，也可以访问静态成员：
 
@@ -121,7 +120,7 @@ user.DEFAULT_NAME;
 
 后者即使语法允许，也容易让人误以为静态成员属于对象。
 
-## 8.3 静态字段
+## 16.3 静态字段
 
 使用 static 修饰的字段称为静态字段或类变量：
 
@@ -133,7 +132,7 @@ public class User {
 
 静态字段通常只有一份，由该类的所有实例共享。
 
-**8.3.1 静态字段共享示例**
+**16.3.1 静态字段共享示例**
 
 ```java
 public class User {
@@ -164,7 +163,7 @@ System.out.println(User.getCount());
 
 每次创建对象都会修改同一个 count 。
 
-**8.3.2 静态字段不是每个对象一份**
+**16.3.2 静态字段不是每个对象一份**
 
 错误理解：
 
@@ -201,7 +200,7 @@ System.out.println(User.count);
 
 并不存在两个独立的静态字段。
 
-**8.3.3 静态字段的默认值**
+**16.3.3 静态字段的默认值**
 
 静态字段与实例字段一样，会获得默认值：
 
@@ -231,7 +230,7 @@ environment = null
 
 但类初始化过程中，显式初始化表达式和静态代码块会覆盖默认值。
 
-**8.3.4 静态字段适合保存什么**
+**16.3.4 静态字段适合保存什么**
 
 适合保存：
 
@@ -248,7 +247,7 @@ environment = null
 private static final int DEFAULT_TIMEOUT = 30;
 ```
 
-**8.3.5 静态可变字段的风险**
+**16.3.5 静态可变字段的风险**
 
 ```java
 public class GlobalState {
@@ -269,7 +268,7 @@ public class GlobalState {
 
 静态字段应优先用于不可变常量和无状态共享对象，谨慎保存可变业务状态。
 
-## 8.4 静态方法
+## 16.4 静态方法
 
 使用 static 修饰的方法称为静态方法或类方法：
 
@@ -289,7 +288,7 @@ int result = MathUtils.max(10, 20);
 
 不需要创建 MathUtils 对象。
 
-**8.4.1 静态方法没有 this**
+**16.4.1 静态方法没有 this**
 
 实例方法调用：
 
@@ -320,7 +319,7 @@ public static void print() {
 
 编译失败。
 
-**8.4.2 静态方法不能直接访问实例成员**
+**16.4.2 静态方法不能直接访问实例成员**
 
 ```java
 public class User {
@@ -340,7 +339,7 @@ name 属于具体对象
 无法确定访问哪个对象的 name
 ```
 
-**8.4.3 静态方法通过对象访问实例成员**
+**16.4.3 静态方法通过对象访问实例成员**
 
 静态方法如果获得对象引用，就可以访问该对象的实例成员：
 
@@ -353,7 +352,7 @@ public static void printName(User user) {
 这里并不是静态方法直接拥有实例上下文。
 而是通过参数 user 明确指定了要访问哪个对象。
 
-**8.4.4 实例方法可以访问静态成员**
+**16.4.4 实例方法可以访问静态成员**
 
 ```java
 public class User {
@@ -374,7 +373,7 @@ System.out.println(User.count);
 System.out.println(this.name);
 ```
 
-**8.4.5 静态方法适用场景**
+**16.4.5 静态方法适用场景**
 
 适合：
 
@@ -393,7 +392,7 @@ public static Order create(String orderNo) {
 }
 ```
 
-**8.4.6 静态方法不适合的场景**
+**16.4.6 静态方法不适合的场景**
 
 如果方法依赖：
 
@@ -423,7 +422,7 @@ public static void createOrder(Order order) {
 - 难以通过多态扩展
 - 容易形成全局状态
 
-## 8.5 静态方法隐藏
+## 16.5 静态方法隐藏
 
 父类：
 
@@ -469,7 +468,7 @@ Child.execute();
 
 不要通过对象引用调用静态方法，以免误解为动态绑定。
 
-## 8.6 静态代码块
+## 16.6 静态代码块
 
 静态代码块使用：
 
@@ -495,7 +494,7 @@ public class Config {
 
 静态代码块在类初始化时执行。
 
-**8.6.1 静态代码块的特点**
+**16.6.1 静态代码块的特点**
 
 - 属于类级初始化逻辑
 - 类初始化时执行
@@ -505,7 +504,7 @@ public class Config {
 - 不能使用 this
 - 按源码顺序与静态字段初始化表达式一起执行
 
-**8.6.2 静态代码块不能保证程序启动时立即执行**
+**16.6.2 静态代码块不能保证程序启动时立即执行**
 
 类什么时候执行静态代码块，取决于该类什么时候被主动初始化。
 例如：
@@ -521,7 +520,7 @@ public class Demo {
 仅仅把 Demo.class 文件放在 classpath 中，不代表静态代码块一定立即执行。
 只有程序实际触发类初始化时才会执行。
 
-**8.6.3 静态代码块异常**
+**16.6.3 静态代码块异常**
 
 如果静态初始化过程中发生异常：
 
@@ -551,7 +550,7 @@ NoClassDefFoundError
 因此：
 静态初始化逻辑应保持简单、可预测，避免网络、数据库和复杂外部 IO。
 
-## 8.7 静态字段与静态代码块的执行顺序
+## 16.7 静态字段与静态代码块的执行顺序
 
 静态字段初始化表达式和静态代码块按源码出现顺序执行。
 
@@ -584,7 +583,7 @@ public class StaticOrderDemo {
 核心规则：
 静态字段初始化表达式和静态代码块按照源码顺序组成类初始化过程。
 
-**8.7.1 静态字段先获得默认值**
+**16.7.1 静态字段先获得默认值**
 
 ```java
 public class StaticDefaultDemo {
@@ -616,7 +615,7 @@ public class StaticDefaultDemo {
 value = 10
 ```
 
-## 8.8 类加载与类初始化
+## 16.8 类加载与类初始化
 
 日常表达中经常说“类被加载时执行静态代码块”，但这不够准确。
 从 JVM 生命周期看，类通常会经历：
@@ -649,7 +648,7 @@ value = 10
 初始化阶段
 ```
 
-**8.8.1 准备阶段与初始化阶段的简化区别**
+**16.8.1 准备阶段与初始化阶段的简化区别**
 
 假设：
 
@@ -676,7 +675,7 @@ public static final int VALUE = 10;
 本章只记住：
 静态字段先有默认值，再执行源码中的显式初始化逻辑。
 
-## 8.9 触发类初始化的典型行为
+## 16.9 触发类初始化的典型行为
 
 通常会主动触发类初始化的行为包括：
 
@@ -688,7 +687,7 @@ public static final int VALUE = 10;
 - 6.初始化某个类时，先初始化其父类
 - 7.JVM 启动时初始化包含 main() 的主类
 
-**8.9.1 new 触发初始化**
+**16.9.1 new 触发初始化**
 
 ```
 new User();
@@ -696,7 +695,7 @@ new User();
 
 创建对象前，必须确保 User 类已经初始化完成。
 
-**8.9.2 调用静态方法触发初始化**
+**16.9.2 调用静态方法触发初始化**
 
 ```
 User.create();
@@ -704,7 +703,7 @@ User.create();
 
 通常会触发 User 类初始化。
 
-**8.9.3 访问普通静态字段触发初始化**
+**16.9.3 访问普通静态字段触发初始化**
 
 ```java
 System.out.println(Config.timeout);
@@ -712,7 +711,7 @@ System.out.println(Config.timeout);
 
 如果 timeout 不是编译期常量，通常会触发 Config 初始化。
 
-## 8.10 不一定触发类初始化的行为
+## 16.10 不一定触发类初始化的行为
 
 某些行为可能不会触发目标类初始化：
 
@@ -722,7 +721,7 @@ System.out.println(Config.timeout);
 - 获取类字面量 SomeClass.class
 - 类加载但未主动初始化
 
-**8.10.1 访问编译期常量**
+**16.10.1 访问编译期常量**
 
 ```java
 public class Constants {
@@ -754,7 +753,7 @@ Constants initialized
 原因是：
 编译期常量可能在编译阶段被直接内联到调用方代码中，运行时不需要读取 Constants 类的字段。
 
-**8.10.2 非编译期常量会触发初始化**
+**16.10.2 非编译期常量会触发初始化**
 
 ```java
 public class Constants {
@@ -775,7 +774,7 @@ System.out.println(Constants.TIMEOUT);
 
 通常会先初始化 Constants。
 
-**8.10.3 通过子类访问父类静态字段**
+**16.10.3 通过子类访问父类静态字段**
 
 父类：
 
@@ -820,7 +819,7 @@ Child initialized
 因为 value 实际由 Parent 定义。
 真正被主动使用的是 Parent。
 
-**8.10.4 创建数组不会初始化元素类型**
+**16.10.4 创建数组不会初始化元素类型**
 
 ```
 User[] users = new User[10];
@@ -833,7 +832,7 @@ User[] users = new User[10];
 null
 ```
 
-**8.10.5 类字面量**
+**16.10.5 类字面量**
 
 ```
 Class<User> type = User.class;
@@ -842,7 +841,7 @@ Class<User> type = User.class;
 获取类字面量通常不会执行类的静态初始化逻辑。
 但后续反射操作是否初始化，取决于具体 API 和参数。
 
-## 8.11 父子类静态初始化顺序
+## 16.11 父子类静态初始化顺序
 
 初始化子类前，必须先初始化父类。
 父类：
@@ -886,7 +885,7 @@ Child static
 再初始化 Child
 ```
 
-**8.11.1 完整父子类初始化顺序**
+**16.11.1 完整父子类初始化顺序**
 
 第一次创建子类对象时：
 
@@ -918,7 +917,7 @@ Child static
 
 静态初始化不会重复执行。
 
-## 8.12 初始化期间的前向引用
+## 16.12 初始化期间的前向引用
 
 Java 对字段初始化中的前向引用存在限制。
 错误示例：
@@ -960,7 +959,7 @@ second 已获得默认值 0
 因此：
 不要设计依赖复杂声明顺序的静态初始化逻辑。
 
-## 8.13 static import
+## 16.13 static import
 
 Java 支持静态导入：
 
@@ -982,7 +981,7 @@ int lower = min(a, b);
 Math.max(a, b);
 ```
 
-**8.13.1 静态导入适用场景**
+**16.13.1 静态导入适用场景**
 
 适合：
 
@@ -996,7 +995,7 @@ Math.max(a, b);
 import static org.junit.jupiter.api.Assertions.assertEquals;
 ```
 
-**8.13.2 不应滥用静态导入**
+**16.13.2 不应滥用静态导入**
 
 如果大量导入：
 
@@ -1019,7 +1018,7 @@ DEFAULT_SIZE;
 因此：
 静态导入应只在能够明显提升可读性时使用。
 
-## 8.14 工具类设计
+## 16.14 工具类设计
 
 工具类通常只提供静态方法：
 
@@ -1033,7 +1032,7 @@ public final class StringUtils {
 }
 ```
 
-**8.14.1 为什么工具类构造方法使用 private**
+**16.14.1 为什么工具类构造方法使用 private**
 
 如果不声明构造方法：
 
@@ -1058,7 +1057,7 @@ private StringUtils() {
 
 用于禁止外部实例化。
 
-**8.14.2 为什么工具类常使用 final**
+**16.14.2 为什么工具类常使用 final**
 
 ```java
 public final class StringUtils {
@@ -1074,7 +1073,7 @@ public final class StringUtils {
 - 避免被误用为父类
 - 明确表达工具类定位
 
-**8.14.3 工具类不要保存可变业务状态**
+**16.14.3 工具类不要保存可变业务状态**
 
 不推荐：
 
@@ -1103,3 +1102,501 @@ List<OrderItem> items
     // 纯计算
 }
 ```
+
+
+## 16.15 建议实验
+
+实验一：静态字段共享
+
+```java
+public class StaticFieldDemo {
+    public static void main(String[] args) {
+        User user1 = new User();
+        User user2 = new User();
+        user1.increment();
+        user2.increment();
+        System.out.println(User.getCount());
+    }
+    static class User {
+        private static int count;
+        void increment() {
+            count++;
+        }
+        static int getCount() {
+            return count;
+        }
+    }
+}
+```
+
+预期：
+
+```
+2
+```
+
+实验二：静态方法不能访问实例成员
+
+```java
+public class StaticMethodDemo {
+    private String name = "Java";
+    public static void print() {
+        // System.out.println(name);
+        // 编译错误
+    }
+}
+```
+
+修改为：
+
+```java
+public static void print(
+StaticMethodDemo demo
+) {
+    System.out.println(demo.name);
+}
+```
+
+验证可以通过对象引用访问实例字段。
+
+实验三：静态初始化顺序
+
+```java
+public class StaticInitializationDemo {
+    private static int first =
+    print("first", 1);
+    static {
+        System.out.println("block 1");
+    }
+    private static int second =
+    print("second", 2);
+    static {
+        System.out.println("block 2");
+    }
+    private static int print(
+    String name,
+    int value
+    ) {
+        System.out.println(name);
+        return value;
+    }
+    public static void main(String[] args) {
+        System.out.println("main");
+    }
+}
+```
+
+预期：
+
+```
+first
+block 1
+second
+block 2
+main
+```
+
+实验四：父子类初始化顺序
+
+```java
+public class ParentChildInitializationDemo {
+    public static void main(String[] args) {
+        new Child();
+    }
+    static class Parent {
+        static {
+            System.out.println("父类静态");
+        }
+        {
+            System.out.println("父类实例");
+        }
+        Parent() {
+            System.out.println("父类构造");
+        }
+    }
+    static class Child extends Parent {
+        static {
+            System.out.println("子类静态");
+        }
+        {
+            System.out.println("子类实例");
+        }
+        Child() {
+            System.out.println("子类构造");
+        }
+    }
+}
+```
+
+预期：
+
+```
+父类静态
+子类静态
+父类实例
+父类构造
+子类实例
+子类构造
+```
+
+实验五：编译期常量不触发初始化
+
+```java
+public class ConstantInitializationDemo {
+    static class Constants {
+        static {
+            System.out.println(
+            "Constants initialized"
+            );
+        }
+        static final int VALUE = 10;
+    }
+    public static void main(String[] args) {
+        System.out.println(Constants.VALUE);
+    }
+}
+```
+
+观察是否输出静态初始化信息。
+然后改为：
+
+```java
+static final int VALUE =
+Integer.parseInt("10");
+```
+
+再次观察差异。
+
+实验六：通过子类访问父类静态字段
+
+```java
+public class ParentStaticFieldDemo {
+    static class Parent {
+        static {
+            System.out.println("Parent");
+        }
+        static int value = 10;
+    }
+    static class Child extends Parent {
+        static {
+            System.out.println("Child");
+        }
+    }
+    public static void main(String[] args) {
+        System.out.println(Child.value);
+    }
+}
+```
+
+预期：
+
+```
+Parent
+10
+```
+
+通常不会输出 Child。
+
+实验七：静态初始化循环依赖
+
+```java
+public class CircularInitializationDemo {
+    static class A {
+        static int value = B.value + 1;
+    }
+    static class B {
+        static int value = A.value + 1;
+    }
+    public static void main(String[] args) {
+        System.out.println(A.value);
+        System.out.println(B.value);
+    }
+}
+```
+
+观察结果并分析默认值参与初始化的过程。
+
+实验八：静态代码块初始化失败
+
+```java
+public class InitializationFailureDemo {
+    static class Config {
+        static {
+            if (System.currentTimeMillis() > 0) {
+                throw new RuntimeException(
+                "初始化失败"
+                );
+            }
+        }
+    }
+    public static void main(String[] args) {
+        for (int i = 0; i < 2; i++) {
+            try {
+                Class.forName(
+                Config.class.getName(),
+                true,
+                Config.class
+                .getClassLoader()
+                );
+            } catch (Throwable throwable) {
+                System.out.println(
+                throwable.getClass()
+                .getSimpleName()
+                );
+            }
+        }
+    }
+}
+```
+
+观察第一次和后续使用失败类时的异常差异（ExceptionInInitializerError 与 NoClassDefFoundError）。
+
+## 16.16 高频面试题
+
+本章建议保留以下问题：
+
+- 1. static 表示什么？
+- 2.静态字段和实例字段有什么区别？
+- 3.静态字段是每个对象一份吗？
+- 4.静态方法为什么不能直接访问实例字段？
+- 5.静态方法中为什么不能使用 this ？
+- 6.实例方法能否访问静态字段？
+- 7.静态方法能否被重写？
+- 8.什么是静态方法隐藏？
+- 9.为什么建议通过类名调用静态方法？
+- 10.静态代码块什么时候执行？
+- 11.静态代码块会执行几次？
+- 12.静态字段初始化表达式和静态代码块的顺序是什么？
+- 13.静态字段是否有默认值？
+- 14.类加载和类初始化有什么区别？
+- 15.哪些行为会触发类初始化？
+- 16.访问编译期常量为什么可能不触发类初始化？
+- 17.访问非编译期常量为什么会触发类初始化？
+- 18.通过子类访问父类静态字段，会初始化子类吗？
+- 19.创建对象数组是否会初始化元素类型？
+- 20.获取 SomeClass.class 是否一定会初始化类？
+- 21.父类和子类的静态初始化顺序是什么？
+- 22.完整的父子类初始化顺序是什么？
+- 23.静态代码块抛异常会发生什么？
+- 24.什么是类初始化循环依赖？
+- 25.工具类为什么使用私有构造方法？
+- 26.工具类为什么常声明为 final？
+- 27.static 是否能保证线程安全？
+- 28.静态可变字段有什么风险？
+- 29.静态工具类和单例对象有什么区别？
+- 30.为什么复杂业务逻辑不适合全部设计成静态方法？
+- 31.为什么静态缓存容易造成内存泄漏？
+- 32.JVM 如何保证类初始化的线程安全？
+
+## 16.17 易错点
+
+**误区一：static 成员属于所有对象**
+
+不准确。
+static 成员属于类，只是所有对象都可以访问同一个类级成员。
+
+**误区二：每创建一个对象，静态字段都会复制一份**
+
+**错误。**
+
+静态字段通常只有类级一份。
+
+**误区三：静态方法不能访问任何实例成员**
+
+不准确。
+静态方法不能直接访问实例成员，但可以通过明确的对象引用访问。
+
+**误区四：静态方法可以被子类重写**
+
+**错误。**
+
+子类同名静态方法属于隐藏，不参与运行时多态。
+
+**误区五：静态代码块在程序启动时一定执行**
+
+**错误。**
+
+只有类被主动初始化时才执行。
+未使用的类可能始终不会初始化。
+
+**误区六：类被加载就一定已经初始化**
+
+**错误。**
+
+加载、链接和初始化是不同阶段。
+
+**误区七：通过 Child.value 一定初始化 Child**
+
+**错误。**
+
+如果 value 实际定义在 Parent 中，通常只初始化 Parent。
+
+**误区八：创建 User[] 会创建多个 User 对象**
+
+**错误。**
+
+只创建数组对象，数组元素初始值是 null。
+
+**误区九：static 能保证线程安全**
+
+**错误。**
+
+static 只表示共享范围，反而可能扩大并发竞争。
+
+**误区十：静态方法一定比实例方法性能更好**
+
+不应这样设计。
+
+现代 JVM 会进行优化，业务设计应优先考虑语义、可测试性、可替换性、封装和多态需求。
+
+**误区十一：工具类应该保存全局业务状态**
+
+**错误。**
+
+工具类通常应保持无状态。
+
+**误区十二：静态初始化适合执行复杂网络调用**
+
+**错误。**
+
+静态初始化失败会导致整个类不可用，而且很难恢复。
+
+**误区十三：类初始化永远不会发生死锁**
+
+**错误。**
+
+如果多个类静态初始化相互依赖并获取不同锁，可能形成初始化死锁。
+
+## 16.18 工程实践建议
+
+**16.18.1 静态字段优先保持不可变**
+
+推荐：
+
+```java
+private static final DateTimeFormatter FORMATTER =
+DateTimeFormatter.ISO_LOCAL_DATE;
+```
+
+谨慎：
+
+```java
+private static Map<String, Object> globalState;
+```
+
+**16.18.2 不要使用静态变量保存请求级数据**
+
+错误：
+
+```java
+private static String currentUserId;
+```
+
+在 Web 服务中多个请求线程共享该字段，容易发生用户数据串扰。
+
+请求级数据应通过方法参数、请求上下文、明确作用域对象或必要时 ThreadLocal 传递。
+
+**16.18.3 静态初始化保持简单**
+
+推荐：
+
+```java
+private static final Set<String> SUPPORTED_TYPES =
+Set.of("A", "B", "C");
+```
+
+谨慎：
+
+```
+static {
+// 访问数据库
+// 远程请求
+// 启动线程
+// 获取复杂锁
+}
+```
+
+**16.18.4 工具类保持无状态**
+
+推荐：
+
+```java
+public static String normalize(
+String value
+) {
+    return value == null
+    ? null
+    : value.trim();
+}
+```
+
+避免：
+
+```java
+private static String lastValue;
+```
+
+**16.18.5 可替换行为不要设计成静态方法**
+
+需要测试和扩展时：
+
+```java
+public interface MessageSender {
+    void send(Message message);
+}
+```
+
+优于：
+
+```
+MessageUtils.send(message);
+```
+
+**16.18.6 避免静态状态污染测试**
+
+如果测试需要：
+
+```
+GlobalCache.clear();
+GlobalConfig.reset();
+```
+
+说明代码可能依赖全局可变状态。
+可以考虑实例化依赖、构造注入、测试独立对象、显式生命周期或容器管理。
+
+## 16.19 本章知识链路
+
+```
+类定义完成
+↓
+静态字段先获得默认值
+↓
+类被主动使用
+↓
+父类先初始化
+↓
+按源码顺序执行静态字段初始化
+和静态代码块
+↓
+类级状态建立完成
+↓
+new 创建对象
+↓
+执行实例字段初始化和构造方法
+```
+
+static 知识链：
+
+```
+static
+→ 属于类
+→ 所有对象共享
+→ 不依赖具体对象
+→ 没有 this
+→ 不具有实例多态
+→ 可变状态需要考虑并发和生命周期
+```
+
+面试口述版：
+
+- static 表示成员属于类级别，而不是某个具体对象。静态字段通常只有一份，由该类的所有实例共享；静态方法没有 this，因此不能直接访问实例成员，也不参与实例方法的运行时多态。静态字段初始化表达式和静态代码块在类初始化阶段按源码顺序执行，初始化子类前会先初始化父类。访问编译期常量可能不会触发声明类初始化，因为常量值可能被编译器内联。静态共享状态不会自动保证线程安全，并且可能带来全局状态、测试污染和内存泄漏问题，因此应谨慎使用。

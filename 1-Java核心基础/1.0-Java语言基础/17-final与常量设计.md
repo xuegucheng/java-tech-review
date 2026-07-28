@@ -1,6 +1,48 @@
 # final 与常量设计
 
-## 8.15 final 的基本含义
+## 17.1 本章定位
+
+前面的章节已经讨论了类与对象、继承、static 与类初始化等内容。
+本章专门讨论 final 关键字的完整语义以及常量设计实践。
+
+主要回答以下问题：
+
+- final 可以修饰哪些元素？
+- final 变量、字段、方法、类各自的语义是什么？
+- final 引用是否等于对象不可变？
+- 什么是空白 final？
+- 什么是 effectively final？
+- static final 一定是编译期常量吗？
+- 编译期常量内联有什么风险？
+- 如何设计安全的常量？
+
+本章核心主线：
+
+```
+final 变量
+→ 只能赋值一次
+
+final 引用
+→ 引用值不变，对象状态仍可能变化
+
+final 方法
+→ 不能被重写
+
+final 类
+→ 不能被继承
+
+不可变对象
+→ 不仅需要 final，还需要封装和防御性复制
+```
+
+本章暂不深入：
+
+- 不可变对象的完整设计模式、Builder 模式、Getter 防御性返回：见 10-面向对象设计。
+- final 字段的 Java 内存模型语义（安全发布）：见并发模块。
+- Lambda 捕获变量的完整规则：见现代 Java 特性笔记。
+- 单例模式完整实现：见设计模式或并发模块。
+
+## 17.2 final 的基本含义
 
 final 可以修饰：
 
@@ -20,7 +62,7 @@ final 类
 → 不能被继承
 ```
 
-## 8.16 final 局部变量
+## 17.3 final 局部变量
 
 ```
 final int value = 10;
@@ -34,7 +76,7 @@ value = 20;
 
 编译失败。
 
-**8.16.1 final 表示只能赋值一次**
+**17.3.1 final 表示只能赋值一次**
 
 final 不一定要求声明时立刻赋值：
 
@@ -56,7 +98,7 @@ value = 20;
 
 就可以编译。
 
-**8.16.2 final 局部变量必须确定赋值**
+**17.3.2 final 局部变量必须确定赋值**
 
 错误：
 
@@ -70,7 +112,7 @@ System.out.println(value);
 
 因为当 condition == false 时， value 没有初始化。
 
-**8.16.3 循环中的 final 变量**
+**17.3.3 循环中的 final 变量**
 
 ```
 for (int i = 0; i < 10; i++) {
@@ -90,7 +132,7 @@ value = i;
 
 通常无法编译，因为同一个 final 变量可能被多次赋值。
 
-## 8.17 final 引用变量
+## 17.4 final 引用变量
 
 ```java
 final List<String> list =
@@ -117,7 +159,7 @@ final 限制的是引用变量中的引用值不能改变
 不限制引用对象的内部状态
 ```
 
-**8.17.1 final 引用不等于不可变对象**
+**17.4.1 final 引用不等于不可变对象**
 
 ```
 final User user = new User();
@@ -135,7 +177,7 @@ user.setName("Java");
 - 不暴露内部可变对象
 - 修改操作返回新对象
 
-**8.17.2 final 集合仍然可以修改**
+**17.4.2 final 集合仍然可以修改**
 
 ```java
 private final List<String> items =
@@ -163,7 +205,7 @@ public Order(List<String> items) {
 }
 ```
 
-## 8.18 final 字段
+## 17.5 final 字段
 
 实例字段可以声明为 final：
 
@@ -181,7 +223,7 @@ final 实例字段必须在对象构造完成前被赋值。
 - 2.实例代码块中初始化
 - 3.每个构造方法中初始化
 
-**8.18.1 声明处初始化**
+**17.5.1 声明处初始化**
 
 ```java
 private final String type = "DEFAULT";
@@ -189,7 +231,7 @@ private final String type = "DEFAULT";
 
 每个对象的 type 初始化为 "DEFAULT" 。
 
-**8.18.2 构造方法初始化**
+**17.5.2 构造方法初始化**
 
 ```java
 public class User {
@@ -210,7 +252,7 @@ public User() {
 
 如果没有其他初始化方式，会编译失败。
 
-**8.18.3 实例代码块初始化**
+**17.5.3 实例代码块初始化**
 
 ```java
 public class User {
@@ -224,7 +266,7 @@ public class User {
 所有构造方法执行前，实例代码块会初始化 id 。
 但业务代码通常优先使用声明处或构造方法，意图更清晰。
 
-**8.18.4 final 字段不能重复赋值**
+**17.5.4 final 字段不能重复赋值**
 
 ```
 public User(String userId) {
@@ -235,7 +277,7 @@ this.userId = "other";
 
 编译失败。
 
-## 8.19 static final 字段
+## 17.6 static final 字段
 
 static final 表示类级变量只能赋值一次：
 
@@ -258,7 +300,7 @@ public static final int DEFAULT_TIMEOUT = 30;
 public static final String SYSTEM_USER = "SYSTEM";
 ```
 
-**8.19.1 static final 不一定是编译期常量**
+**17.6.1 static final 不一定是编译期常量**
 
 编译期常量：
 
@@ -275,7 +317,7 @@ Integer.parseInt("30");
 
 二者都是 static final ，但只有前者属于典型编译期常量。
 
-**8.19.2 编译期常量的条件**
+**17.6.2 编译期常量的条件**
 
 通常需要满足：
 
@@ -300,7 +342,7 @@ public static final Integer VALUE = 10;
 
 类型是包装类，不属于 Java 语言规范意义上的基本类型或 String 编译期常量。
 
-**8.19.3 编译期常量内联风险**
+**17.6.3 编译期常量内联风险**
 
 依赖模块 A：
 
@@ -345,7 +387,7 @@ TIMEOUT = 60;
 - 枚举
 - 运行时对象
 
-## 8.20 空白 final
+## 17.7 空白 final
 
 没有在声明时初始化的 final 字段称为空白 final。
 
@@ -365,7 +407,7 @@ public class User {
 - 支持不可变对象设计
 - 强制构造过程完整
 
-**8.20.1 静态空白 final**
+**17.7.1 静态空白 final**
 
 ```java
 public class Config {
@@ -385,7 +427,7 @@ public class Config {
 完成赋值。
 不能在普通实例构造方法中赋值，因为它属于类级字段。
 
-## 8.21 final 方法参数
+## 17.8 final 方法参数
 
 ```java
 public void execute(final User user) {
@@ -408,7 +450,7 @@ user.setName("Java");
 因此：
 final 参数只限制形参变量，不能保证传入对象不可变。
 
-**8.21.1 final 参数的工程价值**
+**17.8.1 final 参数的工程价值**
 
 可能用于：
 
@@ -424,7 +466,7 @@ final 或 effectively final
 
 不一定必须显式写 final 。
 
-## 8.22 effectively final
+## 17.9 effectively final
 
 有效 final 表示：
 变量虽然没有显式使用 final，但初始化后从未重新赋值。
@@ -451,7 +493,7 @@ Lambda 的完整捕获规则放在现代 Java 章节。
 本章只记住：
 effectively final 是行为上的不再赋值，而不是使用了 final 关键字。
 
-## 8.23 final 方法
+## 17.10 final 方法
 
 ```java
 public class Account {
@@ -472,7 +514,7 @@ public class SavingsAccount extends Account {
 
 编译失败。
 
-**8.23.1 final 方法的适用场景**
+**17.10.1 final 方法的适用场景**
 
 适合：
 
@@ -500,7 +542,7 @@ public abstract class ImportTemplate {
 }
 ```
 
-**8.23.2 private 方法不需要 final**
+**17.10.2 private 方法不需要 final**
 
 private 方法对子类不可见，本身不能被重写。
 因此：
@@ -520,12 +562,12 @@ private void validate() {
 
 即可。
 
-**8.23.3 static final 方法**
+**17.10.3 static final 方法**
 
 - 静态方法不参与重写，只能被隐藏。
 - 因此静态方法通常不需要使用 final 防止重写。
 
-## 8.24 final 类
+## 17.11 final 类
 
 ```java
 public final class String {
@@ -541,12 +583,12 @@ public class CustomString extends String {
 
 编译失败。
 
-**8.24.1 final 类中的方法**
+**17.11.1 final 类中的方法**
 
 - final 类不能有子类，因此其中的实例方法不会被外部子类重写。
 - 不需要为每个方法再机械添加 final。
 
-**8.24.2 final 类的适用场景**
+**17.11.2 final 类的适用场景**
 
 适合：
 
@@ -563,7 +605,7 @@ public final class Money {
 }
 ```
 
-**8.24.3 final 类不等于不可变类**
+**17.11.3 final 类不等于不可变类**
 
 ```java
 public final class User {
@@ -584,7 +626,7 @@ public final class User {
 - 内部可变对象
 - 对外暴露
 
-## 8.25 final 与不可变对象
+## 17.12 final 与不可变对象
 
 一个典型不可变对象：
 
@@ -630,7 +672,7 @@ public final class Money {
 - 修改操作返回新对象
 - 引用字段本身应不可变或进行防御性复制
 
-**8.25.1 private final 仍然不够**
+**17.12.1 private final 仍然不够**
 
 ```java
 public final class Order {
@@ -659,7 +701,7 @@ this.items = List.copyOf(items);
 
 并避免直接返回内部可变集合。
 
-## 8.26 static 与对象生命周期
+## 17.13 static 与对象生命周期
 
 实例字段通常随对象生命周期存在。
 静态字段通常随类及其类加载器生命周期存在。
@@ -696,7 +738,7 @@ CACHE.add(object);
 - 缓存无限增长
 - 测试污染
 
-**8.26.1 静态集合必须考虑生命周期**
+**17.13.1 静态集合必须考虑生命周期**
 
 ```java
 private static final Map<String, Object> CACHE =
@@ -713,7 +755,7 @@ new ConcurrentHashMap<>();
 - 类加载器边界
 - 是否真的需要全局缓存
 
-## 8.27 static 与线程安全
+## 17.14 static 与线程安全
 
 static 只表示类级共享，不表示线程安全。
 
@@ -762,7 +804,7 @@ count++;
 本章只记住：
 static 增加了共享范围，但不提供任何并发安全保证。
 
-## 8.28 static 与多态
+## 17.15 static 与多态
 
 实例方法适合表达可替换行为：
 
@@ -797,7 +839,7 @@ paymentProcessor.pay(order);
 
 前者是固定类调用，后者可以通过接口实现多态。
 
-## 8.29 静态工厂方法
+## 17.16 静态工厂方法
 
 静态方法也可以承担对象创建职责：
 
@@ -839,7 +881,7 @@ Order order = Order.create(orderNo);
 - 执行参数校验
 - 区分不同创建语义
 
-## 8.30 静态内部类概览
+## 17.17 静态内部类概览
 
 类中可以声明静态嵌套类：
 
@@ -865,7 +907,7 @@ new Outer.Nested();
 
 内部类完整规则放在高级语言特性笔记。
 
-**8.30.1 静态内部类单例思想**
+**17.17.1 静态内部类单例思想**
 
 ```java
 public class Singleton {
@@ -890,7 +932,7 @@ public class Singleton {
 
 单例完整讨论放在设计模式和并发模块。
 
-## 8.31 类初始化的线程安全性
+## 17.18 类初始化的线程安全性
 
 JVM 会保证同一个类的初始化过程由一个线程执行。
 当多个线程同时首次使用某个类时：
@@ -920,7 +962,7 @@ new Config();
 - 初始化失败
 - 类永久不可用
 
-## 8.32 类初始化循环依赖
+## 17.19 类初始化循环依赖
 
 示例：
 
@@ -972,9 +1014,9 @@ B.value = 1
 核心原则：
 避免静态初始化之间形成复杂双向依赖。
 
-## 8.33 常量设计
+## 17.20 常量设计
 
-**8.33.1 常量应表达稳定语义**
+**17.20.1 常量应表达稳定语义**
 
 适合：
 
@@ -992,7 +1034,7 @@ public static final int CURRENT_TIMEOUT = 30;
 
 如果该值可能需要通过配置动态修改，就不应硬编码为编译期常量。
 
-**8.33.2 避免魔法值**
+**17.20.2 避免魔法值**
 
 不推荐：
 
@@ -1018,7 +1060,7 @@ public enum OrderStatus {
 }
 ```
 
-**8.33.3 常量的可见性**
+**17.20.3 常量的可见性**
 
 不是所有常量都应为 public：
 
@@ -1029,7 +1071,7 @@ private static final int BATCH_SIZE = 100;
 如果只在当前类内部使用，应保持 private。
 只有构成公共协议的一部分时，才考虑 public。
 
-**8.33.4 避免可变 public static final**
+**17.20.4 避免可变 public static final**
 
 ```java
 public static final List<String> VALUES =
@@ -1053,7 +1095,7 @@ List.of("A", "B");
 
 或者使用私有字段加只读访问。
 
-## 8.34 单例与静态工具类的区别
+## 17.21 单例与静态工具类的区别
 
 静态工具类：
 
@@ -1098,7 +1140,7 @@ public final class ConfigService {
 但单例仍然具有全局状态和测试耦合风险。
 在 Spring 项目中，通常更倾向让容器管理单例对象，而不是手写全局单例。
 
-## 8.35 建议实验
+## 17.22 建议实验
 
 实验一：静态字段共享
 
@@ -1395,7 +1437,7 @@ public class InitializationFailureDemo {
 
 观察第一次和后续使用失败类时的异常差异。
 
-## 8.36 高频面试题
+## 17.23 高频面试题
 
 本章建议保留以下问题：
 
@@ -1448,7 +1490,7 @@ public class InitializationFailureDemo {
 - 47.为什么静态缓存容易造成内存泄漏？
 - 48.JVM 如何保证类初始化的线程安全？
 
-## 8.37 易错点
+## 17.24 易错点
 
 **误区一：static 成员属于所有对象**
 
@@ -1573,9 +1615,9 @@ static 只表示共享范围，反而可能扩大并发竞争。
 
 如果多个类静态初始化相互依赖并获取不同锁，可能形成初始化死锁。
 
-## 8.38 工程实践建议
+## 17.25 工程实践建议
 
-**8.38.1 静态字段优先保持不可变**
+**17.25.1 静态字段优先保持不可变**
 
 推荐：
 
@@ -1590,7 +1632,7 @@ DateTimeFormatter.ISO_LOCAL_DATE;
 private static Map<String, Object> globalState;
 ```
 
-**8.38.2 不要使用静态变量保存请求级数据**
+**17.25.2 不要使用静态变量保存请求级数据**
 
 错误：
 
@@ -1609,7 +1651,7 @@ private static String currentUserId;
 
 传递。
 
-**8.38.3 静态初始化保持简单**
+**17.25.3 静态初始化保持简单**
 
 推荐：
 
@@ -1629,7 +1671,7 @@ static {
 }
 ```
 
-**8.38.4 工具类保持无状态**
+**17.25.4 工具类保持无状态**
 
 推荐：
 
@@ -1649,7 +1691,7 @@ String value
 private static String lastValue;
 ```
 
-**8.38.5 可替换行为不要设计成静态方法**
+**17.25.5 可替换行为不要设计成静态方法**
 
 需要测试和扩展时：
 
@@ -1665,7 +1707,7 @@ public interface MessageSender {
 MessageUtils.send(message);
 ```
 
-**8.38.6 常量只暴露必要范围**
+**17.25.6 常量只暴露必要范围**
 
 类内使用：
 
@@ -1680,7 +1722,7 @@ private static final int BATCH_SIZE = 100;
 public static final
 ```
 
-**8.38.7 可变集合不要公开暴露**
+**17.25.7 可变集合不要公开暴露**
 
 不推荐：
 
@@ -1706,7 +1748,7 @@ public static List<String> values() {
 }
 ```
 
-**8.38.8 可能变化的配置不要使用编译期常量**
+**17.25.8 可能变化的配置不要使用编译期常量**
 
 不推荐：
 
@@ -1722,7 +1764,7 @@ config.getTimeout();
 
 或配置中心、环境变量、配置文件。
 
-**8.38.9 不可变对象要进行防御性复制**
+**17.25.9 不可变对象要进行防御性复制**
 
 ```java
 public final class Order {
@@ -1738,7 +1780,7 @@ public final class Order {
 
 还需确认 OrderItem 本身是否可变。
 
-**8.38.10 避免静态状态污染测试**
+**17.25.10 避免静态状态污染测试**
 
 如果测试需要：
 
@@ -1757,7 +1799,7 @@ GlobalConfig.reset();
 - 显式生命周期
 - 容器管理
 
-## 8.39 本章知识链路
+## 17.26 本章知识链路
 
 ```
 类定义完成
