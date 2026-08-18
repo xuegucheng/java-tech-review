@@ -13,7 +13,7 @@
   <img src="https://img.shields.io/badge/Status-Actively%20Maintained-brightgreen" alt="status">
   <img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="license">
   <img src="https://img.shields.io/badge/Content-370%2B%20pages-9cf" alt="pages">
-  <img src="https://img.shields.io/badge/Topics-19-blue" alt="topics">
+  <img src="https://img.shields.io/badge/Topics-24-blue" alt="topics">
 </p>
 
 ---
@@ -22,7 +22,7 @@
 
 这是一套**系统化、结构化的 Java 技术复习笔记**，由有道云笔记导出后经过拆分、润色和重新组织而成。
 
-拆分为 **19 个独立知识点文件**，每个文件聚焦一个完整主题，适合碎片化时间分块复习。
+当前包含 **24 个独立知识点文件**，每个文件聚焦一个完整主题，适合碎片化时间分块复习。
 
 > 不只是罗列语法，每篇笔记都包含：**定位说明 → 核心知识 → 面试口述版 → 高频面试题 → 易错点 → 工程实践建议**。
 
@@ -60,7 +60,12 @@ java-tech-review/
 │   │   ├── 17-final与常量设计.md
 │   │   ├── 18-equals与hashCode.md
 │   │   └── 19-toString与对象工具方法.md
-│   ├── 1.1-集合框架/                   ← 计划中
+│   ├── 1.1-集合框架/                   ← 进行中
+│   │   ├── 00-泛型基础与集合类型安全.md
+│   │   ├── 01-集合框架体系与核心契约.md
+│   │   ├── 02-ArrayList原理与工程实践.md
+│   │   ├── 03-LinkedList原理与工程实践.md
+│   │   └── 04-HashMap原理与源码深度分析.md
 │   ├── 1.2-并发编程/                   ← 计划中
 │   ├── 1.3-JVM/                        ← 计划中
 │   └── 1.4-Java高级语言特性/            ← 计划中
@@ -198,7 +203,7 @@ code java-tech-review
 | 优先级 | 模块 | 内容 | 状态 |
 |--------|------|------|------|
 | P0 | 1.0 Java 语言基础 | 类型系统、OOP、核心机制 | ✅ 已完成 |
-| P0 | 1.1 集合框架 | List、Set、Map、Queue、迭代器 | 📋 计划中 |
+| P0 | 1.1 集合框架 | List、Set、Map、Queue、迭代器 | 🚧 进行中（基础篇） |
 | P0 | 1.2 并发编程 | 线程模型、锁、JUC、线程池 | 📋 计划中 |
 | P0 | 1.3 JVM | 类加载、内存模型、GC、调优 | 📋 计划中 |
 | P0 | 3. 数据库与缓存 | MySQL、Redis、分库分表 | 📋 计划中 |
