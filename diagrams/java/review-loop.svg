@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="320" viewBox="0 0 1200 320" role="img" aria-labelledby="title desc">
+  <title id="title">Java 技术复习闭环</title>
+  <desc id="desc">从面试回答进入心智模型、深入原理、关键源码路径和可运行实验，实验结果再回到回答。</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#2563eb"/>
+    </marker>
+  </defs>
+  <rect width="1200" height="320" fill="#f8fafc"/>
+  <text x="600" y="48" text-anchor="middle" font-family="sans-serif" font-size="28" font-weight="700" fill="#0f172a">Java 技术复习闭环</text>
+  <text x="600" y="78" text-anchor="middle" font-family="sans-serif" font-size="16" fill="#475569">每个主题都从能说清开始，到能验证结束</text>
+
+  <g font-family="sans-serif" text-anchor="middle">
+    <rect x="40" y="130" width="190" height="105" rx="16" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+    <text x="135" y="170" font-size="20" font-weight="700" fill="#1e3a8a">Interview</text>
+    <text x="135" y="198" font-size="16" fill="#1e40af">30 秒回答</text>
+    <text x="135" y="220" font-size="14" fill="#1e40af">先恢复表达</text>
+
+    <rect x="270" y="130" width="190" height="105" rx="16" fill="#e0e7ff" stroke="#4f46e5" stroke-width="2"/>
+    <text x="365" y="170" font-size="20" font-weight="700" fill="#312e81">Mental Model</text>
+    <text x="365" y="198" font-size="16" fill="#3730a3">结构与因果</text>
+    <text x="365" y="220" font-size="14" fill="#3730a3">图先于细节</text>
+
+    <rect x="500" y="130" width="190" height="105" rx="16" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/>
+    <text x="595" y="170" font-size="20" font-weight="700" fill="#4c1d95">Deep Dive</text>
+    <text x="595" y="198" font-size="16" fill="#5b21b6">为什么这样设计</text>
+    <text x="595" y="220" font-size="14" fill="#5b21b6">只追关键路径</text>
+
+    <rect x="730" y="130" width="190" height="105" rx="16" fill="#fef3c7" stroke="#d97706" stroke-width="2"/>
+    <text x="825" y="170" font-size="20" font-weight="700" fill="#78350f">Source Path</text>
+    <text x="825" y="198" font-size="16" fill="#92400e">关键源码入口</text>
+    <text x="825" y="220" font-size="14" fill="#92400e">规范与实现分开</text>
+
+    <rect x="960" y="130" width="190" height="105" rx="16" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+    <text x="1055" y="170" font-size="20" font-weight="700" fill="#14532d">Runnable</text>
+    <text x="1055" y="198" font-size="16" fill="#166534">运行并测试</text>
+    <text x="1055" y="220" font-size="14" fill="#166534">结论可复现</text>
+  </g>
+
+  <g stroke="#2563eb" stroke-width="3" fill="none" marker-end="url(#arrow)">
+    <line x1="230" y1="182" x2="265" y2="182"/>
+    <line x1="460" y1="182" x2="495" y2="182"/>
+    <line x1="690" y1="182" x2="725" y2="182"/>
+    <line x1="920" y1="182" x2="955" y2="182"/>
+    <path d="M1055 250 C1055 290, 135 290, 135 250"/>
+  </g>
+  <text x="600" y="286" text-anchor="middle" font-family="sans-serif" font-size="15" fill="#1d4ed8">实验结果回写面试回答：修正模型，而不是盲目堆更多文字</text>
+</svg>

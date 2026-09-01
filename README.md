@@ -1,239 +1,104 @@
-<p align="center">
-  <h1 align="center">☕ Java Tech Review</h1>
-  <p align="center">
-    <strong>从源码到架构，系统化 Java 技术复习笔记</strong>
-    <br/>
-    面向面试备战 · 日常温习 · 体系化知识管理
-  </p>
-</p>
+# Java Tech Review
 
-<p align="center">
-  <img src="https://img.shields.io/badge/Baseline-Java%208-orange?logo=openjdk&logoColor=white" alt="Baseline Java 8">
-  <img src="https://img.shields.io/badge/Modern-Java%2025-purple?logo=openjdk&logoColor=white" alt="Modern Java 25">
-  <img src="https://img.shields.io/badge/Status-Actively%20Maintained-brightgreen" alt="status">
-  <img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="license">
-  <img src="https://img.shields.io/badge/Content-370%2B%20pages-9cf" alt="pages">
-  <img src="https://img.shields.io/badge/Topics-24-blue" alt="topics">
-</p>
+> 面向 3～10 年 Java 后端工程师的技术复习仓库：先恢复面试表达，再进入 mental model、源码路径和可运行验证。
 
----
+它不是 Java 初学教程、API 大全或不断追加 Markdown 的文件清单。每个主题尽量形成：
 
-## 📖 关于本项目
-
-这是一套**系统化、结构化的 Java 技术复习笔记**，由有道云笔记导出后经过拆分、润色和重新组织而成。
-
-当前包含 **24 个独立知识点文件**，每个文件聚焦一个完整主题，适合碎片化时间分块复习。
-
-> 不只是罗列语法，每篇笔记都包含：**定位说明 → 核心知识 → 面试口述版 → 高频面试题 → 易错点 → 工程实践建议**。
-
-## 🎯 适用人群
-
-- **面试准备者** —— 每篇末尾的「面试口述版」可直接用于表达，高频面试题覆盖常见考点
-- **日常复习者** —— 模块化拆分，通勤、午休花 15-30 分钟即可完成一个主题
-- **Java 初学者** —— 从平台基础到 OOP 高级特性，按序号顺序学习即可
-- **技术管理者** —— 用于团队新人培训和技术规范对齐
-
-## 🗂️ 项目结构
-
+```text
+Interview Answer → Mental Model → Deep Dive → Source Path → Runnable Example
 ```
+
+## 10 秒知道先看什么
+
+- **今天突击**：从 [Java Core](01-java-core/README.md) 和 [Collections](02-collections/README.md) 的 `Interview Review` 开始。
+- **1 天路线**：只看下方 P0；先 Java 对象模型/参数传递/相等性，再集合契约/HashMap/LRU。
+- **7 天路线**：Day 1 Java Core + Collections，Day 2 Concurrency，Day 3 JVM，Day 4 MySQL，Day 5 Redis + MQ，Day 6 Spring，Day 7 Distributed + System Design。未创建的模块会明确保持为待建设，不伪装成已完成。
+- **怀疑一个结论**：从 Review 页面跳到 Deep Dive，再运行 [examples](examples/README.md)。
+
+## P0：面试高频 / 核心机制
+
+| 主题 | 先看 | 再深入 |
+| --- | --- | --- |
+| Java 参数传递与不可变对象 | [Interview Review](01-java-core/interview/parameter-passing-and-immutability.md) | [Deep Dive](01-java-core/deep-dive/parameter-passing.md) |
+| 对象模型与多态 | [Interview Review](01-java-core/interview/object-model-and-polymorphism.md) | [Deep Dive](01-java-core/deep-dive/polymorphism-and-dynamic-dispatch.md) |
+| equals/hashCode | [Interview Review](01-java-core/interview/equality-and-object-contract.md) | [Deep Dive](01-java-core/deep-dive/equals-and-hashcode-contract.md) |
+| 集合契约与选型 | [Interview Review](02-collections/interview/collection-selection.md) | [Deep Dive](02-collections/deep-dive/collection-contracts.md) |
+| HashMap 与 Hash 集合 | [Interview Review](02-collections/interview/hashmap-and-hash-collections.md) | [HashMap Deep Dive](02-collections/deep-dive/hashmap.md) |
+| LinkedHashMap 与 LRU | [Interview Review](02-collections/interview/ordered-map-and-lru.md) | [Deep Dive](02-collections/deep-dive/linkedhashmap-and-lru.md) |
+
+P0 是导航权重，不是“其他内容不重要”。完整原理文章仍然保留，只是不让低频细节挡住核心机制。
+
+## 仓库结构
+
+```text
 java-tech-review/
-├── README.md                           ← 你在这里
-├── 1-Java核心基础/
-│   ├── 1.0-Java语言基础/               ← 当前已完成模块
-│   │   ├── README.md                   ← 模块学习路线
-│   │   ├── 01-Java平台与程序运行基础.md
-│   │   ├── 02-Java类型系统与变量.md
-│   │   ├── 03-类型转换与精度陷阱.md
-│   │   ├── 04-运算符详解.md
-│   │   ├── 05-流程控制.md
-│   │   ├── 06-方法定义与重载.md
-│   │   ├── 07-参数传递机制.md
-│   │   ├── 08-面向对象与类设计.md
-│   │   ├── 09-封装与访问控制.md
-│   │   ├── 10-对象创建与不可变设计.md
-│   │   ├── 11-继承与重写.md
-│   │   ├── 12-多态与动态绑定.md
-│   │   ├── 13-抽象类.md
-│   │   ├── 14-接口设计.md
-│   │   ├── 15-组合与设计原则.md
-│   │   ├── 16-static与类初始化.md
-│   │   ├── 17-final与常量设计.md
-│   │   ├── 18-equals与hashCode.md
-│   │   └── 19-toString与对象工具方法.md
-│   ├── 1.1-集合框架/                   ← 进行中
-│   │   ├── 00-泛型基础与集合类型安全.md
-│   │   ├── 01-集合框架体系与核心契约.md
-│   │   ├── 02-ArrayList原理与工程实践.md
-│   │   ├── 03-LinkedList原理与工程实践.md
-│   │   └── 04-HashMap原理与源码深度分析.md
-│   ├── 1.2-并发编程/                   ← 计划中
-│   ├── 1.3-JVM/                        ← 计划中
-│   └── 1.4-Java高级语言特性/            ← 计划中
-├── 2-框架与生态/                        ← 计划中
-├── 3-数据库与缓存/                       ← 计划中
-├── 4-中间件/                            ← 计划中
-├── 5-分布式与微服务/                      ← 计划中
-├── 6-架构设计与设计模式/                   ← 计划中
-├── 7-DevOps与工具/                      ← 计划中
-├── 8-计算机基础/                         ← 计划中
-├── 9-线上问题排查/                        ← 计划中
-├── 10-源码与实验Demo/                    ← 计划中
-└── 11-面试与项目表达/                      ← 计划中
+├── 01-java-core/
+│   ├── README.md
+│   ├── interview/       # 5～15 分钟复习
+│   └── deep-dive/       # 原有长文、规范边界、关键源码
+├── 02-collections/
+│   ├── README.md
+│   ├── interview/
+│   └── deep-dive/
+├── diagrams/
+│   ├── java/            # SVG mental model
+│   ├── collections/     # SVG 数据结构图
+│   └── legacy/          # 原有 PNG 资产，仅作保留
+├── examples/            # Java 21 + Maven + JUnit 5
+├── docs/                # 仓库架构契约
+├── research/            # Benchmark 与重构依据
+└── NOTE_STYLE_GUIDE.md
 ```
 
-## 📚 当前内容：Java 语言基础
+### 模块入口
 
-已完成的 `1.0-Java语言基础` 模块覆盖 Java 语言最核心的语法与运行机制。
+| 模块 | 定位 | 状态 |
+| --- | --- | --- |
+| [01 Java Core](01-java-core/README.md) | 语言语义、对象模型、类型设计和运行边界 | 已整理 Interview Review + Deep Dive |
+| [02 Collections](02-collections/README.md) | 集合契约、数据结构、哈希和顺序语义 | 已整理 Interview Review + Deep Dive |
+| Concurrency | JMM、锁、AQS、线程池和并发集合 | 待建设 |
+| JVM | 类加载、内存、GC、诊断和调优 | 待建设 |
+| Spring / Database / Redis / MQ | 生产后端核心栈 | 待建设 |
+| Distributed / System Design | 分布式一致性、可靠性和设计题 | 待建设 |
 
-### 学习路线
+## 如何阅读一篇主题
 
-```
-Java 平台与运行基础 (01)
-    ↓
-类型系统与变量 (02) → 类型转换与精度 (03)
-    ↓
-运算符 (04) → 流程控制 (05) → 方法定义 (06)
-    ↓
-参数传递机制 (07)
-    ↓
-面向对象与类设计 (08) → 封装与访问控制 (09) → 对象创建 (10)
-    ↓
-继承与重写 (11) → 多态与动态绑定 (12)
-    ↓
-抽象类 (13) → 接口设计 (14) → 组合与设计原则 (15)
-    ↓
-static 与初始化 (16) → final 与常量 (17)
-    ↓
-equals & hashCode (18) → toString & 工具方法 (19)
-```
+1. 先读 `面试结论` 和 `30 秒回答`，确认自己能否说清。
+2. 顺着 `面试追问链` 继续问“为什么”，不要平铺背 40 道题。
+3. 需要细节时进入对应的 `Deep Dive`，只追关键源码路径。
+4. 需要证据时运行 `examples/` 中的示例和测试。
 
-### 篇幅与建议学时
+## Runnable Examples
 
-| 序号 | 文件 | 大小 | 建议学时 |
-|------|------|------|---------|
-| 01 | Java 平台与程序运行基础 | 10.6 KB | 1h |
-| 02 | Java 类型系统与变量 | 10.5 KB | 1.5h |
-| 03 | 类型转换与精度陷阱 | 9.8 KB | 1h |
-| 04 | 运算符详解 | 13.2 KB | 1.5h |
-| 05 | 流程控制 | 7.9 KB | 1h |
-| 06 | 方法定义与重载 | 8.8 KB | 1h |
-| 07 | ⭐ 参数传递机制 | 35.8 KB | 1.5h |
-| 08 | 面向对象与类设计 | 9.8 KB | 1.5h |
-| 09 | 封装与访问控制 | 14.2 KB | 1h |
-| 10 | 对象创建与不可变设计 | 22.0 KB | 1h |
-| 11 | 继承与重写 | 11.7 KB | 1.5h |
-| 12 | ⭐ 多态与动态绑定 | 15.6 KB | 1.5h |
-| 13 | 抽象类 | 9.4 KB | 1h |
-| 14 | 接口设计 | 11.2 KB | 1.5h |
-| 15 | 组合与设计原则 | 28.9 KB | 1h |
-| 16 | static 与类初始化 | 18.2 KB | 1.5h |
-| 17 | final 与常量设计 | 32.8 KB | 1h |
-| 18 | ⭐ equals 与 hashCode | 23.0 KB | 1.5h |
-| 19 | toString 与对象工具方法 | 26.8 KB | 1h |
-
-> ⭐ 标记的为面试高频重点章节。
-
-## ✨ 内容特色
-
-### 结构化的知识组织
-
-每篇笔记不是简单的语法罗列，而是按照认知规律组织：
-
-```
-本章定位（解决什么问题）
-  ↓
-核心概念（为什么重要、怎么理解）
-  ↓
-代码示例（辅助理解，不是堆砌）
-  ↓
-面试口述版（直接可用于表达）
-  ↓
-高频面试题（覆盖常见考察点）
-  ↓
-易错点（常见误区纠正）
-  ↓
-工程实践建议（从面试到落地）
-```
-
-### 实用的面试表达
-
-每篇末尾的「面试口述版」是将复杂知识点转化为 2-3 分钟的流畅表达，直接可用于面试场景。
-
-例如参数传递机制的口述版：
-
-> "Java 只有值传递。基本类型作为参数时，传递的是基本值的副本；引用类型作为参数时，传递的是引用值的副本。调用方引用变量和方法形参是两个独立变量，只是它们最初保存了相同的引用值，因此指向同一个对象。方法通过形参修改对象字段时，调用方能够看到变化；但如果方法重新给形参赋值，只会改变形参自己的引用值，不会替换调用方的引用。"
-
-### 深度与广度平衡
-
-- **不堆砌 API 文档** —— 官方文档有的不重复
-- **追问本质** —— 不只是「是什么」，更要「为什么这么设计」
-- **连接实际** —— 每个知识点关联到工程实践和面试场景
-
-## 🚀 使用方式
-
-### 在线浏览
-
-直接在 GitHub 上浏览 Markdown 文件，GitHub 会自动渲染格式。
-
-推荐路径：从 `1-Java核心基础/1.0-Java语言基础/README.md` 开始，按学习路线顺序阅读。
-
-### 本地克隆
+示例工程默认 Java 21，完整类和测试不嵌入正文。执行：
 
 ```bash
-git clone https://github.com/xuegucheng/java-tech-review.git
-cd java-tech-review
+mvn -f examples/pom.xml test
 ```
 
-使用任意 Markdown 阅读器（VS Code、Typora、Obsidian 等）打开阅读。
+当前可验证：参数传递、HashMap 冲突、LinkedHashMap LRU 和 Holder 类初始化。详见 [examples/README.md](examples/README.md)。
 
-### VS Code 推荐
+## 图示策略
 
-```bash
-code java-tech-review
-```
+- Mermaid 用于流程、决策、生命周期和简单时序。
+- SVG 用于 bucket、链表、引用、队列和对象布局等空间结构。
+- 一张图只解决一个真正难理解的问题，不重复正文。
 
-配合以下插件体验更佳：
-- **Markdown All in One** — 目录导航、快捷键
-- **Markdown Preview Enhanced** — 增强预览
+入口：[图示规则](diagrams/README.md)、[Java 复习闭环](diagrams/java/review-loop.svg)、[HashMap resize](diagrams/collections/hashmap-resize.svg)、[LinkedHashMap/LRU](diagrams/collections/linkedhashmap-lru.svg)。
 
-## 🗺️ 路线图
+## Java 版本策略
 
-这是长期迭代项目，后续计划覆盖：
+- 经典面试主线默认 `JDK 8+`。
+- `Java 17+`、`Java 21+`、`Java 25+` 的语法和 API 会显式标记。
+- examples 默认 Java 21；未来 Java 25 实验必须使用独立 profile/module，不破坏默认构建。
+- 规范保证、OpenJDK 实现和版本相关观察要分开表述。
 
-| 优先级 | 模块 | 内容 | 状态 |
-|--------|------|------|------|
-| P0 | 1.0 Java 语言基础 | 类型系统、OOP、核心机制 | ✅ 已完成 |
-| P0 | 1.1 集合框架 | List、Set、Map、Queue、迭代器 | 🚧 进行中（基础篇） |
-| P0 | 1.2 并发编程 | 线程模型、锁、JUC、线程池 | 📋 计划中 |
-| P0 | 1.3 JVM | 类加载、内存模型、GC、调优 | 📋 计划中 |
-| P0 | 3. 数据库与缓存 | MySQL、Redis、分库分表 | 📋 计划中 |
-| P1 | 2. 框架与生态 | Spring、Spring Boot、MyBatis | 📋 计划中 |
-| P1 | 1.4 Java 高级语言特性 | Lambda、Stream、泛型、注解、反射 | 📋 计划中 |
-| P1 | 5. 分布式与微服务 | 分布式理论、RPC、消息队列 | 📋 计划中 |
-| P1 | 8. 计算机基础 | 网络、操作系统、数据结构 | 📋 计划中 |
-| P2 | 4. 中间件 | Kafka、RocketMQ、Elasticsearch | 📋 计划中 |
-| P2 | 6. 架构设计 | 设计模式、DDD、系统设计 | 📋 计划中 |
-| P2 | 7. DevOps | Docker、K8s、CI/CD | 📋 计划中 |
-| P3 | 9. 线上问题排查 | CPU、内存、GC、死锁排查 | 📋 计划中 |
-| P3 | 10. 源码实验 | 框架源码阅读笔记与代码实验 | 📋 计划中 |
-| P3 | 11. 面试表达 | 项目表达、系统设计、行为面试 | 📋 计划中 |
+## 维护入口
 
-## 🤝 贡献
+- [仓库架构说明](docs/REPOSITORY_ARCHITECTURE.md)：目录、分层、P0/P1/P2、One Source of Truth 和新增内容规则。
+- [Benchmark 研究报告](research/repository-benchmark.md)：7 个公开项目的比较和本次 `REBUILD_STRUCTURE` 依据。
+- [Note Style Guide](NOTE_STYLE_GUIDE.md)：结论优先、追问链、图示、版本和示例规范。
 
-欢迎通过以下方式参与：
+## 许可证状态
 
-- **Issue** — 指出错误、提出改进建议、补充遗漏知识点
-- **PR** — 修正错误、补充新内容、优化表达
-- **Star** ⭐ — 如果觉得有用，点个 star 让更多人看到
-
-内容贡献请遵循现有风格：结构化章节、代码示例精简、有面试口述版、标注易错点。
-
-## 📄 License
-
-MIT License — 自由使用、修改、分发。
-
----
-
-<p align="center">
-  <sub>Built with ❤️ by <a href="https://github.com/xuegucheng">@xuegucheng</a></sub>
-</p>
+当前仓库没有检测到 `LICENSE` 文件。若要对外复用或分发，请先补充并确认明确的许可证，不从旧 README 的徽章推断授权范围。

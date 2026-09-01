@@ -1,0 +1,53 @@
+# 参数传递与不可变对象
+
+> **P0 · JDK 8+ · 5 分钟复习**
+
+## 面试结论
+
+Java 只有值传递。基本类型参数复制基本值；引用类型参数复制引用值。两个变量可以因为持有相同引用值而共享一个对象，但参数重新指向新对象不会替换调用方变量。
+
+## 30 秒回答
+
+```text
+实参求值
+    ↓
+把值复制给形参
+    ↓
+基本类型：复制值
+引用类型：复制引用值
+    ↓
+形参改对象状态：调用方可观察
+形参重新赋值：调用方引用不变
+```
+
+因此“引用类型按引用传递”是容易被追问的错误说法。真正需要继续回答的是：共享对象是否可变、谁拥有修改权、方法是否需要防御性复制。
+
+## 追问链
+
+1. 为什么方法里能改调用方看到的对象？因为两个引用值指向同一个对象。
+2. 为什么给参数 `new` 不生效？因为只改变了形参变量保存的引用值。
+3. `final` 参数能否保证对象不变？不能；它只禁止形参重新赋值。
+4. `List.copyOf` 和 `Collections.unmodifiableList` 一样吗？前者通常建立不可修改快照，后者是对原集合的不可修改视图；两者都不深拷贝元素。
+5. 如何减少副作用？用不可变值对象、明确所有权、输入复制和不暴露内部可变集合。
+
+## 工程坑
+
+- Getter 直接返回内部 `List` 会泄漏修改入口。
+- 构造器只保存外部可变集合的引用，会让对象不变量受外部代码影响。
+- 浅拷贝只隔离容器外层，元素仍可能共享。
+- 跨线程传递参数不会自动产生新的隔离或可见性保证；并发语义需要单独讨论。
+
+## Deep Dive
+
+- [参数传递 Deep Dive](../deep-dive/parameter-passing.md)
+- [对象创建与不可变设计](../deep-dive/object-creation-and-immutability.md)
+- [类型与变量](../deep-dive/types-and-variables.md)
+
+## Runnable Example
+
+- [ParameterPassingDemo.java](../../examples/src/main/java/com/xuegucheng/javatechreview/ParameterPassingDemo.java)
+- [对应测试](../../examples/src/test/java/com/xuegucheng/javatechreview/ParameterPassingDemoTest.java)
+
+## 一句话复盘
+
+> 复制的是值；引用值相同会共享对象；真正的设计问题是可变状态的所有权。

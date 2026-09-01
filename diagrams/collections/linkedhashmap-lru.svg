@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="650" viewBox="0 0 1280 650" role="img" aria-labelledby="title desc">
+  <title id="title">LinkedHashMap 与 LRU 的双结构</title>
+  <desc id="desc">同一组节点同时属于 HashMap 桶链和全局双向顺序链，访问顺序模式下最近访问节点位于尾部。</desc>
+  <defs>
+    <marker id="blueArrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#2563eb"/>
+    </marker>
+    <marker id="greenArrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#16a34a"/>
+    </marker>
+  </defs>
+  <rect width="1280" height="650" fill="#f8fafc"/>
+  <text x="640" y="42" text-anchor="middle" font-family="sans-serif" font-size="28" font-weight="700" fill="#0f172a">LinkedHashMap：HashMap + 双向顺序链</text>
+  <text x="640" y="72" text-anchor="middle" font-family="sans-serif" font-size="16" fill="#475569">同一个 Entry 同时参与桶定位和 encounter order</text>
+
+  <g font-family="sans-serif">
+    <text x="68" y="132" font-size="21" font-weight="700" fill="#1e3a8a">HashMap 桶结构</text>
+    <rect x="60" y="155" width="180" height="58" rx="10" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+    <text x="150" y="190" text-anchor="middle" font-size="17" fill="#1e3a8a">bucket[1]</text>
+    <rect x="300" y="155" width="150" height="58" rx="10" fill="#fef3c7" stroke="#d97706" stroke-width="2"/>
+    <text x="375" y="190" text-anchor="middle" font-size="17" fill="#78350f">A</text>
+    <rect x="500" y="155" width="150" height="58" rx="10" fill="#fef3c7" stroke="#d97706" stroke-width="2"/>
+    <text x="575" y="190" text-anchor="middle" font-size="17" fill="#78350f">C</text>
+    <path d="M240 184 L292 184" stroke="#2563eb" stroke-width="3" marker-end="url(#blueArrow)"/>
+    <path d="M450 184 L492 184" stroke="#2563eb" stroke-width="3" marker-end="url(#blueArrow)"/>
+    <text x="745" y="132" font-size="21" font-weight="700" fill="#166534">全局双向顺序链（access-order）</text>
+    <text x="760" y="166" font-size="15" fill="#166534">head = 最久未访问</text>
+    <text x="1120" y="166" text-anchor="end" font-size="15" fill="#166534">tail = 最近访问</text>
+    <rect x="690" y="190" width="130" height="62" rx="12" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+    <text x="755" y="228" text-anchor="middle" font-size="18" fill="#14532d">A</text>
+    <rect x="880" y="190" width="130" height="62" rx="12" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+    <text x="945" y="228" text-anchor="middle" font-size="18" fill="#14532d">C</text>
+    <rect x="1070" y="190" width="130" height="62" rx="12" fill="#fecaca" stroke="#dc2626" stroke-width="2"/>
+    <text x="1135" y="228" text-anchor="middle" font-size="18" fill="#7f1d1d">B</text>
+    <path d="M820 221 L872 221" stroke="#16a34a" stroke-width="3" marker-end="url(#greenArrow)"/>
+    <path d="M1010 221 L1062 221" stroke="#16a34a" stroke-width="3" marker-end="url(#greenArrow)"/>
+    <path d="M872 237 L820 237" stroke="#16a34a" stroke-width="3" marker-end="url(#greenArrow)"/>
+    <path d="M1062 237 L1010 237" stroke="#16a34a" stroke-width="3" marker-end="url(#greenArrow)"/>
+  </g>
+
+  <g stroke="#64748b" stroke-width="2" stroke-dasharray="7 6" fill="none">
+    <path d="M375 213 C375 310, 755 300, 755 190"/>
+    <path d="M575 213 C575 345, 945 330, 945 190"/>
+  </g>
+  <text x="640" y="355" text-anchor="middle" font-family="sans-serif" font-size="17" fill="#475569">虚线表示：同一个节点还被顺序链引用；next 与 before/after 不是一回事</text>
+
+  <rect x="80" y="405" width="1120" height="160" rx="18" fill="#fff" stroke="#cbd5e1" stroke-width="2"/>
+  <g font-family="sans-serif">
+    <text x="120" y="445" font-size="20" font-weight="700" fill="#0f172a">访问 B 之后</text>
+    <text x="120" y="480" font-size="17" fill="#334155">1. 桶结构仍然负责按 key 快速定位 B</text>
+    <text x="120" y="510" font-size="17" fill="#334155">2. access-order 下摘除 B 的顺序链位置</text>
+    <text x="120" y="540" font-size="17" fill="#334155">3. 把 B 接到 tail；因此 get() 也可能改变结构</text>
+    <text x="790" y="480" font-size="18" font-weight="700" fill="#991b1b">LRU 淘汰</text>
+    <text x="790" y="510" font-size="17" fill="#7f1d1d">容量超限 → removeEldestEntry</text>
+    <text x="790" y="540" font-size="17" fill="#7f1d1d">删除 head（最久未访问）</text>
+  </g>
+  <text x="640" y="615" text-anchor="middle" font-family="sans-serif" font-size="16" fill="#1d4ed8">教学级 LRU 不自动提供过期、统计、并发淘汰和生产缓存策略</text>
+</svg>

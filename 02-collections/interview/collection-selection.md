@@ -1,0 +1,33 @@
+# 集合选型与核心契约
+
+> **P0 · JDK 8+；Sequenced Collections 标记 Java 21+ · 5 分钟复习**
+
+## 面试结论
+
+集合选型先问语义，再问实现：是否允许重复、是否需要稳定顺序、主要操作是什么、是否要排序、如何处理 null、是否跨线程共享。接口只承诺契约，不承诺所有实现的复杂度和并发能力。
+
+## 选型路径
+
+```text
+重复？顺序？排序？主要读写？
+        ↓
+List / Set / Queue / Deque / Map
+        ↓
+选择实现，再核对复杂度、内存、视图和线程安全
+```
+
+## 高频追问
+
+1. 为什么 Map 不属于 Collection？Map 表达 key-value 映射，不能被自然地视为单一元素序列，但它提供 keySet、values、entrySet 视图。
+2. “有序”就是“排序”吗？不是；插入顺序、访问顺序和比较器排序是不同语义。
+3. `unmodifiable` 就是 immutable 吗？不一定；包装可能只是禁止当前入口修改，底层集合仍会变化。
+4. fail-fast 能保证线程安全吗？不能，它只是尽力发现错误修改。
+
+## Deep Dive
+
+- [集合接口与核心契约](../deep-dive/collection-contracts.md)
+- [泛型与类型安全](../deep-dive/generics-and-type-safety.md)
+
+## 一句话复盘
+
+> 先明确集合语义，再选择实现；接口契约、复杂度和线程安全不能互相替代。
