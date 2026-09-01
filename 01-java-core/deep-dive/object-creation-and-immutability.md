@@ -2326,598 +2326,66 @@ API 冗长，失去直接构造的简洁性。
 
 ---
 
-## 10.43 建议实验
+## 10.43 实验与 examples 边界
+
+本节保留原有实验清单与文字观察，不在正文维护完整 runnable class。需要执行回归时统一以 `examples/` 为唯一代码入口。
+
 
 ### 实验一：构造器建立合法状态
 
-```java
-public class ValidStateDemo {
+> 完整 runnable class 已移出正文；以下保留验证目标和观察结论。
 
-    static final class Port {
-
-        private final int value;
-
-        Port(int value) {
-            if (
-                    value < 1
-                    || value > 65_535
-            ) {
-                throw new IllegalArgumentException();
-            }
-
-            this.value = value;
-        }
-    }
-
-    public static void main(String[] args) {
-        new Port(8080);
-
-        try {
-            new Port(70_000);
-        } catch (
-                IllegalArgumentException exception
-        ) {
-            System.out.println("invalid port");
-        }
-    }
-}
-```
 
 ### 实验二：静态工厂命名
 
-```java
-import java.time.Duration;
-
-public class StaticFactoryDemo {
-
-    static final class Timeout {
-
-        private final Duration duration;
-
-        private Timeout(Duration duration) {
-            this.duration = duration;
-        }
-
-        static Timeout seconds(long value) {
-            return new Timeout(
-                    Duration.ofSeconds(value)
-            );
-        }
-
-        static Timeout milliseconds(
-                long value
-        ) {
-            return new Timeout(
-                    Duration.ofMillis(value)
-            );
-        }
-    }
-
-    public static void main(String[] args) {
-        Timeout.seconds(30);
-        Timeout.milliseconds(30);
-    }
-}
-```
 
 ### 实验三：Builder 创建不可变对象
 
-```java
-import java.util.ArrayList;
-import java.util.List;
-
-public class BuilderDemo {
-
-    static final class User {
-
-        private final String name;
-        private final List<String> roles;
-
-        private User(Builder builder) {
-            this.name = builder.name;
-            this.roles =
-                    List.copyOf(builder.roles);
-        }
-
-        static Builder builder() {
-            return new Builder();
-        }
-
-        static final class Builder {
-
-            private String name;
-            private final List<String> roles =
-                    new ArrayList<>();
-
-            Builder name(String name) {
-                this.name = name;
-                return this;
-            }
-
-            Builder addRole(String role) {
-                roles.add(role);
-                return this;
-            }
-
-            User build() {
-                if (
-                        name == null
-                        || name.isBlank()
-                ) {
-                    throw new IllegalStateException();
-                }
-
-                return new User(this);
-            }
-        }
-    }
-
-    public static void main(String[] args) {
-        User user = User.builder()
-                .name("Java")
-                .addRole("USER")
-                .build();
-
-        System.out.println(user.name);
-    }
-}
-```
 
 ### 实验四：Builder 复制集合
 
-```java
-BuilderDemo.User.Builder builder =
-        BuilderDemo.User.builder()
-                .name("Java")
-                .addRole("USER");
-
-BuilderDemo.User first =
-        builder.build();
-
-builder.addRole("ADMIN");
-
-BuilderDemo.User second =
-        builder.build();
-```
 
 观察 `first` 不应因为 Builder 后续修改而增加角色。
 
 ### 实验五：final 集合仍可变
 
-```java
-import java.util.ArrayList;
-import java.util.List;
-
-public class FinalCollectionDemo {
-
-    private final List<String> values =
-            new ArrayList<>();
-
-    public static void main(String[] args) {
-        FinalCollectionDemo demo =
-                new FinalCollectionDemo();
-
-        demo.values.add("Java");
-
-        System.out.println(demo.values);
-    }
-}
-```
 
 ### 实验六：构造器防御性复制
 
-```java
-import java.util.ArrayList;
-import java.util.List;
-
-public class InputCopyDemo {
-
-    static final class Group {
-
-        private final List<String> members;
-
-        Group(List<String> members) {
-            this.members =
-                    List.copyOf(members);
-        }
-
-        List<String> members() {
-            return members;
-        }
-    }
-
-    public static void main(String[] args) {
-        List<String> source =
-                new ArrayList<>();
-
-        source.add("A");
-
-        Group group = new Group(source);
-
-        source.add("B");
-
-        System.out.println(group.members());
-    }
-}
-```
 
 ### 实验七：数组双向复制
 
-```java
-import java.util.Arrays;
-
-public class ArrayCopyDemo {
-
-    static final class Digest {
-
-        private final byte[] bytes;
-
-        Digest(byte[] bytes) {
-            this.bytes = bytes.clone();
-        }
-
-        byte[] bytes() {
-            return bytes.clone();
-        }
-    }
-
-    public static void main(String[] args) {
-        byte[] source = {1, 2, 3};
-
-        Digest digest = new Digest(source);
-
-        source[0] = 9;
-
-        byte[] result = digest.bytes();
-        result[1] = 9;
-
-        System.out.println(
-                Arrays.toString(
-                        digest.bytes()
-                )
-        );
-    }
-}
-```
 
 ### 实验八：不可修改视图与快照
 
-```java
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-public class CollectionIsolationDemo {
-
-    public static void main(String[] args) {
-        List<String> source =
-                new ArrayList<>();
-
-        source.add("A");
-
-        List<String> view =
-                Collections.unmodifiableList(
-                        source
-                );
-
-        List<String> snapshot =
-                List.copyOf(source);
-
-        source.add("B");
-
-        System.out.println(view);
-        System.out.println(snapshot);
-    }
-}
-```
 
 ### 实验九：record 深度不可变边界
 
-```java
-import java.util.ArrayList;
-import java.util.List;
-
-public class RecordImmutableDemo {
-
-    record Group(List<String> members) {
-
-        Group {
-            members =
-                    List.copyOf(members);
-        }
-    }
-
-    public static void main(String[] args) {
-        List<String> source =
-                new ArrayList<>();
-
-        source.add("A");
-
-        Group group = new Group(source);
-
-        source.add("B");
-
-        System.out.println(group.members());
-    }
-}
-```
 
 ### 实验十：withXxx
 
-```java
-public class WitherDemo {
-
-    record User(
-            String name,
-            String email
-    ) {
-        User withEmail(String newEmail) {
-            if (email.equals(newEmail)) {
-                return this;
-            }
-
-            return new User(
-                    name,
-                    newEmail
-            );
-        }
-    }
-
-    public static void main(String[] args) {
-        User first =
-                new User(
-                        "Java",
-                        "old@example.com"
-                );
-
-        User second =
-                first.withEmail(
-                        "new@example.com"
-                );
-
-        System.out.println(first);
-        System.out.println(second);
-    }
-}
-```
 
 ### 实验十一：浅拷贝元素共享
 
-```java
-import java.util.ArrayList;
-import java.util.List;
-
-public class ShallowCopyDemo {
-
-    static class User {
-
-        String name;
-
-        User(String name) {
-            this.name = name;
-        }
-    }
-
-    public static void main(String[] args) {
-        List<User> source =
-                new ArrayList<>();
-
-        source.add(new User("A"));
-
-        List<User> copy =
-                new ArrayList<>(source);
-
-        copy.get(0).name = "B";
-
-        System.out.println(
-                source.get(0).name
-        );
-    }
-}
-```
 
 ### 实验十二：拷贝工厂复用不可变实例
 
-```java
-public class CopyFactoryDemo {
-
-    static final class Code {
-
-        private final String value;
-
-        private Code(String value) {
-            this.value = value;
-        }
-
-        static Code of(String value) {
-            return new Code(value);
-        }
-
-        static Code copyOf(Code source) {
-            return source;
-        }
-    }
-
-    public static void main(String[] args) {
-        Code first = Code.of("A");
-        Code second = Code.copyOf(first);
-
-        System.out.println(first == second);
-    }
-}
-```
 
 ### 实验十三：缓存派生值
 
-```java
-public class DerivedCacheDemo {
-
-    static final class Text {
-
-        private final String value;
-        private Integer cachedLength;
-
-        Text(String value) {
-            this.value = value;
-        }
-
-        int length() {
-            Integer result = cachedLength;
-
-            if (result == null) {
-                result = value.length();
-                cachedLength = result;
-            }
-
-            return result;
-        }
-    }
-
-    public static void main(String[] args) {
-        Text text = new Text("Java");
-
-        System.out.println(text.length());
-        System.out.println(text.length());
-    }
-}
-```
 
 该示例用于理解逻辑不可变；跨线程使用仍需处理缓存字段可见性。
 
 ### 实验十四：枚举单例
 
-```java
-public class EnumSingletonDemo {
-
-    enum IdGenerator {
-        INSTANCE;
-
-        private long value;
-
-        synchronized long next() {
-            return ++value;
-        }
-    }
-
-    public static void main(String[] args) {
-        System.out.println(
-                IdGenerator.INSTANCE.next()
-        );
-    }
-}
-```
 
 该实例包含可变状态，因此必须明确并发控制。
 
 ### 实验十五：构造器注入
 
-```java
-public class ConstructorInjectionDemo {
-
-    interface Clock {
-        long now();
-    }
-
-    static final class TokenService {
-
-        private final Clock clock;
-
-        TokenService(Clock clock) {
-            this.clock =
-                    java.util.Objects
-                            .requireNonNull(clock);
-        }
-
-        boolean expired(long expireAt) {
-            return clock.now() > expireAt;
-        }
-    }
-
-    public static void main(String[] args) {
-        Clock fixed = () -> 100L;
-
-        TokenService service =
-                new TokenService(fixed);
-
-        System.out.println(
-                service.expired(90L)
-        );
-    }
-}
-```
 
 ### 实验十六：金额不可变值对象
 
-```java
-import java.math.BigDecimal;
-import java.util.Currency;
-import java.util.Objects;
-
-public class MoneyDemo {
-
-    static final class Money {
-
-        private final long amountInFen;
-        private final Currency currency;
-
-        private Money(
-                long amountInFen,
-                Currency currency
-        ) {
-            this.amountInFen = amountInFen;
-            this.currency =
-                    Objects.requireNonNull(currency);
-        }
-
-        static Money cnyYuan(String amount) {
-            long fen =
-                    new BigDecimal(amount)
-                            .movePointRight(2)
-                            .longValueExact();
-
-            return new Money(
-                    fen,
-                    Currency.getInstance("CNY")
-            );
-        }
-
-        Money add(Money other) {
-            if (!currency.equals(
-                    other.currency
-            )) {
-                throw new IllegalArgumentException();
-            }
-
-            return new Money(
-                    Math.addExact(
-                            amountInFen,
-                            other.amountInFen
-                    ),
-                    currency
-            );
-        }
-
-        long amountInFen() {
-            return amountInFen;
-        }
-    }
-
-    public static void main(String[] args) {
-        Money price =
-                Money.cnyYuan("105.20");
-
-        Money shipping =
-                Money.cnyYuan("8.00");
-
-        Money total =
-                price.add(shipping);
-
-        System.out.println(
-                total.amountInFen()
-        );
-    }
-}
-```
 
 ---
 

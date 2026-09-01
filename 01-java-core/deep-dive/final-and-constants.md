@@ -215,7 +215,7 @@ thresholds[0] = 99; // 合法
 
 `final List<String>` 只能固定字段引用，不能阻止列表元素变化，也不能阻止构造器保存的外部列表继续变化。`unmodifiableList` 是只读视图，`List.copyOf` 是不可修改快照；防御性复制、嵌套对象和不变量的完整设计统一见 [object-creation-and-immutability.md](object-creation-and-immutability.md)。
 
-## 17.15 final 参数
+## 17.14 final 参数
 
 ```java
 void process(final Order order) {
@@ -226,7 +226,7 @@ void process(final Order order) {
 
 final 参数防止在方法体内重新给形参赋值，不保护调用方变量，也不阻止对象状态变化。它主要是局部可读性约束，不是 API 契约或并发保证。
 
-## 17.16 effectively final
+## 17.15 effectively final
 
 变量未显式写 `final`，但初始化后从未重新赋值，则是 effectively final：
 
@@ -237,13 +237,13 @@ Runnable task = () -> System.out.println(prefix);
 
 一旦存在重新赋值，该变量不再 effectively final，不能被 Lambda 或局部/匿名类按该规则捕获。
 
-## 17.17 为什么闭包捕获要求有效 final
+## 17.16 为什么闭包捕获要求有效 final
 
 局部变量生命周期可能短于 Lambda 对象。Java 捕获的是变量值的快照语义，而不是可被多个作用域共同修改的局部槽。
 
 如需共享可变状态，应显式使用对象、原子类或受控状态容器，同时承担并发与可读性成本。
 
-## 17.18 final 方法
+## 17.17 final 方法
 
 ```java
 public final void validate() {
@@ -254,15 +254,15 @@ public final void validate() {
 
 final 方法仍能被继承和调用；“不能重写”不等于“不能使用”。
 
-## 17.19 private 方法与 final
+## 17.18 private 方法与 final
 
 private 方法对子类不可见，不形成重写关系，因此再加 final 通常没有额外设计价值。子类声明同名方法只是独立方法，不是覆盖父类 private 方法。
 
-## 17.20 static 方法与 final
+## 17.19 static 方法与 final
 
 静态方法不参与实例重写，只能隐藏。对静态方法添加 final 的价值有限，主要是禁止子类声明具有可隐藏关系的同签名静态方法；它仍不是动态分派。
 
-## 17.21 final 类
+## 17.20 final 类
 
 ```java
 public final class Money {
@@ -273,7 +273,7 @@ final 类不能被继承。它适合语义完整的值对象、安全敏感类�
 
 final 类中的实例方法无需再逐个标记 final，因为没有外部子类可以重写。
 
-## 17.22 final 类不等于不可变类
+## 17.21 final 类不等于不可变类
 
 ```java
 public final class MutableUser {
@@ -284,19 +284,19 @@ public final class MutableUser {
 
 它不能被继承，但对象仍然可变。不可变还需要字段封装、构造校验、防御性复制和不提供状态修改入口。
 
-## 17.23 record 与 final
+## 17.22 record 与 final
 
 record 隐式为 `final`，组件字段是 `private final`；这只说明组件引用不能重绑，不自动提供深不可变。record 的防御性复制和对象图边界统一见 [object-creation-and-immutability.md](object-creation-and-immutability.md)。
 
-## 17.24 enum 与 final
+## 17.23 enum 与 final
 
 枚举类型不能被普通类继承，也不能显式继承其他类。带有常量特定类体的枚举在实现层次上有特殊子类语义，因此不要机械说所有 enum 字节码都简单标记 final；工程结论是外部代码不能扩展枚举类型。
 
-## 17.25 sealed 与 final
+## 17.24 sealed 与 final
 
 sealed 表示只允许列出的子类型；final 表示完全禁止子类型。sealed 层次中的直接子类必须明确使用 `final`、`sealed` 或 `non-sealed` 继续声明扩展策略。
 
-## 17.26 static final
+## 17.25 static final
 
 `static final` 同时表达类级成员和一次赋值：
 
@@ -306,7 +306,7 @@ public static final int MAX_RETRY = 3;
 
 它常用于常量，但不应把所有 static final 都称为编译期常量。
 
-## 17.27 常量变量
+## 17.26 常量变量
 
 JLS 中的 constant variable 需要：
 
@@ -316,7 +316,7 @@ JLS 中的 constant variable 需要：
 
 它可以是局部变量、参数之外的字段等满足规则的变量，不要求一定是 `static`。但公共常量通常使用 `public static final`。
 
-## 17.28 不是常量变量的 static final
+## 17.27 不是常量变量的 static final
 
 ```java
 static final Integer BOXED = 3;
@@ -326,13 +326,13 @@ static final Object TOKEN = new Object();
 
 它们都只能赋值一次，但不属于语言规范意义上的常量变量。读取这些字段通常需要真实字段访问并可能触发类初始化。
 
-## 17.29 常量表达式
+## 17.28 常量表达式
 
 常量表达式由字面量、常量变量、部分运算符和不产生异常完成的语言构造组成，并且类型为基本类型或 String。
 
 普通方法调用、对象创建、数组创建和运行时属性读取不属于常量表达式。
 
-## 17.30 字符串常量表达式
+## 17.29 字符串常量表达式
 
 ```java
 static final String PREFIX = "WMS-";
@@ -341,13 +341,13 @@ static final String CODE = PREFIX + "001";
 
 如果各部分都是常量表达式，编译器可在编译期折叠为一个字符串常量。运行时字符串拼接和方法结果则不是同一语义。
 
-## 17.31 常量变量与类初始化
+## 17.30 常量变量与类初始化
 
 读取其他类的常量变量可能直接使用调用方字节码中的值，不触发声明类初始化。读取运行时 final 字段则通常需要初始化声明类。
 
 这也是第 16 章中“主动使用静态字段，但常量变量例外”的根源。
 
-## 17.32 常量内联
+## 17.31 常量内联
 
 调用方编译时可能把 public 常量值直接写入自己的 class 文件：
 
@@ -358,19 +358,19 @@ Constants.TIMEOUT
 
 运行时不必读取 `Constants.TIMEOUT` 字段。
 
-## 17.33 跨模块旧值风险
+## 17.32 跨模块旧值风险
 
 库 A 把 `TIMEOUT` 从 30 改为 60，只替换 A 的 jar 而未重新编译消费者 B，B 仍可能使用内联的 30。
 
 这不是 JVM 缓存错误，而是 B 的字节码已经包含旧值。发布流程应重新编译所有消费者，或避免用可内联常量表达会变化的配置。
 
-## 17.34 public 常量的兼容性
+## 17.33 public 常量的兼容性
 
 删除、改名或改变类型可能造成源码或二进制不兼容；只改变被内联值可能造成新旧消费者行为不一致。
 
 公共常量一旦发布就是 API。评审应像评审方法签名一样评审其语义稳定性。
 
-## 17.35 常量与配置
+## 17.34 常量与配置
 
 稳定协议事实可用常量：
 
@@ -386,7 +386,7 @@ record AllocationConfig(int maxRetry, Duration timeout) { }
 
 “当前暂时不变”不等于“语言常量”。
 
-## 17.36 常量类
+## 17.35 常量类
 
 相关常量可以放在语义明确的最终类中：
 
@@ -399,11 +399,11 @@ public final class ProtocolLimits {
 
 避免一个全局 `Constants` 垃圾桶混合所有领域。
 
-## 17.37 常量接口反模式
+## 17.36 常量接口反模式
 
 类仅为了直接引用字段而 `implements Constants` 会污染类型关系，并把实现细节暴露为公共 API。常量应通过声明类限定名、枚举或值对象访问。
 
-## 17.38 枚举替代状态常量
+## 17.37 枚举替代状态常量
 
 ```java
 enum OrderStatus { CREATED, ALLOCATED, CANCELLED }
@@ -413,7 +413,7 @@ enum OrderStatus { CREATED, ALLOCATED, CANCELLED }
 
 外部协议仍需显式序列化值，避免依赖 `ordinal()`。
 
-## 17.39 值对象替代复合常量
+## 17.38 值对象替代复合常量
 
 金额、时间窗口、尺寸、库位坐标等语义不应拆成互不关联的原始常量。值对象可以统一校验、单位和相等性：
 
@@ -421,7 +421,7 @@ enum OrderStatus { CREATED, ALLOCATED, CANCELLED }
 record WeightLimit(BigDecimal kilograms) { }
 ```
 
-## 17.40 可变对象常量
+## 17.39 可变对象常量
 
 ```java
 public static final List<String> TYPES = new ArrayList<>();
@@ -429,7 +429,7 @@ public static final List<String> TYPES = new ArrayList<>();
 
 字段引用不可替换，但任何调用方都可修改列表。公共常量必须避免暴露可变对象，使用 `List.of`、`Set.of`、`Map.of` 或防御性复制。
 
-## 17.41 JMM 与绕过手段：只保留提示
+## 17.40 JMM 与绕过手段：只保留提示
 
 正确构造且构造期间没有 `this` 逸出的对象，对 `final` 字段具有特殊初始化可见性；这不等于对象整体线程安全，也不能替代锁、`volatile`、不可变对象或正确发布。
 
@@ -441,7 +441,7 @@ public static final List<String> TYPES = new ArrayList<>();
 
 JMM、发布、重排和同步的完整推导留给未来并发模块；性能优化也不属于本章主线。
 
-## 17.46 WMS 常量分类
+## 17.41 WMS 常量分类
 
 ```text
 协议字段长度、固定算法参数
@@ -462,7 +462,7 @@ JMM、发布、重排和同步的完整推导留给未来并发模块；性能�
 
 分类依据是变化频率和业务语义，不是“写起来是否方便”。
 
-## 17.47 常量评审清单
+## 17.42 常量评审清单
 
 发布常量前确认：
 
@@ -474,21 +474,17 @@ JMM、发布、重排和同步的完整推导留给未来并发模块；性能�
 6. 修改时消费者是否会重新编译；
 7. 是否应改用枚举、值对象或配置。
 
-## 17.48 建议实验
+## 17.43 实验与 examples 边界
+
+本节保留原有实验清单与文字观察，不在正文维护完整 runnable class。需要执行回归时统一以 `examples/` 为唯一代码入口。
+
 
 ### 实验1：final 局部变量
 
 **目标**：验证赋值一次的基本规则。
 
-```java
-public class FinalLocalDemo {
-    public static void main(String[] args) {
-        final int value = 10;
-        // value = 20;
-        System.out.println(value);
-    }
-}
-```
+> 完整 runnable class 已移出正文；以下保留验证目标和观察结论。
+
 
 预期或观察重点：
 
@@ -500,19 +496,6 @@ public class FinalLocalDemo {
 
 **目标**：验证所有正常路径恰好赋值一次。
 
-```java
-public class FinalBranchDemo {
-    static int choose(boolean flag) {
-        final int value;
-        if (flag) value = 1; else value = 2;
-        return value;
-    }
-    public static void main(String[] args) {
-        System.out.println(choose(true));
-        System.out.println(choose(false));
-    }
-}
-```
 
 预期或观察重点：
 
@@ -525,16 +508,6 @@ public class FinalBranchDemo {
 
 **目标**：理解每次迭代创建新的变量。
 
-```java
-public class FinalLoopDemo {
-    public static void main(String[] args) {
-        for (int i = 0; i < 3; i++) {
-            final int snapshot = i;
-            System.out.println(snapshot);
-        }
-    }
-}
-```
 
 预期或观察重点：
 
@@ -548,18 +521,6 @@ public class FinalLoopDemo {
 
 **目标**：验证每个对象可拥有不同 final 值。
 
-```java
-public class BlankFinalFieldDemo {
-    static class User {
-        final String id;
-        User(String id) { this.id = id; }
-    }
-    public static void main(String[] args) {
-        System.out.println(new User("U1").id);
-        System.out.println(new User("U2").id);
-    }
-}
-```
 
 预期或观察重点：
 
@@ -572,16 +533,6 @@ U2
 
 **目标**：验证 this 构造器调用集中初始化 final 字段。
 
-```java
-public class FinalConstructorChainDemo {
-    static class Config {
-        final String env;
-        Config() { this("dev"); }
-        Config(String env) { this.env = env; }
-    }
-    public static void main(String[] args) { System.out.println(new Config().env); }
-}
-```
 
 预期或观察重点：
 
@@ -593,13 +544,6 @@ dev
 
 **目标**：验证静态代码块完成一次赋值。
 
-```java
-public class StaticBlankFinalDemo {
-    static final String ENV;
-    static { ENV = "test"; }
-    public static void main(String[] args) { System.out.println(ENV); }
-}
-```
 
 预期或观察重点：
 
@@ -611,17 +555,6 @@ test
 
 **目标**：区分引用不变和对象状态不变。
 
-```java
-import java.util.ArrayList;
-import java.util.List;
-public class FinalReferenceDemo {
-    public static void main(String[] args) {
-        final List<String> values = new ArrayList<>();
-        values.add("A");
-        System.out.println(values);
-    }
-}
-```
 
 预期或观察重点：
 
@@ -633,16 +566,6 @@ public class FinalReferenceDemo {
 
 **目标**：观察数组引用 final 不限制元素。
 
-```java
-import java.util.Arrays;
-public class FinalArrayDemo {
-    public static void main(String[] args) {
-        final int[] values = {1, 2};
-        values[0] = 9;
-        System.out.println(Arrays.toString(values));
-    }
-}
-```
 
 预期或观察重点：
 
@@ -654,19 +577,6 @@ public class FinalArrayDemo {
 
 **目标**：比较 unmodifiableList 与 copyOf 的源集合变化语义。
 
-```java
-import java.util.*;
-public class ViewAndSnapshotDemo {
-    public static void main(String[] args) {
-        List<String> source = new ArrayList<>(List.of("A"));
-        List<String> view = Collections.unmodifiableList(source);
-        List<String> snapshot = List.copyOf(source);
-        source.add("B");
-        System.out.println(view);
-        System.out.println(snapshot);
-    }
-}
-```
 
 预期或观察重点：
 
@@ -679,15 +589,6 @@ public class ViewAndSnapshotDemo {
 
 **目标**：验证仍可修改传入对象。
 
-```java
-public class FinalParameterDemo {
-    static class Box { int value; }
-    static void update(final Box box) { box.value = 10; }
-    public static void main(String[] args) {
-        Box box = new Box(); update(box); System.out.println(box.value);
-    }
-}
-```
 
 预期或观察重点：
 
@@ -699,15 +600,6 @@ public class FinalParameterDemo {
 
 **目标**：验证未显式 final 的未重赋值变量可被 Lambda 捕获。
 
-```java
-public class EffectivelyFinalDemo {
-    public static void main(String[] args) {
-        String prefix = "WMS";
-        Runnable task = () -> System.out.println(prefix);
-        task.run();
-    }
-}
-```
 
 预期或观察重点：
 
@@ -719,16 +611,6 @@ WMS
 
 **目标**：观察子类只实现钩子而不能替换整体流程。
 
-```java
-public class FinalMethodTemplateDemo {
-    static abstract class Task {
-        final void execute() { System.out.println("start"); run(); System.out.println("end"); }
-        abstract void run();
-    }
-    static class Job extends Task { void run() { System.out.println("job"); } }
-    public static void main(String[] args) { new Job().execute(); }
-}
-```
 
 预期或观察重点：
 
@@ -742,18 +624,6 @@ end
 
 **目标**：证明禁止继承不等于不可变。
 
-```java
-public class FinalClassMutableDemo {
-    static final class User {
-        private String name;
-        void rename(String name) { this.name = name; }
-        String name() { return name; }
-    }
-    public static void main(String[] args) {
-        User user = new User(); user.rename("Java"); System.out.println(user.name());
-    }
-}
-```
 
 预期或观察重点：
 
@@ -765,19 +635,6 @@ Java
 
 **目标**：观察 record 组件引用可指向可变列表。
 
-```java
-import java.util.ArrayList;
-import java.util.List;
-public class RecordShallowImmutableDemo {
-    record Batch(List<String> items) { }
-    public static void main(String[] args) {
-        List<String> source = new ArrayList<>();
-        Batch batch = new Batch(source);
-        source.add("A");
-        System.out.println(batch.items());
-    }
-}
-```
 
 预期或观察重点：
 
@@ -789,19 +646,6 @@ public class RecordShallowImmutableDemo {
 
 **目标**：通过紧凑构造器建立不可修改快照。
 
-```java
-import java.util.ArrayList;
-import java.util.List;
-public class RecordDefensiveCopyDemo {
-    record Batch(List<String> items) { Batch { items = List.copyOf(items); } }
-    public static void main(String[] args) {
-        List<String> source = new ArrayList<>();
-        Batch batch = new Batch(source);
-        source.add("A");
-        System.out.println(batch.items());
-    }
-}
-```
 
 预期或观察重点：
 
@@ -813,15 +657,6 @@ public class RecordDefensiveCopyDemo {
 
 **目标**：验证常量内联相关初始化行为。
 
-```java
-public class CompileTimeConstantDemo {
-    static class Constants {
-        static final int VALUE = 3;
-        static { System.out.println("initialized"); }
-    }
-    public static void main(String[] args) { System.out.println(Constants.VALUE); }
-}
-```
 
 预期或观察重点：
 
@@ -833,15 +668,6 @@ public class CompileTimeConstantDemo {
 
 **目标**：验证方法调用结果不是常量表达式。
 
-```java
-public class RuntimeConstantDemo {
-    static class Constants {
-        static final int VALUE = Integer.parseInt("3");
-        static { System.out.println("initialized"); }
-    }
-    public static void main(String[] args) { System.out.println(Constants.VALUE); }
-}
-```
 
 预期或观察重点：
 
@@ -854,13 +680,6 @@ initialized
 
 **目标**：观察常量表达式拼接结果。
 
-```java
-public class StringConstantDemo {
-    static final String PREFIX = "WMS-";
-    static final String CODE = PREFIX + "001";
-    public static void main(String[] args) { System.out.println(CODE); }
-}
-```
 
 预期或观察重点：
 
@@ -872,18 +691,6 @@ WMS-001
 
 **目标**：验证封闭状态集合的类型安全。
 
-```java
-public class EnumConstantDemo {
-    enum Status { CREATED, COMPLETED }
-    static String describe(Status status) {
-        return switch (status) {
-            case CREATED -> "new";
-            case COMPLETED -> "done";
-        };
-    }
-    public static void main(String[] args) { System.out.println(describe(Status.CREATED)); }
-}
-```
 
 预期或观察重点：
 
@@ -895,19 +702,6 @@ new
 
 **目标**：展示构造器完成后发布不可变值对象。
 
-```java
-public class FinalFieldConstructionDemo {
-    static final class Pair {
-        final int left;
-        final int right;
-        Pair(int left, int right) { this.left = left; this.right = right; }
-    }
-    public static void main(String[] args) {
-        Pair pair = new Pair(1, 2);
-        System.out.println(pair.left + pair.right);
-    }
-}
-```
 
 预期或观察重点：
 
@@ -915,7 +709,7 @@ public class FinalFieldConstructionDemo {
 3
 ```
 
-## 17.49 高频面试题
+## 17.44 高频面试题
 
 1. `final` 可以修饰哪些语言元素？
 2. final 局部变量的核心约束是什么？
@@ -1008,7 +802,7 @@ public class FinalFieldConstructionDemo {
 89. 评审 public 常量时最重要的问题是什么？
 90. 本章区分 final 与不可变的核心表达是什么？
 
-## 17.50 易错点
+## 17.45 易错点
 
 ### 易错点 1：把 final 理解成对象不可变
 
@@ -1170,7 +964,7 @@ sealed 允许受控子类型，final 完全禁止。
 
 常量类型、字段存在性和值内联都影响独立部署模块。
 
-## 17.51 工程实践建议
+## 17.46 工程实践建议
 
 ### 工程实践 1：默认使用构造器建立 final 字段
 
@@ -1332,7 +1126,7 @@ final 字段新增和默认值需要迁移策略。
 
 调用方必须知道它是协议事实还是默认值。
 
-## 17.52 官方参考资料
+## 17.47 官方参考资料
 
 - Java Language Specification 4.12.4：final variables 与 constant variables；
 - Java Language Specification 15.28：constant expressions；
@@ -1341,7 +1135,7 @@ final 字段新增和默认值需要迁移策略。
 - Java Language Specification 13：二进制兼容；
 - Java SE 26 `List.copyOf`、不可修改集合和 record 文档。
 
-## 17.53 本章总结
+## 17.48 本章总结
 
 ```text
 final 变量：赋值一次
@@ -1364,6 +1158,6 @@ final 字段有特殊初始化保证，但前提是正确构造且 this 不逸�
 不可变还需要封装、防御性复制和正确发布
 ```
 
-## 17.54 面试口述版
+## 17.49 面试口述版
 
 `final` 的语义取决于修饰位置：变量和字段只能确定赋值一次，方法不能被重写，类不能被继承。final 引用只保证引用不再指向别的对象，不保证对象内部不可变，所以 final 数组和集合仍可能被修改。空白 final 可以在构造器、初始化块或静态初始化中赋值，只要编译器能证明所有正常路径上恰好完成一次。没有显式 final 但从未重新赋值的局部变量属于 effectively final，可以被 Lambda 捕获。`static final` 也不一定是编译期常量；只有基本类型或 String、使用常量表达式初始化的 final 变量才是常量变量，调用方可能把它内联到自身字节码，因此跨模块修改常量必须重新编译消费者。JMM 对正确构造且构造期间没有 `this` 逸出的 final 字段提供特殊初始化可见性，但这不等于对象整体线程安全，也不能替代锁、volatile、防御性复制和正确发布。

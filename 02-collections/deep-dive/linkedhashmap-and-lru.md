@@ -1984,45 +1984,24 @@ flowchart LR
 
 ---
 
-## 07.43 三个核心实验
+## 07.43 实验与 examples 边界
 
-本章仍然只保留真正帮助理解的实验。
+本章仍然只保留真正帮助理解的验证片段；完整运行入口统一见 [examples/README.md](../../examples/README.md)。
 
 ---
 
 ### 实验一：insertion-order 与 access-order 对比
 
 ```java
-import java.util.LinkedHashMap;
-import java.util.Map;
+Map<String, Integer> insertionOrder = new LinkedHashMap<>();
+insertionOrder.put("A", 1);
+insertionOrder.put("B", 2);
+insertionOrder.put("C", 3);
+insertionOrder.get("A"); // {A=1, B=2, C=3}
 
-public class LinkedHashMapOrderDemo {
-
-    public static void main(String[] args) {
-        Map<String, Integer> insertionOrder = new LinkedHashMap<>();
-
-        insertionOrder.put("A", 1);
-        insertionOrder.put("B", 2);
-        insertionOrder.put("C", 3);
-
-        insertionOrder.get("A");
-
-        System.out.println(insertionOrder);
-        // {A=1, B=2, C=3}
-
-        Map<String, Integer> accessOrder =
-                new LinkedHashMap<>(16, 0.75f, true);
-
-        accessOrder.put("A", 1);
-        accessOrder.put("B", 2);
-        accessOrder.put("C", 3);
-
-        accessOrder.get("A");
-
-        System.out.println(accessOrder);
-        // {B=2, C=3, A=1}
-    }
-}
+Map<String, Integer> accessOrder = new LinkedHashMap<>(16, 0.75f, true);
+accessOrder.putAll(insertionOrder);
+accessOrder.get("A"); // {B=2, C=3, A=1}
 ```
 
 核心观察：
@@ -2043,42 +2022,23 @@ flowchart LR
 ### 实验二：用 `removeEldestEntry()` 实现固定容量 LRU
 
 ```java
-import java.util.LinkedHashMap;
-import java.util.Map;
-
-public class LruDemo {
-
-    static class LruCache<K, V> extends LinkedHashMap<K, V> {
-
-        private final int capacity;
-
-        LruCache(int capacity) {
-            super(capacity, 0.75f, true);
-            this.capacity = capacity;
-        }
-
-        @Override
-        protected boolean removeEldestEntry(Map.Entry<K, V> eldest) {
-            return size() > capacity;
-        }
+class LruCache<K, V> extends LinkedHashMap<K, V> {
+    private final int capacity;
+    LruCache(int capacity) {
+        super(capacity, 0.75f, true);
+        this.capacity = capacity;
     }
-
-    public static void main(String[] args) {
-        LruCache<String, Integer> cache = new LruCache<>(3);
-
-        cache.put("A", 1);
-        cache.put("B", 2);
-        cache.put("C", 3);
-
-        cache.get("A");
-        System.out.println(cache);
-        // {B=2, C=3, A=1}
-
-        cache.put("D", 4);
-        System.out.println(cache);
-        // {C=3, A=1, D=4}
+    @Override protected boolean removeEldestEntry(Map.Entry<K, V> eldest) {
+        return size() > capacity;
     }
 }
+
+LruCache<String, Integer> cache = new LruCache<>(3);
+cache.put("A", 1);
+cache.put("B", 2);
+cache.put("C", 3);
+cache.get("A");
+cache.put("D", 4); // {C=3, A=1, D=4}
 ```
 
 核心过程：
@@ -2098,36 +2058,16 @@ flowchart LR
 ### 实验三：Java 21 SequencedMap
 
 ```java
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.SequencedMap;
-
-public class SequencedMapDemo {
-
-    public static void main(String[] args) {
-        LinkedHashMap<String, Integer> map = new LinkedHashMap<>();
-
-        map.put("A", 1);
-        map.put("B", 2);
-        map.put("C", 3);
-
-        System.out.println(map.firstEntry()); // A=1
-        System.out.println(map.lastEntry());  // C=3
-
-        map.putFirst("C", 30);
-        System.out.println(map);              // {C=30, A=1, B=2}
-
-        map.putLast("C", 300);
-        System.out.println(map);              // {A=1, B=2, C=300}
-
-        SequencedMap<String, Integer> reversed = map.reversed();
-        System.out.println(reversed);         // {C=300, B=2, A=1}
-
-        Map.Entry<String, Integer> first = map.pollFirstEntry();
-        System.out.println(first);            // A=1
-        System.out.println(map);              // {B=2, C=300}
-    }
-}
+LinkedHashMap<String, Integer> map = new LinkedHashMap<>();
+map.put("A", 1);
+map.put("B", 2);
+map.put("C", 3);
+map.firstEntry(); // A=1
+map.lastEntry();  // C=3
+map.putFirst("C", 30);
+map.putLast("C", 300);
+SequencedMap<String, Integer> reversed = map.reversed();
+Map.Entry<String, Integer> first = map.pollFirstEntry();
 ```
 
 这个实验主要建立：

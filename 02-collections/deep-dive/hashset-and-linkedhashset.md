@@ -1915,9 +1915,9 @@ HashSet
 
 ---
 
-## 06.34 三个可运行实验
+## 06.34 实验与 examples 边界
 
-本章不做实验堆量，只保留 3 个真正能帮助理解的实验。
+本章不做实验堆量，只保留 3 个真正能帮助理解的验证片段；完整运行入口统一见 [examples/README.md](../../examples/README.md)。
 
 ---
 
@@ -1928,28 +1928,16 @@ HashSet
 观察两个不同对象在正确 equality 设计下只保留一个。
 
 ```java
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+record User(long id, String name) {}
 
-public class HashSetEqualityDemo {
-
-    record User(long id, String name) {}
-
-    public static void main(String[] args) {
-        Set<User> set = new HashSet<>();
-
-        User u1 = new User(1L, "Alice");
-        User u2 = new User(1L, "Alice");
-
-        System.out.println(u1 == u2);      // false
-        System.out.println(u1.equals(u2)); // true
-
-        System.out.println(set.add(u1));   // true
-        System.out.println(set.add(u2));   // false
-        System.out.println(set.size());    // 1
-    }
-}
+Set<User> set = new HashSet<>();
+User u1 = new User(1L, "Alice");
+User u2 = new User(1L, "Alice");
+u1 == u2;        // false
+u1.equals(u2);   // true
+set.add(u1);     // true
+set.add(u2);     // false
+set.size();      // 1
 ```
 
 核心流程：
@@ -1970,47 +1958,21 @@ flowchart TD
 ### 实验二：验证可变 hash 字段导致 contains/remove 异常
 
 ```java
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
-
-public class MutableHashSetDemo {
-
-    static class User {
-        String username;
-
-        User(String username) {
-            this.username = username;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (this == obj) return true;
-            if (!(obj instanceof User other)) return false;
-            return Objects.equals(username, other.username);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(username);
-        }
+final class User {
+    String username;
+    User(String username) { this.username = username; }
+    @Override public boolean equals(Object o) {
+        return o instanceof User u && Objects.equals(username, u.username);
     }
-
-    public static void main(String[] args) {
-        Set<User> set = new HashSet<>();
-
-        User user = new User("alice");
-        set.add(user);
-
-        System.out.println(set.contains(user)); // true
-
-        user.username = "bob";
-
-        System.out.println(set.contains(user)); // 通常 false
-        System.out.println(set.remove(user));   // 通常 false
-        System.out.println(set.size());         // 仍可能是 1
-    }
+    @Override public int hashCode() { return Objects.hash(username); }
 }
+
+Set<User> set = new HashSet<>();
+User user = new User("alice");
+set.add(user);
+user.username = "bob";
+set.contains(user); // 通常 false
+set.remove(user);   // 通常 false
 ```
 
 这里要观察的不是某个神奇 JVM bug，而是：
@@ -2027,32 +1989,13 @@ public class MutableHashSetDemo {
 ### 实验三：Java 21 LinkedHashSet 的 SequencedSet 能力
 
 ```java
-import java.util.LinkedHashSet;
-import java.util.SequencedSet;
-
-public class LinkedHashSetSequencedDemo {
-
-    public static void main(String[] args) {
-        LinkedHashSet<String> set = new LinkedHashSet<>();
-
-        set.add("A");
-        set.add("B");
-        set.add("C");
-
-        System.out.println(set);            // [A, B, C]
-        System.out.println(set.getFirst()); // A
-        System.out.println(set.getLast());  // C
-
-        set.addFirst("C");
-        System.out.println(set);            // [C, A, B]
-
-        set.addLast("C");
-        System.out.println(set);            // [A, B, C]
-
-        SequencedSet<String> reversed = set.reversed();
-        System.out.println(reversed);       // [C, B, A]
-    }
-}
+LinkedHashSet<String> set = new LinkedHashSet<>();
+set.addAll(List.of("A", "B", "C"));
+set.getFirst(); // A
+set.getLast();  // C
+set.addFirst("C"); // [C, A, B]
+set.addLast("C");  // [A, B, C]
+SequencedSet<String> reversed = set.reversed(); // [C, B, A]
 ```
 
 这个实验重点观察：

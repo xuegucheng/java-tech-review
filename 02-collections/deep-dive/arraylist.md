@@ -1037,7 +1037,10 @@ API 规范保证
 
 ---
 
-## 02.48 可运行实验
+## 02.48 实验与 examples 边界
+
+本节保留原有实验清单与文字观察，不在正文维护完整 runnable class。需要执行回归时统一以 `examples/` 为唯一代码入口。
+
 
 以下实验均为独立 Java 文件。示例以 Java 21 为编译基线；涉及更高版本 API 时会明确标注。
 
@@ -1045,19 +1048,8 @@ API 规范保证
 
 
 
-```java
-import java.util.ArrayList;
-import java.util.List;
+> 完整 runnable class 已移出正文；以下保留验证目标和观察结论。
 
-public class ArrayListSizeDemo {
-    public static void main(String[] args) {
-        List<String> values = new ArrayList<>(100);
-        System.out.println(values.size());
-        values.add("A");
-        System.out.println(values.size());
-    }
-}
-```
 
 预期输出：
 
@@ -1070,19 +1062,6 @@ public class ArrayListSizeDemo {
 
 
 
-```java
-import java.util.ArrayList;
-import java.util.List;
-
-public class ArrayListAppendDemo {
-    public static void main(String[] args) {
-        List<String> values = new ArrayList<>();
-        values.add("A");
-        values.add("B");
-        System.out.println(values);
-    }
-}
-```
 
 预期输出：
 
@@ -1094,19 +1073,6 @@ public class ArrayListAppendDemo {
 
 
 
-```java
-import java.util.ArrayList;
-import java.util.List;
-
-public class ArrayListIndexedAddDemo {
-    public static void main(String[] args) {
-        List<String> values =
-                new ArrayList<>(List.of("A", "C"));
-        values.add(1, "B");
-        System.out.println(values);
-    }
-}
-```
 
 预期输出：
 
@@ -1118,20 +1084,6 @@ public class ArrayListIndexedAddDemo {
 
 
 
-```java
-import java.util.ArrayList;
-import java.util.List;
-
-public class ArrayListSetDemo {
-    public static void main(String[] args) {
-        List<String> values =
-                new ArrayList<>(List.of("A", "B"));
-        String old = values.set(1, "X");
-        System.out.println(old);
-        System.out.println(values);
-    }
-}
-```
 
 预期输出：
 
@@ -1144,20 +1096,6 @@ B
 
 
 
-```java
-import java.util.ArrayList;
-import java.util.List;
-
-public class ArrayListRemoveIndexDemo {
-    public static void main(String[] args) {
-        List<String> values =
-                new ArrayList<>(List.of("A", "B", "C"));
-        String removed = values.remove(1);
-        System.out.println(removed);
-        System.out.println(values);
-    }
-}
-```
 
 预期输出：
 
@@ -1170,19 +1108,6 @@ B
 
 
 
-```java
-import java.util.ArrayList;
-import java.util.List;
-
-public class ArrayListRemoveObjectDemo {
-    public static void main(String[] args) {
-        List<String> values =
-                new ArrayList<>(List.of("A", "B", "A"));
-        values.remove("A");
-        System.out.println(values);
-    }
-}
-```
 
 预期输出：
 
@@ -1194,20 +1119,6 @@ public class ArrayListRemoveObjectDemo {
 
 
 
-```java
-import java.util.ArrayList;
-import java.util.List;
-
-public class IntegerRemoveOverloadDemo {
-    public static void main(String[] args) {
-        List<Integer> values =
-                new ArrayList<>(List.of(10, 20, 30));
-        values.remove(1);
-        values.remove(Integer.valueOf(30));
-        System.out.println(values);
-    }
-}
-```
 
 预期输出：
 
@@ -1219,20 +1130,6 @@ public class IntegerRemoveOverloadDemo {
 
 
 
-```java
-import java.util.ArrayList;
-import java.util.List;
-
-public class ArrayListContainsDemo {
-    record Sku(String code) {}
-
-    public static void main(String[] args) {
-        List<Sku> values = new ArrayList<>();
-        values.add(new Sku("A"));
-        System.out.println(values.contains(new Sku("A")));
-    }
-}
-```
 
 预期输出：
 
@@ -1244,20 +1141,6 @@ true
 
 
 
-```java
-import java.util.ArrayList;
-
-public class EnsureCapacityDemo {
-    public static void main(String[] args) {
-        ArrayList<Integer> values = new ArrayList<>();
-        values.ensureCapacity(100);
-        for (int i = 0; i < 5; i++) {
-            values.add(i);
-        }
-        System.out.println(values);
-    }
-}
-```
 
 预期输出：
 
@@ -1269,20 +1152,6 @@ public class EnsureCapacityDemo {
 
 
 
-```java
-import java.util.ArrayList;
-import java.util.List;
-
-public class ArrayListClearDemo {
-    public static void main(String[] args) {
-        List<String> values =
-                new ArrayList<>(List.of("A", "B"));
-        values.clear();
-        System.out.println(values.size());
-        System.out.println(values.isEmpty());
-    }
-}
-```
 
 预期输出：
 
@@ -1295,18 +1164,6 @@ true
 
 
 
-```java
-import java.util.ArrayList;
-import java.util.List;
-
-public class ArrayListAddAllDemo {
-    public static void main(String[] args) {
-        List<Number> values = new ArrayList<>();
-        values.addAll(List.of(1, 2, 3));
-        System.out.println(values);
-    }
-}
-```
 
 预期输出：
 
@@ -1318,20 +1175,6 @@ public class ArrayListAddAllDemo {
 
 
 
-```java
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
-public class ArrayListRemoveAllDemo {
-    public static void main(String[] args) {
-        List<String> values =
-                new ArrayList<>(List.of("A", "B", "C", "B"));
-        values.removeAll(Set.of("B", "C"));
-        System.out.println(values);
-    }
-}
-```
 
 预期输出：
 
@@ -1343,19 +1186,6 @@ public class ArrayListRemoveAllDemo {
 
 
 
-```java
-import java.util.ArrayList;
-import java.util.List;
-
-public class ArrayListRemoveIfDemo {
-    public static void main(String[] args) {
-        List<Integer> values =
-                new ArrayList<>(List.of(1, 2, 3, 4));
-        values.removeIf(value -> value % 2 == 0);
-        System.out.println(values);
-    }
-}
-```
 
 预期输出：
 
@@ -1367,20 +1197,6 @@ public class ArrayListRemoveIfDemo {
 
 
 
-```java
-import java.util.ArrayList;
-import java.util.List;
-
-public class ArrayListReplaceSortDemo {
-    public static void main(String[] args) {
-        List<String> values =
-                new ArrayList<>(List.of(" c ", "a", " b"));
-        values.replaceAll(String::trim);
-        values.sort(String::compareTo);
-        System.out.println(values);
-    }
-}
-```
 
 预期输出：
 
@@ -1392,25 +1208,6 @@ public class ArrayListReplaceSortDemo {
 
 
 
-```java
-import java.util.ArrayList;
-import java.util.List;
-
-public class ArrayListShallowCopyDemo {
-    static final class Item {
-        String name;
-        Item(String name) { this.name = name; }
-    }
-
-    public static void main(String[] args) {
-        Item item = new Item("A");
-        List<Item> source = new ArrayList<>(List.of(item));
-        List<Item> copy = new ArrayList<>(source);
-        copy.get(0).name = "X";
-        System.out.println(source.get(0).name);
-    }
-}
-```
 
 预期输出：
 
@@ -1422,26 +1219,6 @@ X
 
 
 
-```java
-import java.util.ArrayList;
-
-public class ArrayListCloneDemo {
-    public static void main(String[] args) {
-        ArrayList<StringBuilder> source = new ArrayList<>();
-        source.add(new StringBuilder("A"));
-
-        @SuppressWarnings("unchecked")
-        ArrayList<StringBuilder> copy =
-                (ArrayList<StringBuilder>) source.clone();
-
-        copy.add(new StringBuilder("B"));
-        copy.get(0).append("X");
-
-        System.out.println(source.size());
-        System.out.println(source.get(0));
-    }
-}
-```
 
 预期输出：
 
@@ -1454,19 +1231,6 @@ AX
 
 
 
-```java
-import java.util.ArrayList;
-import java.util.List;
-
-public class ArrayListSubListDemo {
-    public static void main(String[] args) {
-        List<String> values =
-                new ArrayList<>(List.of("A", "B", "C", "D"));
-        values.subList(1, 3).clear();
-        System.out.println(values);
-    }
-}
-```
 
 预期输出：
 
@@ -1478,21 +1242,6 @@ public class ArrayListSubListDemo {
 
 
 
-```java
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ListIterator;
-
-public class ArrayListListIteratorDemo {
-    public static void main(String[] args) {
-        List<String> values =
-                new ArrayList<>(List.of("A", "C"));
-        ListIterator<String> iterator = values.listIterator(1);
-        iterator.add("B");
-        System.out.println(values);
-    }
-}
-```
 
 预期输出：
 
@@ -1504,22 +1253,6 @@ public class ArrayListListIteratorDemo {
 
 
 
-```java
-import java.util.ArrayList;
-import java.util.List;
-
-public class ArrayListSequencedDemo {
-    public static void main(String[] args) {
-        List<String> values =
-                new ArrayList<>(List.of("B", "C"));
-        values.addFirst("A");
-        values.addLast("D");
-        System.out.println(values.getFirst());
-        System.out.println(values.getLast());
-        System.out.println(values);
-    }
-}
-```
 
 预期输出：
 
@@ -1533,20 +1266,6 @@ D
 
 
 
-```java
-import java.util.ArrayList;
-import java.util.List;
-
-public class ArrayListReversedDemo {
-    public static void main(String[] args) {
-        List<String> source =
-                new ArrayList<>(List.of("A", "B", "C"));
-        List<String> reversed = source.reversed();
-        reversed.removeFirst();
-        System.out.println(source);
-    }
-}
-```
 
 预期输出：
 

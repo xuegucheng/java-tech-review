@@ -911,7 +911,10 @@ static <E> List<E> snapshot(
 
 ---
 
-## 00.37 可运行实验
+## 00.37 实验与 examples 边界
+
+本节保留原有实验清单与文字观察，不在正文维护完整 runnable class。需要执行回归时统一以 `examples/` 为唯一代码入口。
+
 
 以下实验均为独立 Java 文件。示例以 Java 21 为编译基线；涉及更高版本 API 时会明确标注。
 
@@ -919,19 +922,8 @@ static <E> List<E> snapshot(
 
 
 
-```java
-import java.util.ArrayList;
-import java.util.List;
+> 完整 runnable class 已移出正文；以下保留验证目标和观察结论。
 
-public class GenericTypeSafetyDemo {
-    public static void main(String[] args) {
-        List<String> names = new ArrayList<>();
-        names.add("A");
-        names.add("B");
-        System.out.println(names.get(1).toLowerCase());
-    }
-}
-```
 
 预期输出：
 
@@ -943,16 +935,6 @@ b
 
 
 
-```java
-public class GenericPairDemo {
-    record Pair<K, V>(K key, V value) {}
-
-    public static void main(String[] args) {
-        Pair<String, Integer> stock = new Pair<>("SKU-1", 8);
-        System.out.println(stock.key() + "=" + stock.value());
-    }
-}
-```
 
 预期输出：
 
@@ -964,21 +946,6 @@ SKU-1=8
 
 
 
-```java
-import java.util.List;
-
-public class GenericMethodInferenceDemo {
-    static <T> T first(List<T> values) {
-        return values.get(0);
-    }
-
-    public static void main(String[] args) {
-        String text = first(List.of("A", "B"));
-        Integer number = first(List.of(10, 20));
-        System.out.println(text + ":" + number);
-    }
-}
-```
 
 预期输出：
 
@@ -990,23 +957,6 @@ A:10
 
 
 
-```java
-import java.util.List;
-
-public class BoundedTypeParameterDemo {
-    static <T extends Number> double total(List<T> values) {
-        double result = 0;
-        for (T value : values) {
-            result += value.doubleValue();
-        }
-        return result;
-    }
-
-    public static void main(String[] args) {
-        System.out.println(total(List.of(1, 2, 3)));
-    }
-}
-```
 
 预期输出：
 
@@ -1018,20 +968,6 @@ public class BoundedTypeParameterDemo {
 
 
 
-```java
-import java.util.List;
-
-public class InvarianceWildcardDemo {
-    static double total(List<? extends Number> values) {
-        return values.stream().mapToDouble(Number::doubleValue).sum();
-    }
-
-    public static void main(String[] args) {
-        List<Integer> values = List.of(1, 2, 3);
-        System.out.println(total(values));
-    }
-}
-```
 
 预期输出：
 
@@ -1043,20 +979,6 @@ public class InvarianceWildcardDemo {
 
 
 
-```java
-import java.util.List;
-
-public class UnboundedWildcardDemo {
-    static void printFirst(List<?> values) {
-        Object first = values.get(0);
-        System.out.println(first.getClass().getSimpleName());
-    }
-
-    public static void main(String[] args) {
-        printFirst(List.of(100, 200));
-    }
-}
-```
 
 预期输出：
 
@@ -1068,23 +990,6 @@ Integer
 
 
 
-```java
-import java.util.List;
-
-public class ExtendsProducerDemo {
-    static long sum(List<? extends Number> source) {
-        long result = 0;
-        for (Number value : source) {
-            result += value.longValue();
-        }
-        return result;
-    }
-
-    public static void main(String[] args) {
-        System.out.println(sum(List.of(2L, 3L)));
-    }
-}
-```
 
 预期输出：
 
@@ -1096,23 +1001,6 @@ public class ExtendsProducerDemo {
 
 
 
-```java
-import java.util.ArrayList;
-import java.util.List;
-
-public class SuperConsumerDemo {
-    static void appendDefaults(List<? super Integer> target) {
-        target.add(1);
-        target.add(2);
-    }
-
-    public static void main(String[] args) {
-        List<Number> numbers = new ArrayList<>();
-        appendDefaults(numbers);
-        System.out.println(numbers);
-    }
-}
-```
 
 预期输出：
 
@@ -1124,25 +1012,6 @@ public class SuperConsumerDemo {
 
 
 
-```java
-import java.util.ArrayList;
-import java.util.List;
-
-public class PecsCopyDemo {
-    static <T> void copy(
-            List<? super T> target,
-            List<? extends T> source
-    ) {
-        target.addAll(source);
-    }
-
-    public static void main(String[] args) {
-        List<Number> target = new ArrayList<>();
-        copy(target, List.of(1, 2, 3));
-        System.out.println(target);
-    }
-}
-```
 
 预期输出：
 
@@ -1154,28 +1023,6 @@ public class PecsCopyDemo {
 
 
 
-```java
-import java.util.ArrayList;
-import java.util.List;
-
-public class WildcardCaptureDemo {
-    static void swapFirstTwo(List<?> values) {
-        swap(values, 0, 1);
-    }
-
-    private static <T> void swap(List<T> values, int a, int b) {
-        T temporary = values.get(a);
-        values.set(a, values.get(b));
-        values.set(b, temporary);
-    }
-
-    public static void main(String[] args) {
-        List<String> values = new ArrayList<>(List.of("A", "B"));
-        swapFirstTwo(values);
-        System.out.println(values);
-    }
-}
-```
 
 预期输出：
 
@@ -1187,25 +1034,6 @@ public class WildcardCaptureDemo {
 
 
 
-```java
-import java.util.ArrayList;
-import java.util.List;
-
-public class RawTypePollutionDemo {
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    public static void main(String[] args) {
-        List<String> names = new ArrayList<>();
-        List raw = names;
-        raw.add(100);
-        try {
-            String value = names.get(0);
-            System.out.println(value);
-        } catch (ClassCastException exception) {
-            System.out.println(exception.getClass().getSimpleName());
-        }
-    }
-}
-```
 
 预期输出：
 
@@ -1217,18 +1045,6 @@ ClassCastException
 
 
 
-```java
-import java.util.ArrayList;
-import java.util.List;
-
-public class ErasureRuntimeIdentityDemo {
-    public static void main(String[] args) {
-        List<String> left = new ArrayList<>();
-        List<Integer> right = new ArrayList<>();
-        System.out.println(left.getClass() == right.getClass());
-    }
-}
-```
 
 预期输出：
 
@@ -1240,21 +1056,6 @@ true
 
 
 
-```java
-import java.util.function.Supplier;
-
-public class GenericFactoryDemo {
-    static <T> T create(Supplier<T> supplier) {
-        return supplier.get();
-    }
-
-    public static void main(String[] args) {
-        StringBuilder builder = create(StringBuilder::new);
-        builder.append("created");
-        System.out.println(builder);
-    }
-}
-```
 
 预期输出：
 
@@ -1266,24 +1067,6 @@ created
 
 
 
-```java
-import java.util.List;
-
-public class SafeVarargsDemo {
-    @SafeVarargs
-    static <T> int totalSize(List<T>... groups) {
-        int result = 0;
-        for (List<T> group : groups) {
-            result += group.size();
-        }
-        return result;
-    }
-
-    public static void main(String[] args) {
-        System.out.println(totalSize(List.of("A"), List.of("B", "C")));
-    }
-}
-```
 
 预期输出：
 
@@ -1295,25 +1078,6 @@ public class SafeVarargsDemo {
 
 
 
-```java
-import java.util.List;
-
-public class RecursiveBoundDemo {
-    static <T extends Comparable<? super T>> T max(List<T> values) {
-        T result = values.get(0);
-        for (T value : values) {
-            if (value.compareTo(result) > 0) {
-                result = value;
-            }
-        }
-        return result;
-    }
-
-    public static void main(String[] args) {
-        System.out.println(max(List.of("B", "A", "C")));
-    }
-}
-```
 
 预期输出：
 
@@ -1329,19 +1093,6 @@ C
 
 
 
-```java
-import java.util.ArrayList;
-import java.util.List;
-
-public class GenericBoxingDemo {
-    public static void main(String[] args) {
-        List<Integer> values = new ArrayList<>();
-        values.add(10);
-        int result = values.get(0);
-        System.out.println(result + 1);
-    }
-}
-```
 
 预期输出：
 
@@ -1357,19 +1108,6 @@ public class GenericBoxingDemo {
 
 
 
-```java
-import java.util.List;
-
-public class WildcardNotRawDemo {
-    static String describe(List<?> values) {
-        return values.getClass().getSimpleName() + ":" + values.size();
-    }
-
-    public static void main(String[] args) {
-        System.out.println(describe(List.of("A", "B")));
-    }
-}
-```
 
 预期输出：
 
@@ -1381,23 +1119,6 @@ List12:2
 
 
 
-```java
-import java.util.Collection;
-import java.util.List;
-
-public class GenericSnapshotDemo {
-    static <E> List<E> snapshot(
-            Collection<? extends E> source
-    ) {
-        return List.copyOf(source);
-    }
-
-    public static void main(String[] args) {
-        List<Number> values = snapshot(List.of(1, 2, 3));
-        System.out.println(values);
-    }
-}
-```
 
 预期输出：
 

@@ -2163,296 +2163,42 @@ Java 普通调用不会运行时重新选择重载签名。
 
 ---
 
-## 12.44 建议实验
+## 12.44 实验与 examples 边界
+
+本节保留原有实验清单与文字观察，不在正文维护完整 runnable class。需要执行回归时统一以 `examples/` 为唯一代码入口。
+
 
 ### 实验一：编译时类型与运行时类型
 
-```java
-public class TypeDemo {
+> 完整 runnable class 已移出正文；以下保留验证目标和观察结论。
 
-    static class Animal {
-
-        void speak() {
-            System.out.println("Animal");
-        }
-    }
-
-    static class Dog extends Animal {
-
-        @Override
-        void speak() {
-            System.out.println("Dog");
-        }
-
-        void fetch() {
-            System.out.println("fetch");
-        }
-    }
-
-    public static void main(String[] args) {
-        Animal animal = new Dog();
-
-        animal.speak();
-
-        // animal.fetch();
-    }
-}
-```
 
 ### 实验二：向上转型不创建新对象
 
-```java
-public class UpcastIdentityDemo {
-
-    static class Animal {
-    }
-
-    static class Dog extends Animal {
-    }
-
-    public static void main(String[] args) {
-        Dog dog = new Dog();
-        Animal animal = dog;
-
-        System.out.println(
-                dog == animal
-        );
-    }
-}
-```
 
 ### 实验三：安全向下转型
 
-```java
-public class DowncastDemo {
-
-    static class Animal {
-    }
-
-    static class Dog extends Animal {
-
-        void fetch() {
-            System.out.println("fetch");
-        }
-    }
-
-    public static void main(String[] args) {
-        Animal animal = new Dog();
-
-        if (animal instanceof Dog dog) {
-            dog.fetch();
-        }
-    }
-}
-```
 
 ### 实验四：ClassCastException
 
-```java
-public class CastFailureDemo {
-
-    static class Animal {
-    }
-
-    static class Dog extends Animal {
-    }
-
-    static class Cat extends Animal {
-    }
-
-    public static void main(String[] args) {
-        Animal animal = new Cat();
-
-        try {
-            Dog dog = (Dog) animal;
-        } catch (
-                ClassCastException exception
-        ) {
-            System.out.println(
-                    "invalid cast"
-            );
-        }
-    }
-}
-```
 
 ### 实验五：null instanceof
 
-```java
-public class NullInstanceofDemo {
-
-    public static void main(String[] args) {
-        Object value = null;
-
-        System.out.println(
-                value instanceof String
-        );
-    }
-}
-```
 
 ### 实验六：模式变量流作用域
 
-```java
-public class FlowScopeDemo {
-
-    static void print(Object value) {
-        if (!(value instanceof String text)) {
-            return;
-        }
-
-        System.out.println(
-                text.length()
-        );
-    }
-
-    public static void main(String[] args) {
-        print("Java");
-        print(10);
-    }
-}
-```
 
 ### 实验七：字段与方法对比
 
-```java
-public class FieldAndMethodDemo {
-
-    static class Parent {
-
-        String value = "Parent";
-
-        String value() {
-            return "Parent";
-        }
-    }
-
-    static class Child extends Parent {
-
-        String value = "Child";
-
-        @Override
-        String value() {
-            return "Child";
-        }
-    }
-
-    public static void main(String[] args) {
-        Parent value = new Child();
-
-        System.out.println(value.value);
-        System.out.println(value.value());
-    }
-}
-```
 
 ### 实验八：静态方法隐藏
 
-```java
-public class StaticDispatchDemo {
-
-    static class Parent {
-
-        static void print() {
-            System.out.println("Parent");
-        }
-    }
-
-    static class Child extends Parent {
-
-        static void print() {
-            System.out.println("Child");
-        }
-    }
-
-    public static void main(String[] args) {
-        Parent value = new Child();
-
-        value.print();
-        Child.print();
-    }
-}
-```
 
 ### 实验九：重载只看编译时类型
 
-```java
-public class OverloadCompileTypeDemo {
-
-    static class Animal {
-    }
-
-    static class Dog extends Animal {
-    }
-
-    static void print(Animal value) {
-        System.out.println("Animal");
-    }
-
-    static void print(Dog value) {
-        System.out.println("Dog");
-    }
-
-    public static void main(String[] args) {
-        Animal value = new Dog();
-
-        print(value);
-        print((Dog) value);
-    }
-}
-```
 
 ### 实验十：先重载后重写
 
-```java
-public class OverloadOverrideDemo {
-
-    static class Animal {
-    }
-
-    static class Dog extends Animal {
-    }
-
-    static class Parent {
-
-        void print(Animal value) {
-            System.out.println(
-                    "Parent Animal"
-            );
-        }
-
-        void print(Dog value) {
-            System.out.println(
-                    "Parent Dog"
-            );
-        }
-    }
-
-    static class Child extends Parent {
-
-        @Override
-        void print(Animal value) {
-            System.out.println(
-                    "Child Animal"
-            );
-        }
-
-        @Override
-        void print(Dog value) {
-            System.out.println(
-                    "Child Dog"
-            );
-        }
-    }
-
-    public static void main(String[] args) {
-        Parent receiver = new Child();
-        Animal argument = new Dog();
-
-        receiver.print(argument);
-    }
-}
-```
 
 预期：
 
@@ -2462,371 +2208,33 @@ Child Animal
 
 ### 实验十一：接口多态
 
-```java
-public class InterfacePolymorphismDemo {
-
-    interface Formatter {
-
-        String format(String value);
-    }
-
-    static final class UpperFormatter
-            implements Formatter {
-
-        @Override
-        public String format(
-                String value
-        ) {
-            return value.toUpperCase();
-        }
-    }
-
-    public static void main(String[] args) {
-        Formatter formatter =
-                new UpperFormatter();
-
-        System.out.println(
-                formatter.format("Java")
-        );
-    }
-}
-```
 
 ### 实验十二：多态集合
 
-```java
-import java.util.List;
-
-public class PolymorphicCollectionDemo {
-
-    interface Animal {
-
-        void speak();
-    }
-
-    static final class Dog
-            implements Animal {
-
-        @Override
-        public void speak() {
-            System.out.println("Dog");
-        }
-    }
-
-    static final class Cat
-            implements Animal {
-
-        @Override
-        public void speak() {
-            System.out.println("Cat");
-        }
-    }
-
-    public static void main(String[] args) {
-        List<Animal> animals =
-                List.of(
-                        new Dog(),
-                        new Cat()
-                );
-
-        for (Animal animal : animals) {
-            animal.speak();
-        }
-    }
-}
-```
 
 ### 实验十三：能力接口
 
-```java
-public class CapabilityDemo {
-
-    interface Fetchable {
-
-        void fetch();
-    }
-
-    static class Animal {
-    }
-
-    static final class Dog
-            extends Animal
-            implements Fetchable {
-
-        @Override
-        public void fetch() {
-            System.out.println("fetch");
-        }
-    }
-
-    public static void main(String[] args) {
-        Animal animal = new Dog();
-
-        if (
-                animal
-                instanceof Fetchable fetchable
-        ) {
-            fetchable.fetch();
-        }
-    }
-}
-```
 
 ### 实验十四：sealed 模式匹配
 
-```java
-public class SealedPatternDemo {
-
-    sealed interface Shape
-            permits Circle, Rectangle {
-    }
-
-    record Circle(double radius)
-            implements Shape {
-    }
-
-    record Rectangle(
-            double width,
-            double height
-    ) implements Shape {
-    }
-
-    static double area(Shape shape) {
-        return switch (shape) {
-            case Circle circle ->
-                    Math.PI
-                    * circle.radius()
-                    * circle.radius();
-
-            case Rectangle rectangle ->
-                    rectangle.width()
-                    * rectangle.height();
-        };
-    }
-
-    public static void main(String[] args) {
-        System.out.println(
-                area(new Circle(2))
-        );
-    }
-}
-```
 
 ### 实验十五：数组协变
 
-```java
-public class ArrayCovarianceDemo {
-
-    static class Animal {
-    }
-
-    static class Dog extends Animal {
-    }
-
-    static class Cat extends Animal {
-    }
-
-    public static void main(String[] args) {
-        Dog[] dogs = new Dog[1];
-        Animal[] animals = dogs;
-
-        try {
-            animals[0] = new Cat();
-        } catch (
-                ArrayStoreException exception
-        ) {
-            System.out.println(
-                    "invalid element"
-            );
-        }
-    }
-}
-```
 
 ### 实验十六：泛型不变
 
-```java
-import java.util.ArrayList;
-import java.util.List;
-
-public class GenericInvariantDemo {
-
-    static class Animal {
-    }
-
-    static class Dog extends Animal {
-    }
-
-    public static void main(String[] args) {
-        List<Dog> dogs =
-                new ArrayList<>();
-
-        // List<Animal> animals = dogs;
-    }
-}
-```
 
 ### 实验十七：PECS
 
-```java
-import java.util.ArrayList;
-import java.util.List;
-
-public class PecsDemo {
-
-    static class Animal {
-    }
-
-    static class Dog extends Animal {
-    }
-
-    static void copyDogs(
-            List<? extends Dog> source,
-            List<? super Dog> target
-    ) {
-        for (Dog dog : source) {
-            target.add(dog);
-        }
-    }
-
-    public static void main(String[] args) {
-        List<Dog> source =
-                List.of(new Dog());
-
-        List<Animal> target =
-                new ArrayList<>();
-
-        copyDogs(source, target);
-
-        System.out.println(target.size());
-    }
-}
-```
 
 ### 实验十八：构造器动态绑定风险
 
-```java
-public class ConstructorDispatchDemo {
-
-    static class Parent {
-
-        Parent() {
-            print();
-        }
-
-        void print() {
-            System.out.println("Parent");
-        }
-    }
-
-    static class Child extends Parent {
-
-        private String name = "Java";
-
-        @Override
-        void print() {
-            System.out.println(name);
-        }
-    }
-
-    public static void main(String[] args) {
-        new Child();
-    }
-}
-```
 
 ### 实验十九：this 动态调用
 
-```java
-public class ThisDispatchDemo {
-
-    static class Parent {
-
-        void run() {
-            this.execute();
-        }
-
-        void execute() {
-            System.out.println("Parent");
-        }
-    }
-
-    static class Child extends Parent {
-
-        @Override
-        void execute() {
-            System.out.println("Child");
-        }
-    }
-
-    public static void main(String[] args) {
-        new Child().run();
-    }
-}
-```
 
 ### 实验二十：Visitor 双重分派
 
-```java
-public class VisitorDemo {
-
-    interface Shape {
-
-        void accept(Visitor visitor);
-    }
-
-    static final class Circle
-            implements Shape {
-
-        @Override
-        public void accept(
-                Visitor visitor
-        ) {
-            visitor.visit(this);
-        }
-    }
-
-    static final class Rectangle
-            implements Shape {
-
-        @Override
-        public void accept(
-                Visitor visitor
-        ) {
-            visitor.visit(this);
-        }
-    }
-
-    interface Visitor {
-
-        void visit(Circle circle);
-
-        void visit(Rectangle rectangle);
-    }
-
-    static final class PrintVisitor
-            implements Visitor {
-
-        @Override
-        public void visit(Circle circle) {
-            System.out.println("Circle");
-        }
-
-        @Override
-        public void visit(
-                Rectangle rectangle
-        ) {
-            System.out.println("Rectangle");
-        }
-    }
-
-    public static void main(String[] args) {
-        Shape shape = new Circle();
-
-        shape.accept(new PrintVisitor());
-    }
-}
-```
 
 ---
 

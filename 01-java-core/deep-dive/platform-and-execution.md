@@ -298,11 +298,8 @@ java Main.java
 长期以来最通用、兼容范围最广的入口是：
 
 ```java
-public class Main {
-
-    public static void main(String[] args) {
-        System.out.println("Hello, Java");
-    }
+public static void main(String[] args) {
+    System.out.println("Hello, Java");
 }
 ```
 
@@ -321,12 +318,9 @@ java Main Java JVM
 ```
 
 ```java
-public class Main {
-
-    public static void main(String[] args) {
-        System.out.println(args[0]); // Java
-        System.out.println(args[1]); // JVM
-    }
+public static void main(String[] args) {
+    System.out.println(args[0]); // Java
+    System.out.println(args[1]); // JVM
 }
 ```
 
@@ -932,11 +926,9 @@ java --enable-preview Main
 ```java
 package com.example.demo;
 
-public class Main {
-
-    public static void main(String[] args) {
-        System.out.println("Hello");
-    }
+// Main.java 中的入口方法
+public static void main(String[] args) {
+    System.out.println("Hello");
 }
 ```
 
@@ -1088,20 +1080,17 @@ java -jar app.jar
 
 ---
 
-## 1.14 建议实验
+## 1.14 实验与 examples 边界
+
+本节保留原有实验清单与文字观察，不在正文维护完整 runnable class。需要执行回归时统一以 `examples/` 为唯一代码入口。
+
 
 ### 实验一：传统编译与运行
 
 创建 `Main.java`：
 
-```java
-public class Main {
+> 完整 runnable class 已移出正文；以下保留验证目标和观察结论。
 
-    public static void main(String[] args) {
-        System.out.println("Hello, Java");
-    }
-}
-```
 
 执行：
 
@@ -1136,16 +1125,6 @@ src/com/example/demo/Main.java
 
 内容：
 
-```java
-package com.example.demo;
-
-public class Main {
-
-    public static void main(String[] args) {
-        System.out.println("classpath");
-    }
-}
-```
 
 执行：
 
@@ -1166,14 +1145,6 @@ java -cp out Main
 
 使用 JDK 25 或更高版本：
 
-```java
-class InstanceMainDemo {
-
-    void main() {
-        System.out.println("instance main");
-    }
-}
-```
 
 执行：
 
@@ -1188,15 +1159,6 @@ java InstanceMainDemo
 
 创建 `CompactDemo.java`：
 
-```java
-String greeting() {
-    return "compact source file";
-}
-
-void main() {
-    System.out.println(greeting());
-}
-```
 
 执行：
 
@@ -1212,14 +1174,6 @@ java CompactDemo.java
 
 ### 实验六：查看字节码
 
-```java
-public class Calculator {
-
-    public static int add(int left, int right) {
-        return left + right;
-    }
-}
-```
 
 执行：
 

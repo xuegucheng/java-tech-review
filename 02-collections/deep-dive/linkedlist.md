@@ -1382,25 +1382,17 @@ API 契约
 
 ---
 
-## 03.51 可运行实验
+## 03.51 实验与 examples 边界
+
+本节保留原有实验清单与文字观察，不在正文维护完整 runnable class。需要执行回归时统一以 `examples/` 为唯一代码入口。
+
 
 以下实验均为独立 Java 文件，编译基线为 Java 21。
 
 ### 实验1：首尾追加
 
-```java
-import java.util.LinkedList;
+> 完整 runnable class 已移出正文；以下保留验证目标和观察结论。
 
-public class LinkedListEndsDemo {
-    public static void main(String[] args) {
-        LinkedList<String> list = new LinkedList<>();
-        list.addFirst("B");
-        list.addFirst("A");
-        list.addLast("C");
-        System.out.println(list);
-    }
-}
-```
 
 预期输出：
 
@@ -1410,19 +1402,6 @@ public class LinkedListEndsDemo {
 
 ### 实验2：getFirst 与 getLast
 
-```java
-import java.util.LinkedList;
-import java.util.List;
-
-public class LinkedListFirstLastDemo {
-    public static void main(String[] args) {
-        LinkedList<String> list =
-                new LinkedList<>(List.of("A", "B", "C"));
-        System.out.println(list.getFirst());
-        System.out.println(list.getLast());
-    }
-}
-```
 
 预期输出：
 
@@ -1433,19 +1412,6 @@ C
 
 ### 实验3：按索引插入
 
-```java
-import java.util.LinkedList;
-import java.util.List;
-
-public class LinkedListIndexedAddDemo {
-    public static void main(String[] args) {
-        LinkedList<String> list =
-                new LinkedList<>(List.of("A", "C"));
-        list.add(1, "B");
-        System.out.println(list);
-    }
-}
-```
 
 预期输出：
 
@@ -1455,20 +1421,6 @@ public class LinkedListIndexedAddDemo {
 
 ### 实验4：按索引删除
 
-```java
-import java.util.LinkedList;
-import java.util.List;
-
-public class LinkedListIndexedRemoveDemo {
-    public static void main(String[] args) {
-        LinkedList<String> list =
-                new LinkedList<>(List.of("A", "B", "C"));
-        String removed = list.remove(1);
-        System.out.println(removed);
-        System.out.println(list);
-    }
-}
-```
 
 预期输出：
 
@@ -1479,19 +1431,6 @@ B
 
 ### 实验5：按对象删除第一个匹配
 
-```java
-import java.util.LinkedList;
-import java.util.List;
-
-public class LinkedListRemoveObjectDemo {
-    public static void main(String[] args) {
-        LinkedList<String> list =
-                new LinkedList<>(List.of("A", "B", "A"));
-        list.remove("A");
-        System.out.println(list);
-    }
-}
-```
 
 预期输出：
 
@@ -1501,19 +1440,6 @@ public class LinkedListRemoveObjectDemo {
 
 ### 实验6：null 元素
 
-```java
-import java.util.LinkedList;
-
-public class LinkedListNullDemo {
-    public static void main(String[] args) {
-        LinkedList<String> list = new LinkedList<>();
-        list.add(null);
-        list.add("A");
-        System.out.println(list.indexOf(null));
-        System.out.println(list);
-    }
-}
-```
 
 预期输出：
 
@@ -1524,21 +1450,6 @@ public class LinkedListNullDemo {
 
 ### 实验7：Queue offer poll peek
 
-```java
-import java.util.LinkedList;
-import java.util.Queue;
-
-public class LinkedListQueueDemo {
-    public static void main(String[] args) {
-        Queue<String> queue = new LinkedList<>();
-        queue.offer("A");
-        queue.offer("B");
-        System.out.println(queue.peek());
-        System.out.println(queue.poll());
-        System.out.println(queue);
-    }
-}
-```
 
 预期输出：
 
@@ -1550,22 +1461,6 @@ A
 
 ### 实验8：Deque 两端操作
 
-```java
-import java.util.Deque;
-import java.util.LinkedList;
-
-public class LinkedListDequeDemo {
-    public static void main(String[] args) {
-        Deque<String> deque = new LinkedList<>();
-        deque.addFirst("B");
-        deque.addFirst("A");
-        deque.addLast("C");
-        System.out.println(deque.pollFirst());
-        System.out.println(deque.pollLast());
-        System.out.println(deque);
-    }
-}
-```
 
 预期输出：
 
@@ -1577,20 +1472,6 @@ C
 
 ### 实验9：栈 push pop
 
-```java
-import java.util.Deque;
-import java.util.LinkedList;
-
-public class LinkedListStackDemo {
-    public static void main(String[] args) {
-        Deque<String> stack = new LinkedList<>();
-        stack.push("A");
-        stack.push("B");
-        System.out.println(stack.pop());
-        System.out.println(stack.peek());
-    }
-}
-```
 
 预期输出：
 
@@ -1601,22 +1482,6 @@ A
 
 ### 实验10：ListIterator 双向遍历
 
-```java
-import java.util.LinkedList;
-import java.util.List;
-import java.util.ListIterator;
-
-public class LinkedListListIteratorDemo {
-    public static void main(String[] args) {
-        LinkedList<String> list =
-                new LinkedList<>(List.of("A", "B", "C"));
-        ListIterator<String> it = list.listIterator(list.size());
-        while (it.hasPrevious()) {
-            System.out.print(it.previous());
-        }
-    }
-}
-```
 
 预期输出：
 
@@ -1626,21 +1491,6 @@ CBA
 
 ### 实验11：ListIterator 当前位插入
 
-```java
-import java.util.LinkedList;
-import java.util.List;
-import java.util.ListIterator;
-
-public class LinkedListIteratorAddDemo {
-    public static void main(String[] args) {
-        LinkedList<String> list =
-                new LinkedList<>(List.of("A", "C"));
-        ListIterator<String> it = list.listIterator(1);
-        it.add("B");
-        System.out.println(list);
-    }
-}
-```
 
 预期输出：
 
@@ -1650,25 +1500,6 @@ public class LinkedListIteratorAddDemo {
 
 ### 实验12：Iterator 安全删除
 
-```java
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-
-public class LinkedListIteratorRemoveDemo {
-    public static void main(String[] args) {
-        LinkedList<Integer> list =
-                new LinkedList<>(List.of(1, 2, 3, 4));
-        Iterator<Integer> it = list.iterator();
-        while (it.hasNext()) {
-            if (it.next() % 2 == 0) {
-                it.remove();
-            }
-        }
-        System.out.println(list);
-    }
-}
-```
 
 预期输出：
 
@@ -1678,27 +1509,6 @@ public class LinkedListIteratorRemoveDemo {
 
 ### 实验13：直接修改触发 fail-fast
 
-```java
-import java.util.ConcurrentModificationException;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-
-public class LinkedListFailFastDemo {
-    public static void main(String[] args) {
-        LinkedList<String> list =
-                new LinkedList<>(List.of("A", "B"));
-        Iterator<String> it = list.iterator();
-        list.add("C");
-
-        try {
-            it.next();
-        } catch (ConcurrentModificationException e) {
-            System.out.println("CME");
-        }
-    }
-}
-```
 
 预期输出：
 
@@ -1708,22 +1518,6 @@ CME
 
 ### 实验14：descendingIterator
 
-```java
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-
-public class LinkedListDescendingDemo {
-    public static void main(String[] args) {
-        LinkedList<String> list =
-                new LinkedList<>(List.of("A", "B", "C"));
-        Iterator<String> it = list.descendingIterator();
-        while (it.hasNext()) {
-            System.out.print(it.next());
-        }
-    }
-}
-```
 
 预期输出：
 
@@ -1733,20 +1527,6 @@ CBA
 
 ### 实验15：clear
 
-```java
-import java.util.LinkedList;
-import java.util.List;
-
-public class LinkedListClearDemo {
-    public static void main(String[] args) {
-        LinkedList<String> list =
-                new LinkedList<>(List.of("A", "B"));
-        list.clear();
-        System.out.println(list.size());
-        System.out.println(list.isEmpty());
-    }
-}
-```
 
 预期输出：
 
@@ -1757,27 +1537,6 @@ true
 
 ### 实验16：拷贝构造是浅复制
 
-```java
-import java.util.LinkedList;
-import java.util.List;
-
-public class LinkedListShallowCopyDemo {
-    static final class Item {
-        String name;
-        Item(String name) { this.name = name; }
-    }
-
-    public static void main(String[] args) {
-        Item item = new Item("A");
-        LinkedList<Item> source =
-                new LinkedList<>(List.of(item));
-        LinkedList<Item> copy = new LinkedList<>(source);
-
-        copy.getFirst().name = "X";
-        System.out.println(source.getFirst().name);
-    }
-}
-```
 
 预期输出：
 
@@ -1787,27 +1546,6 @@ X
 
 ### 实验17：clone 结构独立、元素共享
 
-```java
-import java.util.LinkedList;
-
-public class LinkedListCloneDemo {
-    public static void main(String[] args) {
-        LinkedList<StringBuilder> source = new LinkedList<>();
-        source.add(new StringBuilder("A"));
-
-        @SuppressWarnings("unchecked")
-        LinkedList<StringBuilder> copy =
-                (LinkedList<StringBuilder>) source.clone();
-
-        copy.add(new StringBuilder("B"));
-        copy.getFirst().append("X");
-
-        System.out.println(source.size());
-        System.out.println(copy.size());
-        System.out.println(source.getFirst());
-    }
-}
-```
 
 预期输出：
 
@@ -1819,23 +1557,6 @@ AX
 
 ### 实验18：Java 21 reversed 是视图
 
-```java
-import java.util.LinkedList;
-import java.util.List;
-
-public class LinkedListReversedDemo {
-    public static void main(String[] args) {
-        LinkedList<String> source =
-                new LinkedList<>(List.of("A", "B", "C"));
-
-        LinkedList<String> reversed = source.reversed();
-        reversed.set(0, "X");
-
-        System.out.println(reversed);
-        System.out.println(source);
-    }
-}
-```
 
 预期输出：
 
@@ -1846,23 +1567,6 @@ public class LinkedListReversedDemo {
 
 ### 实验19：反向视图首尾映射
 
-```java
-import java.util.LinkedList;
-import java.util.List;
-
-public class LinkedListReversedEndsDemo {
-    public static void main(String[] args) {
-        LinkedList<String> source =
-                new LinkedList<>(List.of("A", "B", "C"));
-
-        LinkedList<String> reversed = source.reversed();
-        reversed.addFirst("D");
-
-        System.out.println(source);
-        System.out.println(reversed);
-    }
-}
-```
 
 预期输出：
 
@@ -1873,23 +1577,6 @@ public class LinkedListReversedEndsDemo {
 
 ### 实验20：toArray 结构独立
 
-```java
-import java.util.LinkedList;
-import java.util.List;
-
-public class LinkedListToArrayDemo {
-    public static void main(String[] args) {
-        LinkedList<String> list =
-                new LinkedList<>(List.of("A", "B"));
-
-        String[] array = list.toArray(String[]::new);
-        array[0] = "X";
-
-        System.out.println(list);
-        System.out.println(java.util.Arrays.toString(array));
-    }
-}
-```
 
 预期输出：
 

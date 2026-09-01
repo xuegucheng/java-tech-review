@@ -2576,635 +2576,110 @@ sealed 接口等情况需要按 JLS 精确定义判断。
 
 ---
 
-## 14.50 建议实验
+## 14.50 实验与 examples 边界
+
+本节保留原有实验清单与文字观察，不在正文维护完整 runnable class。需要执行回归时统一以 `examples/` 为唯一代码入口。
+
 
 ### 实验1：接口引用与动态绑定
 
-```java
-public class InterfacePolymorphismDemo {
+> 完整 runnable class 已移出正文；以下保留验证目标和观察结论。
 
-    interface Speaker {
-        void speak();
-    }
-
-    static final class Dog implements Speaker {
-        @Override
-        public void speak() {
-            System.out.println("Dog");
-        }
-    }
-
-    public static void main(String[] args) {
-        Speaker speaker = new Dog();
-        speaker.speak();
-    }
-}
-```
 
 观察点：验证接口引用只暴露接口契约，运行时执行具体实现。
 
 ### 实验2：一个类实现多个接口
 
-```java
-public class MultipleInterfacesDemo {
-
-    interface Startable {
-        void start();
-    }
-
-    interface Stoppable {
-        void stop();
-    }
-
-    static final class Device
-            implements Startable, Stoppable {
-        @Override
-        public void start() {
-            System.out.println("start");
-        }
-
-        @Override
-        public void stop() {
-            System.out.println("stop");
-        }
-    }
-
-    public static void main(String[] args) {
-        Device device = new Device();
-        device.start();
-        device.stop();
-    }
-}
-```
 
 观察点：验证同一对象可以同时承担多个独立角色。
 
 ### 实验3：默认方法与重写
 
-```java
-public class DefaultOverrideDemo {
-
-    interface Operation {
-        default String name() {
-            return "default";
-        }
-    }
-
-    static final class CustomOperation
-            implements Operation {
-        @Override
-        public String name() {
-            return "custom";
-        }
-    }
-
-    public static void main(String[] args) {
-        Operation operation = new CustomOperation();
-        System.out.println(operation.name());
-    }
-}
-```
 
 观察点：验证默认方法仍参与实例方法动态绑定，实现类可重写。
 
 ### 实验4：默认方法冲突消歧
 
-```java
-public class DefaultConflictDemo {
-
-    interface A {
-        default String name() {
-            return "A";
-        }
-    }
-
-    interface B {
-        default String name() {
-            return "B";
-        }
-    }
-
-    static final class C implements A, B {
-        @Override
-        public String name() {
-            return A.super.name() + B.super.name();
-        }
-    }
-
-    public static void main(String[] args) {
-        System.out.println(new C().name());
-    }
-}
-```
 
 观察点：验证两个无关默认实现冲突时，具体类必须显式重写。
 
 ### 实验5：类优先规则
 
-```java
-public class ClassWinsDemo {
-
-    static class Parent {
-        public String name() {
-            return "class";
-        }
-    }
-
-    interface Named {
-        default String name() {
-            return "interface";
-        }
-    }
-
-    static final class Child
-            extends Parent implements Named {
-    }
-
-    public static void main(String[] args) {
-        System.out.println(new Child().name());
-    }
-}
-```
 
 观察点：验证父类具体方法优先于接口默认方法。
 
 ### 实验6：抽象类压制默认方法
 
-```java
-public class AbstractSuppressDefaultDemo {
-
-    interface Retryable {
-        default String retry() {
-            return "default";
-        }
-    }
-
-    static abstract class StrictTask
-            implements Retryable {
-        @Override
-        public abstract String retry();
-    }
-
-    static final class NetworkTask
-            extends StrictTask {
-        @Override
-        public String retry() {
-            return "network";
-        }
-    }
-
-    public static void main(String[] args) {
-        System.out.println(new NetworkTask().retry());
-    }
-}
-```
 
 观察点：验证抽象类可重新声明方法，要求具体子类实现。
 
 ### 实验7：接口静态工厂
 
-```java
-public class InterfaceStaticFactoryDemo {
-
-    interface Counter {
-        int value();
-
-        static Counter fixed(int value) {
-            return () -> value;
-        }
-    }
-
-    public static void main(String[] args) {
-        Counter counter = Counter.fixed(10);
-        System.out.println(counter.value());
-    }
-}
-```
 
 观察点：验证接口静态方法通过接口名调用，并可返回接口实现。
 
 ### 实验8：接口私有方法复用
 
-```java
-public class InterfacePrivateMethodDemo {
-
-    interface Logger {
-        default void info(String message) {
-            log("INFO", message);
-        }
-
-        default void error(String message) {
-            log("ERROR", message);
-        }
-
-        private void log(String level, String message) {
-            System.out.println("[" + level + "] " + message);
-        }
-    }
-
-    static final class ConsoleLogger
-            implements Logger {
-    }
-
-    public static void main(String[] args) {
-        Logger logger = new ConsoleLogger();
-        logger.info("ok");
-        logger.error("fail");
-    }
-}
-```
 
 观察点：验证私有接口方法只复用接口内部逻辑，不成为实现类扩展点。
 
 ### 实验9：编译期常量与运行期字段
 
-```java
-public class InterfaceFieldInitializationDemo {
-
-    interface Config {
-        int CONSTANT = 100;
-        int RUNTIME = init();
-
-        static int init() {
-            System.out.println("Config initialized");
-            return 200;
-        }
-    }
-
-    public static void main(String[] args) {
-        System.out.println(Config.CONSTANT);
-        System.out.println(Config.RUNTIME);
-    }
-}
-```
 
 观察点：观察读取常量变量与运行期初始化字段的差异。第二次访问会触发初始化输出。
 
 ### 实验10：函数式接口与 Lambda
 
-```java
-public class FunctionalInterfaceDemo {
-
-    @FunctionalInterface
-    interface Validator<T> {
-        boolean test(T value);
-
-        default Validator<T> negate() {
-            return value -> !test(value);
-        }
-    }
-
-    public static void main(String[] args) {
-        Validator<String> notBlank =
-                value -> value != null && !value.isBlank();
-        System.out.println(notBlank.test("Java"));
-        System.out.println(notBlank.negate().test(""));
-    }
-}
-```
 
 观察点：验证默认方法不增加函数式接口的抽象方法数量。
 
 ### 实验11：Object 方法不破坏 SAM
 
-```java
-public class ObjectMethodSamDemo {
-
-    @FunctionalInterface
-    interface Action {
-        void run();
-        boolean equals(Object other);
-    }
-
-    public static void main(String[] args) {
-        Action action = () -> System.out.println("run");
-        action.run();
-    }
-}
-```
 
 观察点：验证与 Object 公共实例方法匹配的抽象声明不额外破坏函数式接口。
 
 ### 实验12：协变返回类型合并函数描述符
 
-```java
-public class CovariantSamDemo {
-
-    interface A {
-        Number value();
-    }
-
-    interface B {
-        Integer value();
-    }
-
-    @FunctionalInterface
-    interface C extends A, B {
-    }
-
-    public static void main(String[] args) {
-        C value = () -> 42;
-        System.out.println(value.value());
-    }
-}
-```
 
 观察点：验证多个继承方法可因协变返回类型合并为一个函数描述符。
 
 ### 实验13：标记接口与泛型边界
 
-```java
-public class MarkerInterfaceDemo {
-
-    interface Trusted {
-    }
-
-    record TrustedMessage(String value)
-            implements Trusted {
-    }
-
-    static <T extends Trusted> void publish(T value) {
-        System.out.println(value);
-    }
-
-    public static void main(String[] args) {
-        publish(new TrustedMessage("ok"));
-    }
-}
-```
 
 观察点：验证标记接口可参与编译期泛型约束。
 
 ### 实验14：sealed 接口与穷尽 switch
 
-```java
-public class SealedInterfaceDemo {
-
-    sealed interface Result
-            permits Success, Failure {
-    }
-
-    record Success(String value)
-            implements Result {
-    }
-
-    record Failure(String code)
-            implements Result {
-    }
-
-    static String describe(Result result) {
-        return switch (result) {
-            case Success success -> success.value();
-            case Failure failure -> failure.code();
-        };
-    }
-
-    public static void main(String[] args) {
-        System.out.println(describe(new Success("ok")));
-    }
-}
-```
 
 观察点：需要 Java 21。验证 sealed 接口使模式 switch 可以穷尽处理。
 
 ### 实验15：record 自动满足接口访问器
 
-```java
-public class RecordImplementsInterfaceDemo {
-
-    interface Identified {
-        String id();
-    }
-
-    record OrderId(String id)
-            implements Identified {
-    }
-
-    public static void main(String[] args) {
-        Identified value = new OrderId("O-1");
-        System.out.println(value.id());
-    }
-}
-```
 
 观察点：验证 record 组件访问器可直接满足同签名接口方法。
 
 ### 实验16：enum 实现接口
 
-```java
-public class EnumImplementsInterfaceDemo {
-
-    interface CodeValue {
-        String code();
-    }
-
-    enum State implements CodeValue {
-        CREATED("C"), DONE("D");
-
-        private final String code;
-
-        State(String code) {
-            this.code = code;
-        }
-
-        @Override
-        public String code() {
-            return code;
-        }
-    }
-
-    public static void main(String[] args) {
-        CodeValue value = State.CREATED;
-        System.out.println(value.code());
-    }
-}
-```
 
 观察点：验证枚举实例可以通过接口统一暴露行为。
 
 ### 实验17：嵌套接口
 
-```java
-public class NestedInterfaceDemo {
-
-    static final class Parser {
-        interface Listener {
-            void onToken(String token);
-        }
-
-        void parse(String text, Listener listener) {
-            for (String token : text.split(",")) {
-                listener.onToken(token);
-            }
-        }
-    }
-
-    public static void main(String[] args) {
-        new Parser().parse("A,B", System.out::println);
-    }
-}
-```
 
 观察点：验证成员接口适合表达只服务于外部类型的回调协议。
 
 ### 实验18：接口与骨架实现
 
-```java
-public class SkeletalImplementationDemo {
-
-    interface TextSequence {
-        int size();
-        String get(int index);
-
-        default boolean isEmpty() {
-            return size() == 0;
-        }
-    }
-
-    static abstract class AbstractTextSequence
-            implements TextSequence {
-        @Override
-        public String toString() {
-            StringBuilder builder = new StringBuilder();
-            for (int i = 0; i < size(); i++) {
-                if (i > 0) {
-                    builder.append(',');
-                }
-                builder.append(get(i));
-            }
-            return builder.toString();
-        }
-    }
-
-    static final class Pair
-            extends AbstractTextSequence {
-        private final String left;
-        private final String right;
-
-        Pair(String left, String right) {
-            this.left = left;
-            this.right = right;
-        }
-
-        @Override
-        public int size() {
-            return 2;
-        }
-
-        @Override
-        public String get(int index) {
-            return switch (index) {
-                case 0 -> left;
-                case 1 -> right;
-                default -> throw new IndexOutOfBoundsException(index);
-            };
-        }
-    }
-
-    public static void main(String[] args) {
-        TextSequence value = new Pair("A", "B");
-        System.out.println(value.isEmpty());
-        System.out.println(value);
-    }
-}
-```
 
 观察点：验证接口定义角色、默认方法提供简单推导、骨架类复用复杂实现。
 
 ### 实验19：简单契约测试
 
-```java
-import java.util.List;
-
-public class InterfaceContractTestDemo {
-
-    interface Counter {
-        int increment();
-        int current();
-    }
-
-    static final class SimpleCounter implements Counter {
-        private int value;
-
-        @Override
-        public int increment() {
-            return ++value;
-        }
-
-        @Override
-        public int current() {
-            return value;
-        }
-    }
-
-    static final class StepCounter implements Counter {
-        private int value;
-
-        @Override
-        public int increment() {
-            value += 1;
-            return value;
-        }
-
-        @Override
-        public int current() {
-            return value;
-        }
-    }
-
-    static void verify(Counter counter) {
-        if (counter.current() != 0) {
-            throw new AssertionError("initial");
-        }
-        if (counter.increment() != 1) {
-            throw new AssertionError("increment");
-        }
-        if (counter.current() != 1) {
-            throw new AssertionError("current");
-        }
-    }
-
-    public static void main(String[] args) {
-        List<Counter> counters = List.of(
-                new SimpleCounter(),
-                new StepCounter()
-        );
-        counters.forEach(InterfaceContractTestDemo::verify);
-        System.out.println("all implementations passed");
-    }
-}
-```
 
 观察点：验证同一套契约断言可以应用到多个实现。
 
 ### 实验20：Comparator 默认组合器
 
-```java
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-
-public class ComparatorCompositionDemo {
-
-    record Item(String name, int priority) {
-    }
-
-    public static void main(String[] args) {
-        List<Item> items = new ArrayList<>(List.of(
-                new Item("B", 1),
-                new Item("A", 1),
-                new Item("C", 2)
-        ));
-
-        Comparator<Item> comparator =
-                Comparator.comparingInt(Item::priority)
-                        .thenComparing(Item::name);
-
-        items.sort(comparator);
-        System.out.println(items);
-    }
-}
-```
 
 观察点：观察 JDK 接口如何通过静态工厂和默认组合器构建可组合契约。
 

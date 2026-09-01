@@ -983,38 +983,28 @@ JDK 8 引入红黑树，并重构扩容迁移为更清晰的 low/high 拆分；�
 
 ---
 
-## 最少实验
+## 实验与 examples 边界
 
-### 04.13 只保留 3 个最有记忆价值的实验
+### 04.13 只保留 3 个最有记忆价值的验证点
+
+完整运行入口统一见 [examples/README.md](../../examples/README.md)；本节只保留 HashMap 契约和索引思路的短机制片段。
 
 #### 实验一：只重写 equals 不重写 hashCode
 
 ```java
-import java.util.HashMap;
-import java.util.Map;
+final class User {
+    private final int id;
+    User(int id) { this.id = id; }
 
-public class BadKeyDemo {
-    static class User {
-        private final int id;
-
-        User(int id) {
-            this.id = id;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            return o instanceof User u && id == u.id;
-        }
-        // 故意不重写 hashCode
+    @Override public boolean equals(Object o) {
+        return o instanceof User u && id == u.id;
     }
-
-    public static void main(String[] args) {
-        Map<User, String> map = new HashMap<>();
-        map.put(new User(1), "A");
-
-        System.out.println(map.get(new User(1))); // 通常取不到 A
-    }
+    // 故意不重写 hashCode
 }
+
+Map<User, String> map = new HashMap<>();
+map.put(new User(1), "A");
+map.get(new User(1)); // 通常取不到 A
 ```
 
 验证结论：**equals 相同但 hashCode 契约被破坏，HashMap 可能连同一个桶都找不到。**
@@ -1022,40 +1012,20 @@ public class BadKeyDemo {
 #### 实验二：修改 key 后 get 不到
 
 ```java
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-
-public class MutableKeyDemo {
-    static class Key {
-        String name;
-
-        Key(String name) {
-            this.name = name;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            return o instanceof Key k && Objects.equals(name, k.name);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(name);
-        }
+final class Key {
+    String name;
+    Key(String name) { this.name = name; }
+    @Override public boolean equals(Object o) {
+        return o instanceof Key k && Objects.equals(name, k.name);
     }
-
-    public static void main(String[] args) {
-        Map<Key, String> map = new HashMap<>();
-        Key key = new Key("A");
-
-        map.put(key, "value");
-        System.out.println(map.get(key));
-
-        key.name = "B";
-        System.out.println(map.get(key)); // 可能为 null
-    }
+    @Override public int hashCode() { return Objects.hash(name); }
 }
+
+Map<Key, String> map = new HashMap<>();
+Key key = new Key("A");
+map.put(key, "value");
+key.name = "B";
+map.get(key); // 可能为 null
 ```
 
 验证结论：**key 的 hash 身份不能在入 Map 后随意变化。**

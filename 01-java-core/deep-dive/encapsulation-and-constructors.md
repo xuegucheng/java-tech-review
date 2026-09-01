@@ -2371,7 +2371,10 @@ public List<Item> items;
 
 ---
 
-## 9.45 建议实验
+## 9.45 实验与 examples 边界
+
+本节保留原有实验清单与文字观察，不在正文维护完整 runnable class。需要执行回归时统一以 `examples/` 为唯一代码入口。
+
 
 ### 实验一：访问级别
 
@@ -2384,12 +2387,8 @@ second
 
 在 `first.Parent` 中声明：
 
-```java
-public int publicValue;
-protected int protectedValue;
-int packageValue;
-private int privateValue;
-```
+> 完整 runnable class 已移出正文；以下保留验证目标和观察结论。
+
 
 分别在：
 
@@ -2402,59 +2401,9 @@ private int privateValue;
 
 ### 实验二：跨包 protected 限制
 
-```java
-package child;
-
-import parent.Parent;
-
-public class Child extends Parent {
-
-    void first() {
-        System.out.println(
-                protectedValue
-        );
-    }
-
-    void second(Child child) {
-        System.out.println(
-                child.protectedValue
-        );
-    }
-
-    void third(Parent parent) {
-        // System.out.println(
-        //         parent.protectedValue
-        // );
-    }
-}
-```
 
 ### 实验三：嵌套类访问 private
 
-```java
-public class NestmateDemo {
-
-    private int value = 10;
-
-    private static class Nested {
-
-        static int read(
-                NestmateDemo outer
-        ) {
-            return outer.value;
-        }
-    }
-
-    public static void main(String[] args) {
-        NestmateDemo demo =
-                new NestmateDemo();
-
-        System.out.println(
-                Nested.read(demo)
-        );
-    }
-}
-```
 
 ### 实验四：子包不是父包
 
@@ -2476,127 +2425,31 @@ com.example.child
 
 ### 实验五：import 不包含子包
 
-```java
-import java.util.*;
-```
 
 然后尝试直接使用：
 
-```java
-ConcurrentHashMap
-```
 
 观察仍需：
 
-```java
-import java.util.concurrent.ConcurrentHashMap;
-```
 
 ### 实验六：import 不触发类初始化
 
 创建：
 
-```java
-public class ImportedType {
-
-    static {
-        System.out.println("initialized");
-    }
-}
-```
 
 只在另一个文件中导入但不主动使用，观察不会因为 `import` 本身执行静态块。
 
 ### 实验七：默认构造器
 
-```java
-public class DefaultConstructorDemo {
-
-    static class First {
-    }
-
-    static class Second {
-
-        Second(String value) {
-        }
-    }
-
-    public static void main(String[] args) {
-        new First();
-
-        // new Second();
-    }
-}
-```
 
 ### 实验八：构造器不是普通方法
 
-```java
-public class ConstructorMethodDemo {
-
-    ConstructorMethodDemo() {
-        System.out.println("constructor");
-    }
-
-    void ConstructorMethodDemo() {
-        System.out.println("method");
-    }
-
-    public static void main(String[] args) {
-        ConstructorMethodDemo demo =
-                new ConstructorMethodDemo();
-
-        demo.ConstructorMethodDemo();
-    }
-}
-```
 
 ### 实验九：this 构造器委托
 
-```java
-public class ThisConstructorDemo {
-
-    private final String name;
-    private final boolean enabled;
-
-    ThisConstructorDemo() {
-        this("anonymous");
-    }
-
-    ThisConstructorDemo(String name) {
-        this(name, true);
-    }
-
-    ThisConstructorDemo(
-            String name,
-            boolean enabled
-    ) {
-        this.name = name;
-        this.enabled = enabled;
-    }
-
-    public static void main(String[] args) {
-        new ThisConstructorDemo();
-    }
-}
-```
 
 ### 实验十：父类无无参构造器
 
-```java
-class Parent {
-
-    Parent(String name) {
-    }
-}
-
-class Child extends Parent {
-
-    Child() {
-        super("child");
-    }
-}
-```
 
 删除 `super("child")`，观察编译错误。
 
@@ -2604,226 +2457,35 @@ class Child extends Parent {
 
 使用 JDK 25 或更高版本：
 
-```java
-import java.math.BigInteger;
-
-public class PositiveBigInteger
-        extends BigInteger {
-
-    public PositiveBigInteger(long value) {
-        if (value <= 0) {
-            throw new IllegalArgumentException(
-                    "value must be positive"
-            );
-        }
-
-        super(Long.toString(value));
-    }
-
-    public static void main(String[] args) {
-        System.out.println(
-                new PositiveBigInteger(10)
-        );
-    }
-}
-```
 
 ### 实验十二：Java 25 早期上下文限制
 
-```java
-class Parent {
-
-    Parent(int value) {
-    }
-}
-
-class Child extends Parent {
-
-    private int value;
-
-    Child(int value) {
-        // System.out.println(this);
-        // System.out.println(this.value);
-        // print();
-
-        super(value);
-
-        this.value = value;
-    }
-
-    void print() {
-    }
-}
-```
 
 逐项取消注释，观察编译器限制。
 
 ### 实验十三：初始化顺序
 
-```java
-public class InitializationOrderDemo {
-
-    private int first =
-            print("field first");
-
-    {
-        print("initializer");
-    }
-
-    private int second =
-            print("field second");
-
-    InitializationOrderDemo() {
-        print("constructor");
-    }
-
-    static int print(String text) {
-        System.out.println(text);
-        return 0;
-    }
-
-    public static void main(String[] args) {
-        new InitializationOrderDemo();
-    }
-}
-```
 
 ### 实验十四：构造器调用可重写方法
 
-```java
-public class OverridableConstructorDemo {
-
-    static class Parent {
-
-        Parent() {
-            print();
-        }
-
-        void print() {
-            System.out.println("Parent");
-        }
-    }
-
-    static class Child extends Parent {
-
-        private String name = "Java";
-
-        @Override
-        void print() {
-            System.out.println(name);
-        }
-    }
-
-    public static void main(String[] args) {
-        new Child();
-    }
-}
-```
 
 观察子类字段尚未完成初始化时的输出。
 
 ### 实验十五：this 逃逸
 
-```java
-import java.util.ArrayList;
-import java.util.List;
-
-public class ThisEscapeDemo {
-
-    private static final List<ThisEscapeDemo>
-            REGISTRY = new ArrayList<>();
-
-    private String name;
-
-    ThisEscapeDemo() {
-        REGISTRY.add(this);
-        name = "Java";
-    }
-
-    public static void main(String[] args) {
-        new ThisEscapeDemo();
-
-        System.out.println(
-                REGISTRY.get(0).name
-        );
-    }
-}
-```
 
 该示例单线程下可能输出正常值，但设计仍然让半初始化对象提前可见。不要把一次输出正常当作安全证明。
 
 ### 实验十六：防御性集合 Getter
 
-```java
-import java.util.ArrayList;
-import java.util.List;
-
-public class EncapsulationDemo {
-
-    static class Order {
-
-        private final List<String> items =
-                new ArrayList<>();
-
-        void addItem(String item) {
-            items.add(item);
-        }
-
-        List<String> items() {
-            return List.copyOf(items);
-        }
-    }
-
-    public static void main(String[] args) {
-        Order order = new Order();
-        order.addItem("A");
-
-        List<String> items =
-                order.items();
-
-        // items.clear();
-
-        System.out.println(items);
-    }
-}
-```
 
 ### 实验十七：私有构造器
 
-```java
-public final class HexUtils {
-
-    private HexUtils() {
-        throw new AssertionError(
-                "no instance"
-        );
-    }
-
-    public static String encode(
-            byte[] values
-    ) {
-        return "";
-    }
-}
-```
 
 ### 实验十八：模块导入声明
 
 使用 JDK 25：
 
-```java
-import module java.base;
-
-public class ModuleImportDemo {
-
-    public static void main(String[] args) {
-        List<String> values =
-                List.of("A", "B");
-
-        System.out.println(values);
-    }
-}
-```
 
 观察无需分别导入 `java.util.List`。
 

@@ -586,24 +586,17 @@ public final class LocationRuleRegistry {
 7. 热部署或插件卸载如何清理？
 8. 该依赖能否通过构造器显式表达？
 
-## 16.47 建议实验
+## 16.47 实验与 examples 边界
+
+本节保留原有实验清单与文字观察，不在正文维护完整 runnable class。需要执行回归时统一以 `examples/` 为唯一代码入口。
+
 
 ### 实验1：静态字段共享
 
 **目标**：验证多个实例访问同一静态字段。
 
-```java
-public class StaticSharedDemo {
-    static class User {
-        static int count;
-        User() { count++; }
-    }
-    public static void main(String[] args) {
-        new User(); new User(); new User();
-        System.out.println(User.count);
-    }
-}
-```
+> 完整 runnable class 已移出正文；以下保留验证目标和观察结论。
+
 
 预期或观察重点：
 
@@ -615,18 +608,6 @@ public class StaticSharedDemo {
 
 **目标**：通过显式参数访问实例状态。
 
-```java
-public class StaticContextDemo {
-    static class User {
-        private final String name;
-        User(String name) { this.name = name; }
-        static String read(User user) { return user.name; }
-    }
-    public static void main(String[] args) {
-        System.out.println(User.read(new User("Java")));
-    }
-}
-```
 
 预期或观察重点：
 
@@ -638,17 +619,6 @@ Java
 
 **目标**：观察调用目标由引用编译时类型决定。
 
-```java
-public class StaticHidingDemo {
-    static class Parent { static String type() { return "Parent"; } }
-    static class Child extends Parent { static String type() { return "Child"; } }
-    public static void main(String[] args) {
-        Parent value = new Child();
-        System.out.println(value.type());
-        System.out.println(Child.type());
-    }
-}
-```
 
 预期或观察重点：
 
@@ -661,16 +631,6 @@ Child
 
 **目标**：验证父子类同名静态字段是两个字段。
 
-```java
-public class StaticFieldHidingDemo {
-    static class Parent { static int value = 1; }
-    static class Child extends Parent { static int value = 2; }
-    public static void main(String[] args) {
-        System.out.println(Parent.value);
-        System.out.println(Child.value);
-    }
-}
-```
 
 预期或观察重点：
 
@@ -683,17 +643,6 @@ public class StaticFieldHidingDemo {
 
 **目标**：验证字段初始化器和静态代码块按源码顺序执行。
 
-```java
-public class StaticSourceOrderDemo {
-    static int a = print("a", 1);
-    static { print("block", 0); }
-    static int b = print("b", 2);
-    static int print(String text, int value) {
-        System.out.println(text); return value;
-    }
-    public static void main(String[] args) { System.out.println(a + b); }
-}
-```
 
 预期或观察重点：
 
@@ -708,16 +657,6 @@ b
 
 **目标**：理解准备阶段默认值先于显式初始化。
 
-```java
-public class StaticDefaultValueDemo {
-    static int value = initialize();
-    static int initialize() {
-        System.out.println(value);
-        return 10;
-    }
-    public static void main(String[] args) { System.out.println(value); }
-}
-```
 
 预期或观察重点：
 
@@ -730,13 +669,6 @@ public class StaticDefaultValueDemo {
 
 **目标**：验证类初始化的父类优先规则。
 
-```java
-public class ParentFirstDemo {
-    static class Parent { static { System.out.println("Parent"); } }
-    static class Child extends Parent { static { System.out.println("Child"); } }
-    public static void main(String[] args) { new Child(); }
-}
-```
 
 预期或观察重点：
 
@@ -749,18 +681,6 @@ Child
 
 **目标**：验证只初始化字段声明类。
 
-```java
-public class DeclaringClassDemo {
-    static class Parent {
-        static int value = init();
-        static int init() { System.out.println("Parent"); return 1; }
-    }
-    static class Child extends Parent {
-        static { System.out.println("Child"); }
-    }
-    public static void main(String[] args) { System.out.println(Child.value); }
-}
-```
 
 预期或观察重点：
 
@@ -773,15 +693,6 @@ Parent
 
 **目标**：观察获取 Class 对象本身不执行静态代码块。
 
-```java
-public class ClassLiteralDemo {
-    static class Target { static { System.out.println("Target initialized"); } }
-    public static void main(String[] args) {
-        Class<Target> type = Target.class;
-        System.out.println(type.getSimpleName());
-    }
-}
-```
 
 预期或观察重点：
 
@@ -793,15 +704,6 @@ Target
 
 **目标**：区分数组类创建与元素类初始化。
 
-```java
-public class ArrayPassiveUseDemo {
-    static class Target { static { System.out.println("Target initialized"); } }
-    public static void main(String[] args) {
-        Target[] values = new Target[2];
-        System.out.println(values.length);
-    }
-}
-```
 
 预期或观察重点：
 
@@ -813,15 +715,6 @@ public class ArrayPassiveUseDemo {
 
 **目标**：验证常量变量读取可以不执行静态代码块。
 
-```java
-public class ConstantPassiveUseDemo {
-    static class Constants {
-        static final int VALUE = 30;
-        static { System.out.println("initialized"); }
-    }
-    public static void main(String[] args) { System.out.println(Constants.VALUE); }
-}
-```
 
 预期或观察重点：
 
@@ -833,15 +726,6 @@ public class ConstantPassiveUseDemo {
 
 **目标**：区分 static final 与常量变量。
 
-```java
-public class RuntimeFinalDemo {
-    static class Config {
-        static final int VALUE = Integer.parseInt("30");
-        static { System.out.println("initialized"); }
-    }
-    public static void main(String[] args) { System.out.println(Config.VALUE); }
-}
-```
 
 预期或观察重点：
 
@@ -854,17 +738,6 @@ initialized
 
 **目标**：比较 initialize=false 与主动初始化。
 
-```java
-public class ForNameInitializationDemo {
-    static class Target { static { System.out.println("initialized"); } }
-    public static void main(String[] args) throws Exception {
-        String name = ForNameInitializationDemo.Target.class.getName();
-        Class.forName(name, false, ForNameInitializationDemo.class.getClassLoader());
-        System.out.println("loaded");
-        Class.forName(name);
-    }
-}
-```
 
 预期或观察重点：
 
@@ -877,22 +750,6 @@ initialized
 
 **目标**：验证嵌套持有者实现延迟创建。
 
-```java
-public class HolderIdiomDemo {
-    static class Service {
-        Service() { System.out.println("create"); }
-    }
-    static class Registry {
-        static { System.out.println("Registry"); }
-        static class Holder { static final Service INSTANCE = new Service(); }
-        static Service instance() { return Holder.INSTANCE; }
-    }
-    public static void main(String[] args) {
-        System.out.println("before");
-        Registry.instance();
-    }
-}
-```
 
 预期或观察重点：
 
@@ -906,20 +763,6 @@ create
 
 **目标**：观察首次和后续使用的异常差异。
 
-```java
-public class InitializationFailureDemo {
-    static class Broken {
-        static int value = fail();
-        static int fail() { throw new IllegalStateException("boom"); }
-    }
-    public static void main(String[] args) {
-        for (int i = 0; i < 2; i++) {
-            try { System.out.println(Broken.value); }
-            catch (Throwable error) { System.out.println(error.getClass().getSimpleName()); }
-        }
-    }
-}
-```
 
 预期或观察重点：
 
@@ -932,17 +775,6 @@ NoClassDefFoundError
 
 **目标**：观察类初始化时声明默认方法的接口初始化。
 
-```java
-public class DefaultMethodInterfaceInitDemo {
-    interface Parent {
-        int VALUE = init();
-        static int init() { System.out.println("Parent interface"); return 1; }
-        default void run() { }
-    }
-    static class Child implements Parent { static { System.out.println("Child class"); } }
-    public static void main(String[] args) { new Child(); }
-}
-```
 
 预期或观察重点：
 
@@ -955,16 +787,6 @@ Child class
 
 **目标**：区分接口继承与默认方法初始化规则。
 
-```java
-public class PlainInterfaceInitDemo {
-    interface Marker {
-        int VALUE = init();
-        static int init() { System.out.println("Marker"); return 1; }
-    }
-    static class Target implements Marker { static { System.out.println("Target"); } }
-    public static void main(String[] args) { new Target(); }
-}
-```
 
 预期或观察重点：
 
@@ -976,14 +798,6 @@ Target
 
 **目标**：验证可直接创建静态嵌套类。
 
-```java
-public class StaticNestedClassDemo {
-    static class Builder { String build() { return "ok"; } }
-    public static void main(String[] args) {
-        System.out.println(new StaticNestedClassDemo.Builder().build());
-    }
-}
-```
 
 预期或观察重点：
 
@@ -995,12 +809,6 @@ ok
 
 **目标**：验证静态同步方法与 class 字面量使用同一监视器。
 
-```java
-public class StaticSynchronizedDemo {
-    static synchronized void first() { System.out.println(Thread.holdsLock(StaticSynchronizedDemo.class)); }
-    public static void main(String[] args) { first(); }
-}
-```
 
 预期或观察重点：
 
@@ -1012,16 +820,6 @@ true
 
 **目标**：用系统类加载器展示类型与定义加载器的关系。
 
-```java
-public class ClassLoaderIdentityDemo {
-    static int value = 1;
-    public static void main(String[] args) {
-        Class<?> type = ClassLoaderIdentityDemo.class;
-        System.out.println(type.getName());
-        System.out.println(type.getClassLoader() != null);
-    }
-}
-```
 
 预期或观察重点：
 

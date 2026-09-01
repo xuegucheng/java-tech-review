@@ -2146,540 +2146,59 @@ Child 又持有 Parent
 
 ---
 
-## 8.38 建议实验
+## 8.38 实验与 examples 边界
+
+本节保留原有实验清单与文字观察，不在正文维护完整 runnable class。需要执行回归时统一以 `examples/` 为唯一代码入口。
+
 
 ### 实验一：类、对象和引用
 
-```java
-public class ClassAndObjectDemo {
+> 完整 runnable class 已移出正文；以下保留验证目标和观察结论。
 
-    public static void main(String[] args) {
-        User first = new User();
-        User second = first;
-
-        second.name = "Java";
-
-        System.out.println(first.name);
-        System.out.println(first == second);
-    }
-
-    static class User {
-        String name;
-    }
-}
-```
 
 ### 实验二：两个独立对象
 
-```java
-public class IndependentObjectDemo {
-
-    public static void main(String[] args) {
-        User first = new User();
-        User second = new User();
-
-        first.name = "A";
-        second.name = "B";
-
-        System.out.println(first.name);
-        System.out.println(second.name);
-        System.out.println(first == second);
-    }
-
-    static class User {
-        String name;
-    }
-}
-```
 
 ### 实验三：行为维护不变量
 
-```java
-public class AccountDemo {
-
-    static class Account {
-
-        private long balanceInFen;
-
-        void deposit(long amountInFen) {
-            if (amountInFen <= 0) {
-                throw new IllegalArgumentException();
-            }
-
-            balanceInFen =
-                    Math.addExact(
-                            balanceInFen,
-                            amountInFen
-                    );
-        }
-
-        long balanceInFen() {
-            return balanceInFen;
-        }
-    }
-
-    public static void main(String[] args) {
-        Account account = new Account();
-
-        account.deposit(1_000);
-
-        System.out.println(
-                account.balanceInFen()
-        );
-    }
-}
-```
 
 ### 实验四：状态转换
 
-```java
-public class OrderStateDemo {
-
-    enum Status {
-        CREATED,
-        PAID,
-        CANCELLED
-    }
-
-    static class Order {
-
-        private Status status =
-                Status.CREATED;
-
-        void pay() {
-            if (status != Status.CREATED) {
-                throw new IllegalStateException();
-            }
-
-            status = Status.PAID;
-        }
-
-        void cancel() {
-            if (status == Status.PAID) {
-                throw new IllegalStateException(
-                        "paid order cannot be cancelled"
-                );
-            }
-
-            status = Status.CANCELLED;
-        }
-
-        Status status() {
-            return status;
-        }
-    }
-
-    public static void main(String[] args) {
-        Order order = new Order();
-
-        order.pay();
-
-        System.out.println(order.status());
-    }
-}
-```
 
 ### 实验五：Tell, Don’t Ask
 
-```java
-public class TellDontAskDemo {
-
-    static class Cart {
-
-        private int itemCount;
-
-        void addItem() {
-            itemCount++;
-        }
-
-        boolean isEmpty() {
-            return itemCount == 0;
-        }
-    }
-
-    public static void main(String[] args) {
-        Cart cart = new Cart();
-
-        cart.addItem();
-
-        System.out.println(cart.isEmpty());
-    }
-}
-```
 
 ### 实验六：构造合法对象
 
-```java
-import java.util.List;
-
-public class ValidObjectDemo {
-
-    static class Order {
-
-        private final String userId;
-        private final List<String> items;
-
-        Order(
-                String userId,
-                List<String> items
-        ) {
-            if (
-                    userId == null
-                    || userId.isBlank()
-            ) {
-                throw new IllegalArgumentException();
-            }
-
-            if (
-                    items == null
-                    || items.isEmpty()
-            ) {
-                throw new IllegalArgumentException();
-            }
-
-            this.userId = userId;
-            this.items = List.copyOf(items);
-        }
-    }
-}
-```
 
 ### 实验七：值对象
 
-```java
-public class ValueObjectDemo {
-
-    record EmailAddress(String value) {
-
-        EmailAddress {
-            if (
-                    value == null
-                    || !value.contains("@")
-            ) {
-                throw new IllegalArgumentException();
-            }
-        }
-    }
-
-    public static void main(String[] args) {
-        EmailAddress first =
-                new EmailAddress(
-                        "a@example.com"
-                );
-
-        EmailAddress second =
-                new EmailAddress(
-                        "a@example.com"
-                );
-
-        System.out.println(
-                first.equals(second)
-        );
-    }
-}
-```
 
 ### 实验八：record 内部集合
 
-```java
-import java.util.ArrayList;
-import java.util.List;
-
-public class RecordCollectionDemo {
-
-    record Group(List<String> members) {
-
-        Group {
-            members = List.copyOf(members);
-        }
-    }
-
-    public static void main(String[] args) {
-        List<String> source =
-                new ArrayList<>();
-
-        source.add("A");
-
-        Group group = new Group(source);
-
-        source.add("B");
-
-        System.out.println(group.members());
-    }
-}
-```
 
 ### 实验九：依赖注入
 
-```java
-public class DependencyDemo {
-
-    interface MessageSender {
-        void send(String message);
-    }
-
-    static class NotificationService {
-
-        private final MessageSender sender;
-
-        NotificationService(
-                MessageSender sender
-        ) {
-            this.sender = sender;
-        }
-
-        void notifyUser() {
-            sender.send("completed");
-        }
-    }
-
-    public static void main(String[] args) {
-        MessageSender sender =
-                System.out::println;
-
-        NotificationService service =
-                new NotificationService(sender);
-
-        service.notifyUser();
-    }
-}
-```
 
 ### 实验十：策略替代条件分支
 
-```java
-public class StrategyDemo {
-
-    interface DiscountPolicy {
-        long discount(long amountInFen);
-    }
-
-    static class NoDiscount
-            implements DiscountPolicy {
-
-        @Override
-        public long discount(
-                long amountInFen
-        ) {
-            return 0;
-        }
-    }
-
-    static class TenPercentDiscount
-            implements DiscountPolicy {
-
-        @Override
-        public long discount(
-                long amountInFen
-        ) {
-            return amountInFen / 10;
-        }
-    }
-
-    public static void main(String[] args) {
-        DiscountPolicy policy =
-                new TenPercentDiscount();
-
-        long amountInFen = 10_000;
-        long payable =
-                amountInFen
-                - policy.discount(amountInFen);
-
-        System.out.println(payable);
-    }
-}
-```
 
 ### 实验十一：贫血与充血对比
 
-```java
-public class RichModelDemo {
-
-    static class Account {
-
-        private long balanceInFen;
-
-        Account(long balanceInFen) {
-            if (balanceInFen < 0) {
-                throw new IllegalArgumentException();
-            }
-
-            this.balanceInFen =
-                    balanceInFen;
-        }
-
-        void withdraw(long amountInFen) {
-            if (
-                    amountInFen <= 0
-                    || amountInFen > balanceInFen
-            ) {
-                throw new IllegalArgumentException();
-            }
-
-            balanceInFen -= amountInFen;
-        }
-
-        long balanceInFen() {
-            return balanceInFen;
-        }
-    }
-
-    public static void main(String[] args) {
-        Account account =
-                new Account(10_000);
-
-        account.withdraw(2_000);
-
-        System.out.println(
-                account.balanceInFen()
-        );
-    }
-}
-```
 
 ### 实验十二：实体身份
 
-```java
-import java.util.Objects;
-
-public class EntityDemo {
-
-    record OrderId(String value) {
-    }
-
-    static class Order {
-
-        private final OrderId id;
-        private String status;
-
-        Order(OrderId id) {
-            this.id = id;
-            this.status = "CREATED";
-        }
-
-        @Override
-        public boolean equals(Object object) {
-            if (this == object) {
-                return true;
-            }
-
-            if (!(object instanceof Order other)) {
-                return false;
-            }
-
-            return Objects.equals(id, other.id);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(id);
-        }
-    }
-
-    public static void main(String[] args) {
-        OrderId id = new OrderId("O-1");
-
-        Order first = new Order(id);
-        Order second = new Order(id);
-
-        System.out.println(
-                first.equals(second)
-        );
-    }
-}
-```
 
 该示例只展示身份概念，真实实体相等策略见 `18`。
 
 ### 实验十三：Clock 提高可测试性
 
-```java
-import java.time.Clock;
-import java.time.Instant;
-
-public class ClockDemo {
-
-    static class Token {
-
-        private final Instant expireAt;
-        private final Clock clock;
-
-        Token(
-                Instant expireAt,
-                Clock clock
-        ) {
-            this.expireAt = expireAt;
-            this.clock = clock;
-        }
-
-        boolean isExpired() {
-            return expireAt.isBefore(
-                    clock.instant()
-            );
-        }
-    }
-}
-```
 
 ### 实验十四：组合关系
 
-```java
-import java.util.ArrayList;
-import java.util.List;
-
-public class CompositionDemo {
-
-    static class Order {
-
-        private final List<OrderItem> items =
-                new ArrayList<>();
-
-        void addItem(
-                String productId,
-                int quantity
-        ) {
-            items.add(
-                    new OrderItem(
-                            productId,
-                            quantity
-                    )
-            );
-        }
-    }
-
-    record OrderItem(
-            String productId,
-            int quantity
-    ) {
-        OrderItem {
-            if (quantity <= 0) {
-                throw new IllegalArgumentException();
-            }
-        }
-    }
-}
-```
 
 ### 实验十五：防止布尔状态矛盾
 
-```java
-public class StateEnumDemo {
-
-    enum Status {
-        CREATED,
-        PAID,
-        SHIPPED,
-        COMPLETED,
-        CANCELLED
-    }
-
-    static class Order {
-
-        private Status status =
-                Status.CREATED;
-    }
-}
-```
 
 对比多个布尔字段可能产生的矛盾组合。
 

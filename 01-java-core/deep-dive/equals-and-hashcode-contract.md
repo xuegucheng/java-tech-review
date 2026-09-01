@@ -496,23 +496,17 @@ public record StockKey(
 7. compareTo 是否应与 equals 一致？
 8. 对象生命周期中 hash 是否可能变化？
 
-## 18.50 建议实验
+## 18.50 实验与 examples 边界
+
+本节保留原有实验清单与文字观察，不在正文维护完整 runnable class。需要执行回归时统一以 `examples/` 为唯一代码入口。
+
 
 ### 实验1：引用 == 与逻辑 equals
 
 **目标**：区分同一对象和相同内容。
 
-```java
-public class IdentityAndValueDemo {
-    record User(String id) { }
-    public static void main(String[] args) {
-        User a = new User("U1");
-        User b = new User("U1");
-        System.out.println(a == b);
-        System.out.println(a.equals(b));
-    }
-}
-```
+> 完整 runnable class 已移出正文；以下保留验证目标和观察结论。
+
 
 预期或观察重点：
 
@@ -525,17 +519,6 @@ true
 
 **目标**：观察引用比较不能替代数值比较。
 
-```java
-public class BoxedEqualityDemo {
-    public static void main(String[] args) {
-        Integer a = 100, b = 100;
-        Integer c = 1000, d = 1000;
-        System.out.println(a == b);
-        System.out.println(c == d);
-        System.out.println(c.equals(d));
-    }
-}
-```
 
 预期或观察重点：
 
@@ -549,21 +532,6 @@ true
 
 **目标**：展示 hashCode 不一致导致去重失败。
 
-```java
-import java.util.HashSet;
-import java.util.Set;
-public class EqualsOnlyDemo {
-    static class Key {
-        final String id; Key(String id) { this.id = id; }
-        public boolean equals(Object o) { return o instanceof Key k && id.equals(k.id); }
-    }
-    public static void main(String[] args) {
-        Set<Key> set = new HashSet<>();
-        set.add(new Key("A")); set.add(new Key("A"));
-        System.out.println(set.size());
-    }
-}
-```
 
 预期或观察重点：
 
@@ -575,22 +543,6 @@ public class EqualsOnlyDemo {
 
 **目标**：验证 equals/hashCode 同时重写后的去重。
 
-```java
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
-public class ValueKeyDemo {
-    static final class Key {
-        final String id; Key(String id) { this.id = id; }
-        public boolean equals(Object o) { return this == o || o instanceof Key k && Objects.equals(id, k.id); }
-        public int hashCode() { return Objects.hashCode(id); }
-    }
-    public static void main(String[] args) {
-        Set<Key> set = new HashSet<>(); set.add(new Key("A")); set.add(new Key("A"));
-        System.out.println(set.size());
-    }
-}
-```
 
 预期或观察重点：
 
@@ -602,17 +554,6 @@ public class ValueKeyDemo {
 
 **目标**：验证相同 hashCode 不代表相等。
 
-```java
-import java.util.HashSet;
-import java.util.Set;
-public class CollisionDemo {
-    record Key(String id) { public int hashCode() { return 1; } }
-    public static void main(String[] args) {
-        Set<Key> set = new HashSet<>(); set.add(new Key("A")); set.add(new Key("B"));
-        System.out.println(set.size());
-    }
-}
-```
 
 预期或观察重点：
 
@@ -624,23 +565,6 @@ public class CollisionDemo {
 
 **目标**：观察修改散列字段后 contains 失败。
 
-```java
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
-public class MutableHashKeyDemo {
-    static class Key {
-        String id; Key(String id) { this.id = id; }
-        public boolean equals(Object o) { return o instanceof Key k && Objects.equals(id, k.id); }
-        public int hashCode() { return Objects.hashCode(id); }
-    }
-    public static void main(String[] args) {
-        Key key = new Key("A"); Set<Key> set = new HashSet<>(); set.add(key);
-        key.id = "B";
-        System.out.println(set.contains(key));
-    }
-}
-```
 
 预期或观察重点：
 
@@ -652,19 +576,6 @@ false
 
 **目标**：验证父子类型即使字段相同也不相等。
 
-```java
-public class GetClassEqualityDemo {
-    static class Point {
-        final int x; Point(int x) { this.x = x; }
-        public boolean equals(Object o) { return o != null && getClass() == o.getClass() && x == ((Point)o).x; }
-        public int hashCode() { return x; }
-    }
-    static class SpecialPoint extends Point { SpecialPoint(int x) { super(x); } }
-    public static void main(String[] args) {
-        System.out.println(new Point(1).equals(new SpecialPoint(1)));
-    }
-}
-```
 
 预期或观察重点：
 
@@ -676,16 +587,6 @@ false
 
 **目标**：展示 final 类中使用 instanceof 的安全边界。
 
-```java
-public class FinalValueEqualityDemo {
-    static final class Code {
-        final String value; Code(String value) { this.value = value; }
-        public boolean equals(Object o) { return o instanceof Code c && value.equals(c.value); }
-        public int hashCode() { return value.hashCode(); }
-    }
-    public static void main(String[] args) { System.out.println(new Code("A").equals(new Code("A"))); }
-}
-```
 
 预期或观察重点：
 
@@ -697,14 +598,6 @@ true
 
 **目标**：验证数组 equals 不比较内容。
 
-```java
-public class ArrayIdentityEqualsDemo {
-    public static void main(String[] args) {
-        int[] a = {1,2}; int[] b = {1,2};
-        System.out.println(a.equals(b));
-    }
-}
-```
 
 预期或观察重点：
 
@@ -716,16 +609,6 @@ false
 
 **目标**：使用匹配的数组比较和散列方法。
 
-```java
-import java.util.Arrays;
-public class ArraysContentEqualsDemo {
-    public static void main(String[] args) {
-        int[] a = {1,2}; int[] b = {1,2};
-        System.out.println(Arrays.equals(a,b));
-        System.out.println(Arrays.hashCode(a) == Arrays.hashCode(b));
-    }
-}
-```
 
 预期或观察重点：
 
@@ -738,16 +621,6 @@ true
 
 **目标**：比较嵌套对象数组。
 
-```java
-import java.util.Arrays;
-public class DeepArrayEqualsDemo {
-    public static void main(String[] args) {
-        Object[] a = {new int[]{1,2}}; Object[] b = {new int[]{1,2}};
-        System.out.println(Arrays.equals(a,b));
-        System.out.println(Arrays.deepEquals(a,b));
-    }
-}
-```
 
 预期或观察重点：
 
@@ -760,16 +633,6 @@ true
 
 **目标**：观察 scale 造成的语义差异。
 
-```java
-import java.math.BigDecimal;
-public class BigDecimalEqualityDemo {
-    public static void main(String[] args) {
-        BigDecimal a = new BigDecimal("1.0"); BigDecimal b = new BigDecimal("1.00");
-        System.out.println(a.equals(b));
-        System.out.println(a.compareTo(b) == 0);
-    }
-}
-```
 
 预期或观察重点：
 
@@ -782,15 +645,6 @@ true
 
 **目标**：验证枚举常量身份唯一。
 
-```java
-public class EnumEqualityDemo {
-    enum Status { CREATED, DONE }
-    public static void main(String[] args) {
-        Status a = Status.CREATED; Status b = Status.valueOf("CREATED");
-        System.out.println(a == b);
-    }
-}
-```
 
 预期或观察重点：
 
@@ -802,16 +656,6 @@ true
 
 **目标**：验证 record 基于组件生成 equals/hashCode。
 
-```java
-public class RecordEqualityDemo {
-    record StockKey(String warehouse, String sku) { }
-    public static void main(String[] args) {
-        StockKey a = new StockKey("W1","S1"); StockKey b = new StockKey("W1","S1");
-        System.out.println(a.equals(b));
-        System.out.println(a.hashCode() == b.hashCode());
-    }
-}
-```
 
 预期或观察重点：
 
@@ -824,14 +668,6 @@ true
 
 **目标**：观察自动 equals 沿用数组身份语义。
 
-```java
-public class RecordArrayComponentDemo {
-    record Payload(byte[] data) { }
-    public static void main(String[] args) {
-        System.out.println(new Payload(new byte[]{1}).equals(new Payload(new byte[]{1})));
-    }
-}
-```
 
 预期或观察重点：
 
@@ -843,18 +679,6 @@ false
 
 **目标**：观察 compareTo 与 equals 不一致的影响。
 
-```java
-import java.math.BigDecimal;
-import java.util.*;
-public class OrderedAndHashSetDemo {
-    public static void main(String[] args) {
-        BigDecimal a = new BigDecimal("1.0"), b = new BigDecimal("1.00");
-        Set<BigDecimal> tree = new TreeSet<>(); tree.add(a); tree.add(b);
-        Set<BigDecimal> hash = new HashSet<>(); hash.add(a); hash.add(b);
-        System.out.println(tree.size()); System.out.println(hash.size());
-    }
-}
-```
 
 预期或观察重点：
 
@@ -867,17 +691,6 @@ public class OrderedAndHashSetDemo {
 
 **目标**：验证逻辑相等对象仍作为不同 key。
 
-```java
-import java.util.IdentityHashMap;
-import java.util.Map;
-public class IdentityMapDemo {
-    public static void main(String[] args) {
-        Map<String,Integer> map = new IdentityHashMap<>();
-        map.put(new String("A"),1); map.put(new String("A"),2);
-        System.out.println(map.size());
-    }
-}
-```
 
 预期或观察重点：
 
@@ -889,17 +702,6 @@ public class IdentityMapDemo {
 
 **目标**：展示单字段两种方法结果不同。
 
-```java
-import java.util.Objects;
-public class ObjectsHashDifferenceDemo {
-    public static void main(String[] args) {
-        String value = "A";
-        System.out.println(Objects.hashCode(value));
-        System.out.println(Objects.hash(value));
-        System.out.println(Objects.hashCode(value) == Objects.hash(value));
-    }
-}
-```
 
 预期或观察重点：
 
@@ -913,15 +715,6 @@ false
 
 **目标**：验证 Objects.equals 的 null 语义。
 
-```java
-import java.util.Objects;
-public class NullSafeEqualsDemo {
-    public static void main(String[] args) {
-        System.out.println(Objects.equals(null,null));
-        System.out.println(Objects.equals(null,"A"));
-    }
-}
-```
 
 预期或观察重点：
 
@@ -934,18 +727,6 @@ false
 
 **目标**：验证稳定值对象可作为 HashMap key。
 
-```java
-import java.util.HashMap;
-import java.util.Map;
-public class StockKeyMapDemo {
-    record StockKey(String warehouseId, String skuId, String batchNo) { }
-    public static void main(String[] args) {
-        Map<StockKey,Integer> stock = new HashMap<>();
-        stock.put(new StockKey("W1","S1","B1"),10);
-        System.out.println(stock.get(new StockKey("W1","S1","B1")));
-    }
-}
-```
 
 预期或观察重点：
 

@@ -1598,24 +1598,15 @@ values.add("Java");
 
 ---
 
-## 2.17 建议实验
+## 2.17 实验与 examples 边界
+
+本节保留原有实验清单与文字观察，不在正文维护完整 runnable class。需要执行回归时统一以 `examples/` 为唯一代码入口。
+
 
 ### 实验一：基本类型赋值
 
-```java
-public class PrimitiveAssignmentDemo {
+> 完整 runnable class 已移出正文；以下保留验证目标和观察结论。
 
-    public static void main(String[] args) {
-        int first = 10;
-        int second = first;
-
-        second = 20;
-
-        System.out.println(first);
-        System.out.println(second);
-    }
-}
-```
 
 预期：
 
@@ -1628,23 +1619,6 @@ public class PrimitiveAssignmentDemo {
 
 ### 实验二：引用赋值
 
-```java
-public class ReferenceAssignmentDemo {
-
-    public static void main(String[] args) {
-        User first = new User();
-        User second = first;
-
-        second.name = "Java";
-
-        System.out.println(first.name);
-    }
-
-    static class User {
-        String name;
-    }
-}
-```
 
 预期：
 
@@ -1656,29 +1630,6 @@ Java
 
 ### 实验三：重新赋值引用
 
-```java
-public class ReferenceReplaceDemo {
-
-    public static void main(String[] args) {
-        User first = new User("first");
-        User second = first;
-
-        second = new User("second");
-
-        System.out.println(first.name);
-        System.out.println(second.name);
-    }
-
-    static class User {
-
-        String name;
-
-        User(String name) {
-            this.name = name;
-        }
-    }
-}
-```
 
 预期：
 
@@ -1689,62 +1640,16 @@ second
 
 ### 实验四：字段默认值与局部变量
 
-```java
-public class DefaultValueDemo {
-
-    private int fieldCount;
-    private String fieldName;
-
-    public static void main(String[] args) {
-        DefaultValueDemo demo = new DefaultValueDemo();
-
-        System.out.println(demo.fieldCount);
-        System.out.println(demo.fieldName);
-
-        int localCount;
-        // System.out.println(localCount); // 编译错误
-    }
-}
-```
 
 观察字段和局部变量规则不同。
 
 ### 实验五：确定赋值
 
-```java
-public class DefiniteAssignmentDemo {
-
-    public static void main(String[] args) {
-        boolean condition = args.length > 0;
-        int value;
-
-        if (condition) {
-            value = 1;
-        } else {
-            value = 2;
-        }
-
-        System.out.println(value);
-    }
-}
-```
 
 删除 `else` 分支，再观察编译结果。
 
 ### 实验六：char 与 Unicode 码点
 
-```java
-public class UnicodeDemo {
-
-    public static void main(String[] args) {
-        String text = "😀";
-
-        System.out.println(text.length());
-        System.out.println(text.codePointCount(0, text.length()));
-        System.out.println(Integer.toHexString(text.codePointAt(0)));
-    }
-}
-```
 
 预期：
 
@@ -1756,60 +1661,12 @@ public class UnicodeDemo {
 
 ### 实验七：var 仍是静态类型
 
-```java
-public class VarDemo {
-
-    public static void main(String[] args) {
-        var value = "Java";
-
-        System.out.println(value.toUpperCase());
-
-        // value = 100; // 编译错误
-    }
-}
-```
 
 ### 实验八：var 的非法位置
 
-```java
-public class InvalidVarDemo {
-
-    // private var name = "Java"; // 编译错误
-
-    public static void main(String[] args) {
-        // var first;             // 编译错误
-        // var second = null;     // 编译错误
-        // var a = 1, b = 2;      // 编译错误
-    }
-}
-```
 
 ### 实验九：局部变量遮蔽字段
 
-```java
-public class ShadowingDemo {
-
-    private String name;
-
-    public void wrong(String name) {
-        name = name;
-    }
-
-    public void correct(String name) {
-        this.name = name;
-    }
-
-    public static void main(String[] args) {
-        ShadowingDemo demo = new ShadowingDemo();
-
-        demo.wrong("Java");
-        System.out.println(demo.name);
-
-        demo.correct("JVM");
-        System.out.println(demo.name);
-    }
-}
-```
 
 预期：
 
@@ -1820,20 +1677,6 @@ JVM
 
 ### 实验十：数组元素默认值
 
-```java
-public class ArrayDefaultValueDemo {
-
-    public static void main(String[] args) {
-        int[] numbers = new int[2];
-        boolean[] flags = new boolean[2];
-        String[] names = new String[2];
-
-        System.out.println(numbers[0]);
-        System.out.println(flags[0]);
-        System.out.println(names[0]);
-    }
-}
-```
 
 ---
 

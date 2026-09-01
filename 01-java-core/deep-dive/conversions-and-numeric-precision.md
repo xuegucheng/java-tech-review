@@ -1852,39 +1852,20 @@ long amountInFen = 10_520L;
 
 ---
 
-## 3.26 建议实验
+## 3.26 实验与 examples 边界
+
+本节保留原有实验清单与文字观察，不在正文维护完整 runnable class。需要执行回归时统一以 `examples/` 为唯一代码入口。
+
 
 ### 实验一：int 转 float 的精度丢失
 
-```java
-public class IntToFloatDemo {
+> 完整 runnable class 已移出正文；以下保留验证目标和观察结论。
 
-    public static void main(String[] args) {
-        int source = 16_777_217;
-        float target = source;
-
-        System.out.println(source);
-        System.out.println(target);
-        System.out.println((int) target);
-    }
-}
-```
 
 观察 `source` 与转换后的值是否一致。
 
 ### 实验二：byte 窄化回绕
 
-```java
-public class ByteNarrowingDemo {
-
-    public static void main(String[] args) {
-        int source = 130;
-        byte target = (byte) source;
-
-        System.out.println(target);
-    }
-}
-```
 
 预期：
 
@@ -1894,71 +1875,17 @@ public class ByteNarrowingDemo {
 
 ### 实验三：浮点转整数
 
-```java
-public class FloatingToIntegerDemo {
-
-    public static void main(String[] args) {
-        System.out.println((int) 12.9);
-        System.out.println((int) -12.9);
-        System.out.println((int) Double.NaN);
-        System.out.println((int) Double.POSITIVE_INFINITY);
-        System.out.println((int) Double.NEGATIVE_INFINITY);
-    }
-}
-```
 
 ### 实验四：常量表达式窄化
 
-```java
-public class ConstantNarrowingDemo {
-
-    public static void main(String[] args) {
-        byte first = 127;
-        byte second = 100 + 20;
-
-        final int constant = 10;
-        byte third = constant;
-
-        int variable = 10;
-        // byte fourth = variable; // 编译错误
-
-        System.out.println(first + second + third);
-    }
-}
-```
 
 ### 实验五：byte + byte
 
-```java
-public class BinaryPromotionDemo {
-
-    public static void main(String[] args) {
-        byte first = 10;
-        byte second = 20;
-
-        int result = first + second;
-
-        System.out.println(result);
-    }
-}
-```
 
 尝试把 `result` 改成 `byte`，观察编译错误。
 
 ### 实验六：复合赋值溢出
 
-```java
-public class CompoundAssignmentDemo {
-
-    public static void main(String[] args) {
-        byte value = 127;
-
-        value += 1;
-
-        System.out.println(value);
-    }
-}
-```
 
 预期：
 
@@ -1968,145 +1895,27 @@ public class CompoundAssignmentDemo {
 
 ### 实验七：long 表达式提前溢出
 
-```java
-public class IntermediateOverflowDemo {
-
-    public static void main(String[] args) {
-        long wrong = 24 * 60 * 60 * 1000 * 1000;
-        long correct = 24L * 60 * 60 * 1000 * 1000;
-
-        System.out.println(wrong);
-        System.out.println(correct);
-    }
-}
-```
 
 ### 实验八：Math.addExact
 
-```java
-public class ExactMathDemo {
-
-    public static void main(String[] args) {
-        try {
-            int result = Math.addExact(
-                    Integer.MAX_VALUE,
-                    1
-            );
-
-            System.out.println(result);
-        } catch (ArithmeticException exception) {
-            System.out.println("overflow");
-        }
-    }
-}
-```
 
 ### 实验九：整数除零与浮点除零
 
-```java
-public class DivisionByZeroDemo {
-
-    public static void main(String[] args) {
-        System.out.println(1.0 / 0.0);
-        System.out.println(0.0 / 0.0);
-
-        try {
-            System.out.println(1 / 0);
-        } catch (ArithmeticException exception) {
-            System.out.println("integer division by zero");
-        }
-    }
-}
-```
 
 ### 实验十：NaN
 
-```java
-public class NaNDemo {
-
-    public static void main(String[] args) {
-        double value = Double.NaN;
-
-        System.out.println(value == value);
-        System.out.println(value < 0);
-        System.out.println(value > 0);
-        System.out.println(Double.isNaN(value));
-    }
-}
-```
 
 ### 实验十一：0.1 + 0.2
 
-```java
-public class FloatingPrecisionDemo {
-
-    public static void main(String[] args) {
-        double result = 0.1 + 0.2;
-
-        System.out.println(result);
-        System.out.println(result == 0.3);
-    }
-}
-```
 
 ### 实验十二：BigDecimal 构造方式
 
-```java
-import java.math.BigDecimal;
-
-public class BigDecimalConstructionDemo {
-
-    public static void main(String[] args) {
-        BigDecimal first = new BigDecimal(0.1);
-        BigDecimal second = new BigDecimal("0.1");
-        BigDecimal third = BigDecimal.valueOf(0.1);
-
-        System.out.println(first);
-        System.out.println(second);
-        System.out.println(third);
-    }
-}
-```
 
 ### 实验十三：BigDecimal equals 与 compareTo
 
-```java
-import java.math.BigDecimal;
-
-public class BigDecimalComparisonDemo {
-
-    public static void main(String[] args) {
-        BigDecimal first = new BigDecimal("10.0");
-        BigDecimal second = new BigDecimal("10.00");
-
-        System.out.println(first.equals(second));
-        System.out.println(first.compareTo(second));
-    }
-}
-```
 
 ### 实验十四：BigDecimal 除法
 
-```java
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-
-public class BigDecimalDivisionDemo {
-
-    public static void main(String[] args) {
-        BigDecimal first = new BigDecimal("1");
-        BigDecimal second = new BigDecimal("3");
-
-        BigDecimal result = first.divide(
-                second,
-                4,
-                RoundingMode.HALF_UP
-        );
-
-        System.out.println(result);
-    }
-}
-```
 
 ---
 

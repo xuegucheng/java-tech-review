@@ -873,7 +873,10 @@ void enqueue(Queue<Task> tasks)
 
 ---
 
-## 01.39 可运行实验
+## 01.39 实验与 examples 边界
+
+本节保留原有实验清单与文字观察，不在正文维护完整 runnable class。需要执行回归时统一以 `examples/` 为唯一代码入口。
+
 
 以下实验均为独立 Java 文件。示例以 Java 21 为编译基线；涉及更高版本 API 时会明确标注。
 
@@ -881,19 +884,8 @@ void enqueue(Queue<Task> tasks)
 
 
 
-```java
-import java.util.Iterator;
-import java.util.List;
+> 完整 runnable class 已移出正文；以下保留验证目标和观察结论。
 
-public class IterableForEachDemo {
-    public static void main(String[] args) {
-        Iterable<String> values = List.of("A", "B");
-        for (String value : values) {
-            System.out.print(value);
-        }
-    }
-}
-```
 
 预期输出：
 
@@ -905,20 +897,6 @@ AB
 
 
 
-```java
-import java.util.ArrayList;
-import java.util.List;
-
-public class ListContractDemo {
-    public static void main(String[] args) {
-        List<String> values = new ArrayList<>();
-        values.add("A");
-        values.add("A");
-        values.add(1, "B");
-        System.out.println(values);
-    }
-}
-```
 
 预期输出：
 
@@ -930,19 +908,6 @@ public class ListContractDemo {
 
 
 
-```java
-import java.util.HashSet;
-import java.util.Set;
-
-public class SetContractDemo {
-    public static void main(String[] args) {
-        Set<String> values = new HashSet<>();
-        values.add("A");
-        values.add("A");
-        System.out.println(values.size());
-    }
-}
-```
 
 预期输出：
 
@@ -954,19 +919,6 @@ public class SetContractDemo {
 
 
 
-```java
-import java.util.ArrayDeque;
-import java.util.Queue;
-
-public class QueueMethodPairsDemo {
-    public static void main(String[] args) {
-        Queue<String> queue = new ArrayDeque<>();
-        System.out.println(queue.poll());
-        queue.offer("A");
-        System.out.println(queue.peek());
-    }
-}
-```
 
 预期输出：
 
@@ -979,20 +931,6 @@ A
 
 
 
-```java
-import java.util.ArrayDeque;
-import java.util.Deque;
-
-public class DequeContractDemo {
-    public static void main(String[] args) {
-        Deque<String> values = new ArrayDeque<>();
-        values.addLast("queue");
-        values.push("stack");
-        System.out.println(values.removeFirst());
-        System.out.println(values.removeFirst());
-    }
-}
-```
 
 预期输出：
 
@@ -1005,21 +943,6 @@ queue
 
 
 
-```java
-import java.util.LinkedHashMap;
-import java.util.Map;
-
-public class MapViewsDemo {
-    public static void main(String[] args) {
-        Map<String, Integer> map = new LinkedHashMap<>();
-        map.put("A", 1);
-        map.put("B", 2);
-        System.out.println(map.keySet());
-        System.out.println(map.values());
-        System.out.println(map.entrySet());
-    }
-}
-```
 
 预期输出：
 
@@ -1033,19 +956,6 @@ public class MapViewsDemo {
 
 
 
-```java
-import java.util.HashMap;
-import java.util.Map;
-
-public class BackedKeySetDemo {
-    public static void main(String[] args) {
-        Map<String, Integer> map = new HashMap<>();
-        map.put("A", 1);
-        map.keySet().remove("A");
-        System.out.println(map.isEmpty());
-    }
-}
-```
 
 预期输出：
 
@@ -1057,21 +967,6 @@ true
 
 
 
-```java
-import java.util.List;
-import java.util.Set;
-
-public class CollectionEqualityDemo {
-    public static void main(String[] args) {
-        System.out.println(
-                List.of("A", "B").equals(List.of("B", "A"))
-        );
-        System.out.println(
-                Set.of("A", "B").equals(Set.of("B", "A"))
-        );
-    }
-}
-```
 
 预期输出：
 
@@ -1084,21 +979,6 @@ true
 
 
 
-```java
-import java.util.Comparator;
-import java.util.Set;
-import java.util.TreeSet;
-
-public class SortedSetEqualityDemo {
-    public static void main(String[] args) {
-        Set<String> values =
-                new TreeSet<>(Comparator.comparingInt(String::length));
-        values.add("AA");
-        values.add("BB");
-        System.out.println(values.size());
-    }
-}
-```
 
 预期输出：
 
@@ -1110,25 +990,6 @@ public class SortedSetEqualityDemo {
 
 
 
-```java
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
-public class IteratorRemoveDemo {
-    public static void main(String[] args) {
-        List<String> values =
-                new ArrayList<>(List.of("A", "", "B"));
-        Iterator<String> iterator = values.iterator();
-        while (iterator.hasNext()) {
-            if (iterator.next().isBlank()) {
-                iterator.remove();
-            }
-        }
-        System.out.println(values);
-    }
-}
-```
 
 预期输出：
 
@@ -1140,25 +1001,6 @@ public class IteratorRemoveDemo {
 
 
 
-```java
-import java.util.ArrayList;
-import java.util.ConcurrentModificationException;
-import java.util.List;
-
-public class FailFastDemo {
-    public static void main(String[] args) {
-        List<String> values =
-                new ArrayList<>(List.of("A", "B"));
-        try {
-            for (String value : values) {
-                values.add(value);
-            }
-        } catch (ConcurrentModificationException exception) {
-            System.out.println(exception.getClass().getSimpleName());
-        }
-    }
-}
-```
 
 预期输出：
 
@@ -1170,20 +1012,6 @@ ConcurrentModificationException
 
 
 
-```java
-import java.util.List;
-
-public class UnmodifiableFactoryDemo {
-    public static void main(String[] args) {
-        List<String> values = List.of("A", "B");
-        try {
-            values.add("C");
-        } catch (UnsupportedOperationException exception) {
-            System.out.println(exception.getClass().getSimpleName());
-        }
-    }
-}
-```
 
 预期输出：
 
@@ -1195,21 +1023,6 @@ UnsupportedOperationException
 
 
 
-```java
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-public class UnmodifiableViewDemo {
-    public static void main(String[] args) {
-        List<String> source = new ArrayList<>();
-        List<String> view =
-                Collections.unmodifiableList(source);
-        source.add("A");
-        System.out.println(view);
-    }
-}
-```
 
 预期输出：
 
@@ -1221,20 +1034,6 @@ public class UnmodifiableViewDemo {
 
 
 
-```java
-import java.util.ArrayList;
-import java.util.List;
-
-public class CopyOfSnapshotDemo {
-    public static void main(String[] args) {
-        List<String> source = new ArrayList<>();
-        source.add("A");
-        List<String> snapshot = List.copyOf(source);
-        source.add("B");
-        System.out.println(snapshot);
-    }
-}
-```
 
 预期输出：
 
@@ -1246,19 +1045,6 @@ public class CopyOfSnapshotDemo {
 
 
 
-```java
-import java.util.Arrays;
-import java.util.List;
-
-public class ArraysAsListViewDemo {
-    public static void main(String[] args) {
-        String[] array = {"A", "B"};
-        List<String> view = Arrays.asList(array);
-        view.set(0, "X");
-        System.out.println(array[0]);
-    }
-}
-```
 
 预期输出：
 
@@ -1270,19 +1056,6 @@ X
 
 
 
-```java
-import java.util.Arrays;
-import java.util.List;
-
-public class PrimitiveArrayAsListDemo {
-    public static void main(String[] args) {
-        int[] array = {1, 2, 3};
-        List<int[]> values = Arrays.asList(array);
-        System.out.println(values.size());
-        System.out.println(values.get(0).length);
-    }
-}
-```
 
 预期输出：
 
@@ -1295,20 +1068,6 @@ public class PrimitiveArrayAsListDemo {
 
 
 
-```java
-import java.util.ArrayList;
-import java.util.List;
-
-public class SubListViewDemo {
-    public static void main(String[] args) {
-        List<String> source =
-                new ArrayList<>(List.of("A", "B", "C"));
-        List<String> middle = source.subList(1, 3);
-        middle.remove("B");
-        System.out.println(source);
-    }
-}
-```
 
 预期输出：
 
@@ -1320,20 +1079,6 @@ public class SubListViewDemo {
 
 
 
-```java
-import java.util.HashMap;
-import java.util.Map;
-
-public class MapMergeDemo {
-    public static void main(String[] args) {
-        Map<String, Integer> counts = new HashMap<>();
-        for (String value : new String[]{"A", "B", "A"}) {
-            counts.merge(value, 1, Integer::sum);
-        }
-        System.out.println(counts.get("A"));
-    }
-}
-```
 
 预期输出：
 
@@ -1345,21 +1090,6 @@ public class MapMergeDemo {
 
 
 
-```java
-import java.util.ArrayList;
-import java.util.List;
-
-public class SequencedCollectionDemo {
-    public static void main(String[] args) {
-        List<String> values =
-                new ArrayList<>(List.of("A", "B"));
-        values.addFirst("START");
-        values.addLast("END");
-        System.out.println(values.getFirst());
-        System.out.println(values.getLast());
-    }
-}
-```
 
 预期输出：
 
@@ -1372,20 +1102,6 @@ END
 
 
 
-```java
-import java.util.ArrayList;
-import java.util.List;
-
-public class ReversedViewDemo {
-    public static void main(String[] args) {
-        List<String> source =
-                new ArrayList<>(List.of("A", "B", "C"));
-        List<String> reversed = source.reversed();
-        reversed.set(0, "X");
-        System.out.println(source);
-    }
-}
-```
 
 预期输出：
 

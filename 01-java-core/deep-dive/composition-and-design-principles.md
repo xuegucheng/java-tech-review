@@ -2491,7 +2491,10 @@ AllocationApplicationService
 - 失败和可观测性如何处理？
 
 ---
-## 15.52 建议实验
+## 15.52 实验与 examples 边界
+
+本节保留原有实验清单与文字观察，不在正文维护完整 runnable class。需要执行回归时统一以 `examples/` 为唯一代码入口。
+
 
 > 以下实验均为单文件示例，以 Java 21 正式语法为基线。每个实验都可分别保存为与 `public class` 同名的 `.java` 文件，再使用 `javac --release 21` 编译。
 
@@ -2499,42 +2502,8 @@ AllocationApplicationService
 ### 实验1：组合替代工具继承
 
 
-```java
-public class CompositionInsteadOfInheritanceDemo {
+> 完整 runnable class 已移出正文；以下保留验证目标和观察结论。
 
-    interface JsonSerializer {
-        String serialize(String value);
-    }
-
-    static final class SimpleJsonSerializer
-            implements JsonSerializer {
-        @Override
-        public String serialize(String value) {
-            return "\"" + value + "\"";
-        }
-    }
-
-    static final class OrderService {
-        private final JsonSerializer serializer;
-
-        OrderService(JsonSerializer serializer) {
-            this.serializer = serializer;
-        }
-
-        String export(String orderNo) {
-            return serializer.serialize(orderNo);
-        }
-    }
-
-    public static void main(String[] args) {
-        OrderService service =
-                new OrderService(
-                        new SimpleJsonSerializer()
-                );
-        System.out.println(service.export("SO-100"));
-    }
-}
-```
 
 
 **观察重点：** 调用方只看到订单服务自己的能力，序列化实现可以独立替换。
@@ -2543,46 +2512,6 @@ public class CompositionInsteadOfInheritanceDemo {
 ### 实验2：委托与增强
 
 
-```java
-public class DelegationDemo {
-
-    interface MessageSender {
-        void send(String message);
-    }
-
-    static final class ConsoleSender
-            implements MessageSender {
-        @Override
-        public void send(String message) {
-            System.out.println("send: " + message);
-        }
-    }
-
-    static final class AuditingSender
-            implements MessageSender {
-        private final MessageSender delegate;
-
-        AuditingSender(MessageSender delegate) {
-            this.delegate = delegate;
-        }
-
-        @Override
-        public void send(String message) {
-            System.out.println("before");
-            delegate.send(message);
-            System.out.println("after");
-        }
-    }
-
-    public static void main(String[] args) {
-        MessageSender sender =
-                new AuditingSender(
-                        new ConsoleSender()
-                );
-        sender.send("hello");
-    }
-}
-```
 
 
 **观察重点：** 验证当前对象可以在委托前后增加行为，而不继承具体发送器。
@@ -2591,55 +2520,6 @@ public class DelegationDemo {
 ### 实验3：策略运行时替换
 
 
-```java
-public class StrategyRuntimeDemo {
-
-    interface PricingPolicy {
-        int price(int basePrice);
-    }
-
-    static final class NormalPricing
-            implements PricingPolicy {
-        @Override
-        public int price(int basePrice) {
-            return basePrice;
-        }
-    }
-
-    static final class VipPricing
-            implements PricingPolicy {
-        @Override
-        public int price(int basePrice) {
-            return basePrice * 80 / 100;
-        }
-    }
-
-    static final class Calculator {
-        private final PricingPolicy policy;
-
-        Calculator(PricingPolicy policy) {
-            this.policy = policy;
-        }
-
-        int calculate(int basePrice) {
-            return policy.price(basePrice);
-        }
-    }
-
-    public static void main(String[] args) {
-        System.out.println(
-                new Calculator(
-                        new NormalPricing()
-                ).calculate(100)
-        );
-        System.out.println(
-                new Calculator(
-                        new VipPricing()
-                ).calculate(100)
-        );
-    }
-}
-```
 
 
 **观察重点：** 同一上下文通过组合不同策略得到不同行为，不需要建立多个计算器子类。
@@ -2648,60 +2528,6 @@ public class StrategyRuntimeDemo {
 ### 实验4：装饰器叠加能力
 
 
-```java
-public class DecoratorDemo {
-
-    interface Operation {
-        String execute();
-    }
-
-    static final class CoreOperation
-            implements Operation {
-        @Override
-        public String execute() {
-            return "core";
-        }
-    }
-
-    static final class RetryDecorator
-            implements Operation {
-        private final Operation delegate;
-
-        RetryDecorator(Operation delegate) {
-            this.delegate = delegate;
-        }
-
-        @Override
-        public String execute() {
-            return "retry(" + delegate.execute() + ")";
-        }
-    }
-
-    static final class MetricsDecorator
-            implements Operation {
-        private final Operation delegate;
-
-        MetricsDecorator(Operation delegate) {
-            this.delegate = delegate;
-        }
-
-        @Override
-        public String execute() {
-            return "metrics(" + delegate.execute() + ")";
-        }
-    }
-
-    public static void main(String[] args) {
-        Operation operation =
-                new MetricsDecorator(
-                        new RetryDecorator(
-                                new CoreOperation()
-                        )
-                );
-        System.out.println(operation.execute());
-    }
-}
-```
 
 
 **观察重点：** 修改装饰器顺序，观察输出变化，理解装饰顺序也是契约的一部分。
@@ -2710,50 +2536,6 @@ public class DecoratorDemo {
 ### 实验5：适配器隔离供应商 SDK
 
 
-```java
-public class AdapterDemo {
-
-    interface SmsSender {
-        void send(String mobile, String text);
-    }
-
-    static final class VendorClient {
-        void push(String phone, String payload) {
-            System.out.println(
-                    phone + ":" + payload
-            );
-        }
-    }
-
-    static final class VendorSmsAdapter
-            implements SmsSender {
-        private final VendorClient client;
-
-        VendorSmsAdapter(VendorClient client) {
-            this.client = client;
-        }
-
-        @Override
-        public void send(
-                String mobile,
-                String text
-        ) {
-            client.push(
-                    mobile,
-                    "{\"text\":\"" + text + "\"}"
-            );
-        }
-    }
-
-    public static void main(String[] args) {
-        SmsSender sender =
-                new VendorSmsAdapter(
-                        new VendorClient()
-                );
-        sender.send("13800000000", "done");
-    }
-}
-```
 
 
 **观察重点：** 核心代码只依赖 `SmsSender`，供应商方法名和载荷格式被限制在适配器内部。
@@ -2762,49 +2544,6 @@ public class AdapterDemo {
 ### 实验6：模板方法固定流程
 
 
-```java
-public class TemplateMethodDemo {
-
-    static abstract class ImportTask {
-
-        public final void execute() {
-            validate();
-            read();
-            process();
-            finish();
-        }
-
-        private void validate() {
-            System.out.println("validate");
-        }
-
-        protected abstract void read();
-
-        protected abstract void process();
-
-        protected void finish() {
-            System.out.println("finish");
-        }
-    }
-
-    static final class CsvImportTask
-            extends ImportTask {
-        @Override
-        protected void read() {
-            System.out.println("read csv");
-        }
-
-        @Override
-        protected void process() {
-            System.out.println("process csv");
-        }
-    }
-
-    public static void main(String[] args) {
-        new CsvImportTask().execute();
-    }
-}
-```
 
 
 **观察重点：** 流程顺序由父类控制，子类只能实现指定步骤。
@@ -2813,46 +2552,6 @@ public class TemplateMethodDemo {
 ### 实验7：LSP 违反：不支持父类型操作
 
 
-```java
-public class LspViolationDemo {
-
-    static class Account {
-        void withdraw(int amount) {
-            System.out.println(
-                    "withdraw " + amount
-            );
-        }
-    }
-
-    static final class FixedDepositAccount
-            extends Account {
-        @Override
-        void withdraw(int amount) {
-            throw new UnsupportedOperationException(
-                    "not mature"
-            );
-        }
-    }
-
-    static void pay(Account account) {
-        account.withdraw(100);
-    }
-
-    public static void main(String[] args) {
-        pay(new Account());
-
-        try {
-            pay(new FixedDepositAccount());
-        } catch (
-                UnsupportedOperationException exception
-        ) {
-            System.out.println(
-                    "subtype cannot replace parent"
-            );
-        }
-    }
-}
-```
 
 
 **观察重点：** 语法上的子类无法保持父类型的提现契约，说明继承关系不满足 LSP。
@@ -2861,49 +2560,6 @@ public class LspViolationDemo {
 ### 实验8：ISP：按调用方拆分能力
 
 
-```java
-public class InterfaceSegregationDemo {
-
-    interface Printable {
-        void print();
-    }
-
-    interface Scannable {
-        void scan();
-    }
-
-    static final class SimplePrinter
-            implements Printable {
-        @Override
-        public void print() {
-            System.out.println("print");
-        }
-    }
-
-    static final class MultiFunctionDevice
-            implements Printable, Scannable {
-        @Override
-        public void print() {
-            System.out.println("print");
-        }
-
-        @Override
-        public void scan() {
-            System.out.println("scan");
-        }
-    }
-
-    public static void main(String[] args) {
-        Printable printer =
-                new SimplePrinter();
-        printer.print();
-
-        Scannable scanner =
-                new MultiFunctionDevice();
-        scanner.scan();
-    }
-}
-```
 
 
 **观察重点：** 简单打印机不需要提供空实现或抛出不支持异常。
@@ -2912,61 +2568,6 @@ public class InterfaceSegregationDemo {
 ### 实验9：DIP 与 Fake 仓储
 
 
-```java
-import java.util.HashMap;
-import java.util.Map;
-
-public class DependencyInversionDemo {
-
-    record Order(String id) {
-    }
-
-    interface OrderRepository {
-        void save(Order order);
-        Order find(String id);
-    }
-
-    static final class InMemoryOrderRepository
-            implements OrderRepository {
-        private final Map<String, Order> data =
-                new HashMap<>();
-
-        @Override
-        public void save(Order order) {
-            data.put(order.id(), order);
-        }
-
-        @Override
-        public Order find(String id) {
-            return data.get(id);
-        }
-    }
-
-    static final class OrderService {
-        private final OrderRepository repository;
-
-        OrderService(OrderRepository repository) {
-            this.repository = repository;
-        }
-
-        void create(String id) {
-            repository.save(new Order(id));
-        }
-    }
-
-    public static void main(String[] args) {
-        OrderRepository repository =
-                new InMemoryOrderRepository();
-        OrderService service =
-                new OrderService(repository);
-
-        service.create("SO-1");
-        System.out.println(
-                repository.find("SO-1")
-        );
-    }
-}
-```
 
 
 **观察重点：** 高层服务只依赖业务仓储契约，测试无需数据库。
@@ -2975,47 +2576,6 @@ public class DependencyInversionDemo {
 ### 实验10：构造器注入保证完整对象
 
 
-```java
-import java.util.Objects;
-
-public class ConstructorInjectionDemo {
-
-    interface Clock {
-        long now();
-    }
-
-    static final class Service {
-        private final Clock clock;
-
-        Service(Clock clock) {
-            this.clock =
-                    Objects.requireNonNull(clock);
-        }
-
-        long execute() {
-            return clock.now();
-        }
-    }
-
-    public static void main(String[] args) {
-        Clock fixedClock = () -> 100L;
-        Service service =
-                new Service(fixedClock);
-
-        System.out.println(service.execute());
-
-        try {
-            new Service(null);
-        } catch (
-                NullPointerException exception
-        ) {
-            System.out.println(
-                    "invalid dependency rejected"
-            );
-        }
-    }
-}
-```
 
 
 **观察重点：** 构造完成后的对象一定具有所需依赖，字段可声明为 `final`。
@@ -3024,39 +2584,6 @@ public class ConstructorInjectionDemo {
 ### 实验11：Tell, Don’t Ask
 
 
-```java
-public class TellDontAskDemo {
-
-    enum Status {
-        CREATED,
-        CANCELLED
-    }
-
-    static final class Order {
-        private Status status =
-                Status.CREATED;
-
-        void cancel() {
-            if (status != Status.CREATED) {
-                throw new IllegalStateException(
-                        "cannot cancel"
-                );
-            }
-            status = Status.CANCELLED;
-        }
-
-        Status status() {
-            return status;
-        }
-    }
-
-    public static void main(String[] args) {
-        Order order = new Order();
-        order.cancel();
-        System.out.println(order.status());
-    }
-}
-```
 
 
 **观察重点：** 取消规则由订单维护，外部不直接读取状态再调用 setter。
@@ -3065,49 +2592,6 @@ public class TellDontAskDemo {
 ### 实验12：迪米特法则：隐藏导航路径
 
 
-```java
-public class LawOfDemeterDemo {
-
-    record Province(String code) {
-    }
-
-    record Address(Province province) {
-    }
-
-    record Customer(Address address) {
-    }
-
-    static final class Order {
-        private final Customer customer;
-
-        Order(Customer customer) {
-            this.customer = customer;
-        }
-
-        String deliveryProvinceCode() {
-            return customer
-                    .address()
-                    .province()
-                    .code();
-        }
-    }
-
-    public static void main(String[] args) {
-        Order order =
-                new Order(
-                        new Customer(
-                                new Address(
-                                        new Province("GD")
-                                )
-                        )
-                );
-
-        System.out.println(
-                order.deliveryProvinceCode()
-        );
-    }
-}
-```
 
 
 **观察重点：** 调用方依赖语义方法，不知道客户、地址和省份对象的完整导航结构。
@@ -3116,44 +2600,6 @@ public class LawOfDemeterDemo {
 ### 实验13：充血模型保护不变量
 
 
-```java
-public class RichDomainModelDemo {
-
-    static final class Inventory {
-        private int available;
-
-        Inventory(int available) {
-            if (available < 0) {
-                throw new IllegalArgumentException();
-            }
-            this.available = available;
-        }
-
-        void reserve(int quantity) {
-            if (quantity <= 0
-                    || quantity > available) {
-                throw new IllegalArgumentException(
-                        "invalid quantity"
-                );
-            }
-            available -= quantity;
-        }
-
-        int available() {
-            return available;
-        }
-    }
-
-    public static void main(String[] args) {
-        Inventory inventory =
-                new Inventory(10);
-        inventory.reserve(3);
-        System.out.println(
-                inventory.available()
-        );
-    }
-}
-```
 
 
 **观察重点：** 对象不暴露任意库存 setter，所有状态变化经过业务方法。
@@ -3162,76 +2608,6 @@ public class RichDomainModelDemo {
 ### 实验14：状态模式封装转移
 
 
-```java
-public class StatePatternDemo {
-
-    interface State {
-        State pay();
-        State cancel();
-        String name();
-    }
-
-    static final class Created
-            implements State {
-        @Override
-        public State pay() {
-            return new Paid();
-        }
-
-        @Override
-        public State cancel() {
-            return new Cancelled();
-        }
-
-        @Override
-        public String name() {
-            return "CREATED";
-        }
-    }
-
-    static final class Paid
-            implements State {
-        @Override
-        public State pay() {
-            throw new IllegalStateException();
-        }
-
-        @Override
-        public State cancel() {
-            throw new IllegalStateException();
-        }
-
-        @Override
-        public String name() {
-            return "PAID";
-        }
-    }
-
-    static final class Cancelled
-            implements State {
-        @Override
-        public State pay() {
-            throw new IllegalStateException();
-        }
-
-        @Override
-        public State cancel() {
-            throw new IllegalStateException();
-        }
-
-        @Override
-        public String name() {
-            return "CANCELLED";
-        }
-    }
-
-    public static void main(String[] args) {
-        State state = new Created();
-        state = state.pay();
-        System.out.println(state.name());
-    }
-}
-```
 
 
 **观察重点：** 每个状态明确自己允许的操作和下一状态。
@@ -3240,37 +2616,6 @@ public class StatePatternDemo {
 ### 实验15：sealed 类型与穷尽 switch
 
 
-```java
-public class SealedSwitchDemo {
-
-    sealed interface Result
-            permits Success, Failure {
-    }
-
-    record Success(String value)
-            implements Result {
-    }
-
-    record Failure(String reason)
-            implements Result {
-    }
-
-    static String describe(Result result) {
-        return switch (result) {
-            case Success success ->
-                    "ok:" + success.value();
-            case Failure failure ->
-                    "fail:" + failure.reason();
-        };
-    }
-
-    public static void main(String[] args) {
-        System.out.println(
-                describe(new Success("data"))
-        );
-    }
-}
-```
 
 
 **观察重点：** 删除一个 `case` 后编译，观察穷尽性检查。该实验需要 Java 21 或更高版本。
@@ -3279,51 +2624,6 @@ public class SealedSwitchDemo {
 ### 实验16：规则管道与短路
 
 
-```java
-import java.util.List;
-
-public class RulePipelineDemo {
-
-    interface Rule {
-        boolean test(int value);
-    }
-
-    static final class Pipeline {
-        private final List<Rule> rules;
-
-        Pipeline(List<Rule> rules) {
-            this.rules = List.copyOf(rules);
-        }
-
-        boolean test(int value) {
-            for (Rule rule : rules) {
-                if (!rule.test(value)) {
-                    return false;
-                }
-            }
-            return true;
-        }
-    }
-
-    public static void main(String[] args) {
-        Pipeline pipeline =
-                new Pipeline(
-                        List.of(
-                                value -> value > 0,
-                                value -> value < 100,
-                                value -> value % 2 == 0
-                        )
-                );
-
-        System.out.println(
-                pipeline.test(20)
-        );
-        System.out.println(
-                pipeline.test(101)
-        );
-    }
-}
-```
 
 
 **观察重点：** 规则可独立组合，管道明确采用失败即短路语义。
@@ -3332,55 +2632,6 @@ public class RulePipelineDemo {
 ### 实验17：策略注册表替代 switch
 
 
-```java
-import java.util.Map;
-
-public class StrategyRegistryDemo {
-
-    enum Type {
-        NORMAL,
-        VIP
-    }
-
-    interface Policy {
-        int apply(int value);
-    }
-
-    static final class Registry {
-        private final Map<Type, Policy> policies;
-
-        Registry(Map<Type, Policy> policies) {
-            this.policies = Map.copyOf(policies);
-        }
-
-        int apply(Type type, int value) {
-            Policy policy = policies.get(type);
-            if (policy == null) {
-                throw new IllegalArgumentException(
-                        "unknown type: " + type
-                );
-            }
-            return policy.apply(value);
-        }
-    }
-
-    public static void main(String[] args) {
-        Registry registry =
-                new Registry(
-                        Map.of(
-                                Type.NORMAL,
-                                value -> value,
-                                Type.VIP,
-                                value -> value * 80 / 100
-                        )
-                );
-
-        System.out.println(
-                registry.apply(Type.VIP, 100)
-        );
-    }
-}
-```
 
 
 **观察重点：** 策略选择关系集中在组装数据中，不散落在业务方法。
@@ -3389,54 +2640,6 @@ public class StrategyRegistryDemo {
 ### 实验18：契约测试思想
 
 
-```java
-import java.util.HashMap;
-import java.util.Map;
-
-public class ContractTestDemo {
-
-    interface KeyValueStore {
-        void put(String key, String value);
-        String get(String key);
-    }
-
-    static final class MemoryStore
-            implements KeyValueStore {
-        private final Map<String, String> data =
-                new HashMap<>();
-
-        @Override
-        public void put(
-                String key,
-                String value
-        ) {
-            data.put(key, value);
-        }
-
-        @Override
-        public String get(String key) {
-            return data.get(key);
-        }
-    }
-
-    static void verifyContract(
-            KeyValueStore store
-    ) {
-        store.put("k", "v");
-
-        if (!"v".equals(store.get("k"))) {
-            throw new AssertionError(
-                    "contract broken"
-            );
-        }
-    }
-
-    public static void main(String[] args) {
-        verifyContract(new MemoryStore());
-        System.out.println("contract passed");
-    }
-}
-```
 
 
 **观察重点：** 真实数据库、Redis 或文件实现都可以复用同一套契约测试。
@@ -3445,54 +2648,6 @@ public class ContractTestDemo {
 ### 实验19：从继承迁移到装饰组合
 
 
-```java
-public class InheritanceToCompositionDemo {
-
-    interface UserService {
-        String find(String id);
-    }
-
-    static final class DefaultUserService
-            implements UserService {
-        @Override
-        public String find(String id) {
-            return "user:" + id;
-        }
-    }
-
-    static final class CachedUserService
-            implements UserService {
-        private final UserService delegate;
-        private String cachedId;
-        private String cachedValue;
-
-        CachedUserService(UserService delegate) {
-            this.delegate = delegate;
-        }
-
-        @Override
-        public String find(String id) {
-            if (id.equals(cachedId)) {
-                return cachedValue;
-            }
-
-            cachedId = id;
-            cachedValue = delegate.find(id);
-            return cachedValue;
-        }
-    }
-
-    public static void main(String[] args) {
-        UserService service =
-                new CachedUserService(
-                        new DefaultUserService()
-                );
-
-        System.out.println(service.find("1"));
-        System.out.println(service.find("1"));
-    }
-}
-```
 
 
 **观察重点：** 缓存增强不需要成为业务服务的子类，可包装任何 `UserService` 实现。
@@ -3501,88 +2656,6 @@ public class InheritanceToCompositionDemo {
 ### 实验20：WMS 分配策略组合
 
 
-```java
-import java.util.Comparator;
-import java.util.List;
-
-public class WmsAllocationCompositionDemo {
-
-    record Stock(
-            String location,
-            int quantity,
-            int distance
-    ) {
-    }
-
-    interface AllocationRule {
-        boolean allowed(Stock stock);
-    }
-
-    interface AllocationStrategy {
-        Stock choose(List<Stock> stocks);
-    }
-
-    static final class AllocationService {
-        private final List<AllocationRule> rules;
-        private final AllocationStrategy strategy;
-
-        AllocationService(
-                List<AllocationRule> rules,
-                AllocationStrategy strategy
-        ) {
-            this.rules = List.copyOf(rules);
-            this.strategy = strategy;
-        }
-
-        Stock allocate(List<Stock> stocks) {
-            List<Stock> candidates =
-                    stocks.stream()
-                            .filter(stock ->
-                                    rules.stream()
-                                            .allMatch(rule ->
-                                                    rule.allowed(stock)
-                                            )
-                            )
-                            .toList();
-
-            return strategy.choose(candidates);
-        }
-    }
-
-    public static void main(String[] args) {
-        AllocationRule enough =
-                stock -> stock.quantity() >= 5;
-
-        AllocationStrategy nearest =
-                stocks -> stocks.stream()
-                        .min(
-                                Comparator.comparingInt(
-                                        Stock::distance
-                                )
-                        )
-                        .orElseThrow();
-
-        AllocationService service =
-                new AllocationService(
-                        List.of(enough),
-                        nearest
-                );
-
-        Stock selected =
-                service.allocate(
-                        List.of(
-                                new Stock("A", 3, 1),
-                                new Stock("B", 8, 5),
-                                new Stock("C", 9, 2)
-                        )
-                );
-
-        System.out.println(
-                selected.location()
-        );
-    }
-}
-```
 
 
 **观察重点：** 候选过滤和排序选择是两个独立变化轴，可以分别测试和替换。

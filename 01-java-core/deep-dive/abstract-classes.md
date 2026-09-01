@@ -3073,33 +3073,17 @@ if (this instanceof CsvTask) {
 
 ---
 
-## 13.49 建议实验
+## 13.49 实验与 examples 边界
+
+本节保留原有实验清单与文字观察，不在正文维护完整 runnable class。需要执行回归时统一以 `examples/` 为唯一代码入口。
+
 
 > 以下实验默认使用现代 JDK。故意展示编译错误的语句均已注释，取消注释后可观察编译器诊断。
 
 ### 实验一：抽象类不能直接实例化
 
-```java
-public class AbstractInstantiationDemo {
+> 完整 runnable class 已移出正文；以下保留验证目标和观察结论。
 
-    abstract static class Animal {
-        abstract void speak();
-    }
-
-    static final class Dog extends Animal {
-        @Override
-        void speak() {
-            System.out.println("Dog");
-        }
-    }
-
-    public static void main(String[] args) {
-        // Animal animal = new Animal();
-        Animal animal = new Dog();
-        animal.speak();
-    }
-}
-```
 
 验证：
 
@@ -3109,138 +3093,21 @@ public class AbstractInstantiationDemo {
 
 ### 实验二：没有抽象方法的抽象类
 
-```java
-public class AbstractWithoutMethodDemo {
-
-    abstract static class BaseEntity {
-        private final long id;
-
-        BaseEntity(long id) {
-            this.id = id;
-        }
-
-        final long id() {
-            return id;
-        }
-    }
-
-    static final class Order extends BaseEntity {
-        Order(long id) {
-            super(id);
-        }
-    }
-
-    public static void main(String[] args) {
-        Order order = new Order(100L);
-        System.out.println(order.id());
-    }
-}
-```
 
 验证抽象类可以不声明任何抽象方法。
 
 ### 实验三：具体子类必须实现全部抽象方法
 
-```java
-public class CompleteContractDemo {
-
-    abstract static class Task {
-        abstract void validate();
-        abstract void execute();
-    }
-
-    static final class ExportTask extends Task {
-        @Override
-        void validate() {
-            System.out.println("validate");
-        }
-
-        @Override
-        void execute() {
-            System.out.println("execute");
-        }
-    }
-
-    public static void main(String[] args) {
-        Task task = new ExportTask();
-        task.validate();
-        task.execute();
-    }
-}
-```
 
 尝试注释掉任意一个实现，观察具体子类编译失败。
 
 ### 实验四：中间抽象类部分实现
 
-```java
-public class PartialImplementationDemo {
-
-    abstract static class Task {
-        abstract void validate();
-        abstract void execute();
-    }
-
-    abstract static class ValidatedTask extends Task {
-        @Override
-        final void validate() {
-            System.out.println("common validation");
-        }
-    }
-
-    static final class ImportTask extends ValidatedTask {
-        @Override
-        void execute() {
-            System.out.println("import");
-        }
-    }
-
-    public static void main(String[] args) {
-        Task task = new ImportTask();
-        task.validate();
-        task.execute();
-    }
-}
-```
 
 观察中间抽象类只完成部分契约，具体子类完成剩余部分。
 
 ### 实验五：抽象类构造器与初始化顺序
 
-```java
-public class AbstractConstructorOrderDemo {
-
-    abstract static class Parent {
-        private final String value = initParent();
-
-        Parent() {
-            System.out.println("parent constructor");
-        }
-
-        private String initParent() {
-            System.out.println("parent field");
-            return "P";
-        }
-    }
-
-    static final class Child extends Parent {
-        private final String value = initChild();
-
-        Child() {
-            System.out.println("child constructor");
-        }
-
-        private String initChild() {
-            System.out.println("child field");
-            return "C";
-        }
-    }
-
-    public static void main(String[] args) {
-        new Child();
-    }
-}
-```
 
 预期顺序：
 
@@ -3253,316 +3120,51 @@ child constructor
 
 ### 实验六：构造器动态绑定风险
 
-```java
-public class ConstructorDispatchRiskDemo {
-
-    abstract static class Parent {
-        Parent() {
-            printLength();
-        }
-
-        abstract void printLength();
-    }
-
-    static final class Child extends Parent {
-        private String text = "Java";
-
-        @Override
-        void printLength() {
-            System.out.println(
-                    text == null
-                    ? "text is not initialized"
-                    : text.length()
-            );
-        }
-    }
-
-    public static void main(String[] args) {
-        new Child();
-    }
-}
-```
 
 观察父类构造期间进入子类实现时，子类字段仍是默认值。
 
 ### 实验七：抽象方法非法修饰符
 
-```java
-public class AbstractModifierDemo {
-
-    abstract static class ValidType {
-        public abstract void publicMethod();
-        protected abstract void protectedMethod();
-        abstract void packageMethod();
-
-        // private abstract void invalidPrivate();
-        // static abstract void invalidStatic();
-        // final abstract void invalidFinal();
-        // native abstract void invalidNative();
-        // synchronized abstract void invalidSynchronized();
-        // strictfp abstract void invalidStrictfp();
-    }
-
-    public static void main(String[] args) {
-        System.out.println("Uncomment invalid declarations");
-    }
-}
-```
 
 逐行取消注释，观察编译器拒绝互相冲突的修饰符。
 
 ### 实验八：匿名子类
 
-```java
-public class AnonymousAbstractClassDemo {
-
-    abstract static class Formatter {
-        abstract String format(String value);
-    }
-
-    public static void main(String[] args) {
-        Formatter formatter = new Formatter() {
-            @Override
-            String format(String value) {
-                return value.toUpperCase();
-            }
-        };
-
-        System.out.println(formatter.format("java"));
-        System.out.println(formatter.getClass().getName());
-    }
-}
-```
 
 验证创建的是匿名具体子类，而不是抽象类本身。
 
 ### 实验九：协变返回类型
 
-```java
-public class CovariantReturnDemo {
-
-    static class Document {
-    }
-
-    static final class PdfDocument extends Document {
-        void printPdf() {
-            System.out.println("pdf");
-        }
-    }
-
-    abstract static class Factory {
-        abstract Document create();
-    }
-
-    static final class PdfFactory extends Factory {
-        @Override
-        PdfDocument create() {
-            return new PdfDocument();
-        }
-    }
-
-    public static void main(String[] args) {
-        PdfFactory factory = new PdfFactory();
-        PdfDocument document = factory.create();
-        document.printPdf();
-    }
-}
-```
 
 验证子类覆盖方法可以返回父返回类型的子类型。
 
 ### 实验十：缩小受检异常
 
-```java
-import java.io.FileNotFoundException;
-import java.io.IOException;
-
-public class NarrowThrowsDemo {
-
-    abstract static class Reader {
-        abstract String read() throws IOException;
-    }
-
-    static final class FileReader extends Reader {
-        @Override
-        String read() throws FileNotFoundException {
-            return "data";
-        }
-    }
-
-    public static void main(String[] args)
-            throws IOException {
-        Reader reader = new FileReader();
-        System.out.println(reader.read());
-    }
-}
-```
 
 验证子类可以缩小受检异常范围，不能扩大为 `Exception`。
 
 ### 实验十一：重新抽象具体方法
 
-```java
-public class ReabstractMethodDemo {
-
-    static class BaseFormatter {
-        String format(Object value) {
-            return String.valueOf(value);
-        }
-    }
-
-    abstract static class StrictFormatter
-            extends BaseFormatter {
-        @Override
-        abstract String format(Object value);
-    }
-
-    static final class JsonFormatter
-            extends StrictFormatter {
-        @Override
-        String format(Object value) {
-            return "{\"value\":\"" + value + "\"}";
-        }
-    }
-
-    public static void main(String[] args) {
-        StrictFormatter formatter = new JsonFormatter();
-        System.out.println(formatter.format("Java"));
-    }
-}
-```
 
 验证抽象子类可以要求更具体子类重新提供实现。
 
 ### 实验十二：抽象类部分实现接口
 
-```java
-public class PartialInterfaceDemo {
-
-    interface Processor {
-        void validate();
-        void process();
-    }
-
-    abstract static class BaseProcessor
-            implements Processor {
-        @Override
-        public final void validate() {
-            System.out.println("common validation");
-        }
-    }
-
-    static final class OrderProcessor
-            extends BaseProcessor {
-        @Override
-        public void process() {
-            System.out.println("process order");
-        }
-    }
-
-    public static void main(String[] args) {
-        Processor processor = new OrderProcessor();
-        processor.validate();
-        processor.process();
-    }
-}
-```
 
 验证抽象类不必完成接口的全部抽象方法。
 
 ### 实验十三：抽象父类压制接口默认方法
 
-```java
-public class AbstractWinsDefaultDemo {
-
-    interface Named {
-        default String name() {
-            return "default";
-        }
-    }
-
-    abstract static class Base implements Named {
-        @Override
-        public abstract String name();
-    }
-
-    static final class Child extends Base {
-        @Override
-        public String name() {
-            return "child";
-        }
-    }
-
-    public static void main(String[] args) {
-        Named named = new Child();
-        System.out.println(named.name());
-    }
-}
-```
 
 验证类层次的抽象声明可以要求具体子类覆盖接口默认实现。
 
 ### 实验十四：泛型抽象类
 
-```java
-public class GenericAbstractClassDemo {
-
-    abstract static class Converter<S, T> {
-        abstract T convert(S source);
-    }
-
-    static final class StringToInteger
-            extends Converter<String, Integer> {
-        @Override
-        Integer convert(String source) {
-            return Integer.valueOf(source);
-        }
-    }
-
-    public static void main(String[] args) {
-        Converter<String, Integer> converter =
-                new StringToInteger();
-        System.out.println(converter.convert("42") + 1);
-    }
-}
-```
 
 验证泛型参数在父类和具体子类之间的类型约束。
 
 ### 实验十五：模板方法执行顺序
 
-```java
-import java.util.ArrayList;
-import java.util.List;
-
-public class TemplateOrderDemo {
-
-    abstract static class Task {
-        final List<String> events = new ArrayList<>();
-
-        final void execute() {
-            events.add("validate");
-            process();
-            events.add("finish");
-        }
-
-        abstract void process();
-    }
-
-    static final class ExportTask extends Task {
-        @Override
-        void process() {
-            events.add("process");
-        }
-    }
-
-    public static void main(String[] args) {
-        ExportTask task = new ExportTask();
-        task.execute();
-        System.out.println(task.events);
-    }
-}
-```
 
 预期：
 
@@ -3572,200 +3174,26 @@ public class TemplateOrderDemo {
 
 ### 实验十六：异常时仍执行清理
 
-```java
-import java.util.ArrayList;
-import java.util.List;
-
-public class TemplateFinallyDemo {
-
-    abstract static class Task {
-        final List<String> events = new ArrayList<>();
-
-        final void execute() {
-            events.add("start");
-            try {
-                process();
-                events.add("success");
-            } finally {
-                events.add("cleanup");
-            }
-        }
-
-        abstract void process();
-    }
-
-    static final class FailedTask extends Task {
-        @Override
-        void process() {
-            events.add("process");
-            throw new IllegalStateException("failed");
-        }
-    }
-
-    public static void main(String[] args) {
-        FailedTask task = new FailedTask();
-        try {
-            task.execute();
-        } catch (IllegalStateException exception) {
-            System.out.println(exception.getMessage());
-        }
-        System.out.println(task.events);
-    }
-}
-```
 
 验证失败路径仍然进入 `finally`。
 
 ### 实验十七：sealed 抽象类
 
-```java
-public class SealedAbstractClassDemo {
-
-    abstract sealed static class Result
-            permits Success, Failure {
-        abstract String message();
-    }
-
-    static final class Success extends Result {
-        @Override
-        String message() {
-            return "success";
-        }
-    }
-
-    static final class Failure extends Result {
-        @Override
-        String message() {
-            return "failure";
-        }
-    }
-
-    static String describe(Result result) {
-        return switch (result) {
-            case Success success -> success.message();
-            case Failure failure -> failure.message();
-        };
-    }
-
-    public static void main(String[] args) {
-        System.out.println(describe(new Success()));
-    }
-}
-```
 
 验证 sealed 抽象类与穷尽模式匹配。需要支持相应模式 `switch` 的现代 JDK。
 
 ### 实验十八：枚举中的抽象方法
 
-```java
-public class EnumAbstractMethodDemo {
-
-    enum Operation {
-        ADD {
-            @Override
-            int apply(int left, int right) {
-                return left + right;
-            }
-        },
-        MULTIPLY {
-            @Override
-            int apply(int left, int right) {
-                return left * right;
-            }
-        };
-
-        abstract int apply(int left, int right);
-    }
-
-    public static void main(String[] args) {
-        System.out.println(Operation.ADD.apply(2, 3));
-        System.out.println(Operation.MULTIPLY.apply(2, 3));
-    }
-}
-```
 
 验证每个枚举常量可以通过常量特定类体实现抽象方法。
 
 ### 实验十九：继承 AbstractList 实现骨架列表
 
-```java
-import java.util.AbstractList;
-import java.util.List;
-
-public class SkeletalListDemo {
-
-    static final class FixedList<E>
-            extends AbstractList<E> {
-        private final List<E> values;
-
-        FixedList(List<E> values) {
-            this.values = List.copyOf(values);
-        }
-
-        @Override
-        public E get(int index) {
-            return values.get(index);
-        }
-
-        @Override
-        public int size() {
-            return values.size();
-        }
-    }
-
-    public static void main(String[] args) {
-        List<String> values =
-                new FixedList<>(List.of("A", "B", "C"));
-        System.out.println(values.indexOf("B"));
-        System.out.println(values.contains("C"));
-    }
-}
-```
 
 只实现 `get()` 和 `size()`，观察 `AbstractList` 提供的复合行为。
 
 ### 实验二十：抽象契约测试思想
 
-```java
-public class ContractTestDemo {
-
-    abstract static class Counter {
-        abstract void increment();
-        abstract int value();
-    }
-
-    static final class SimpleCounter extends Counter {
-        private int value;
-
-        @Override
-        void increment() {
-            value++;
-        }
-
-        @Override
-        int value() {
-            return value;
-        }
-    }
-
-    static void verifyCounterContract(Counter counter) {
-        int before = counter.value();
-        counter.increment();
-        int after = counter.value();
-
-        if (after != before + 1) {
-            throw new AssertionError(
-                    "counter contract violated"
-            );
-        }
-    }
-
-    public static void main(String[] args) {
-        verifyCounterContract(new SimpleCounter());
-        System.out.println("contract passed");
-    }
-}
-```
 
 把 `verifyCounterContract` 应用于所有具体实现，验证统一父类型契约。
 

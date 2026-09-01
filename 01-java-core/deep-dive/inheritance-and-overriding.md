@@ -2047,504 +2047,71 @@ final class PropertiesConfig {
 
 ---
 
-## 11.42 建议实验
+## 11.42 实验与 examples 边界
+
+本节保留原有实验清单与文字观察，不在正文维护完整 runnable class。需要执行回归时统一以 `examples/` 为唯一代码入口。
+
 
 ### 实验一：基本重写
 
-```java
-public class OverrideDemo {
+> 完整 runnable class 已移出正文；以下保留验证目标和观察结论。
 
-    static class Animal {
-
-        void speak() {
-            System.out.println("Animal");
-        }
-    }
-
-    static class Dog extends Animal {
-
-        @Override
-        void speak() {
-            System.out.println("Dog");
-        }
-    }
-
-    public static void main(String[] args) {
-        Animal value = new Dog();
-
-        value.speak();
-    }
-}
-```
 
 ### 实验二：重载不是重写
 
-```java
-public class OverloadNotOverrideDemo {
-
-    static class Parent {
-
-        void print(Number value) {
-            System.out.println("Number");
-        }
-    }
-
-    static class Child extends Parent {
-
-        void print(Integer value) {
-            System.out.println("Integer");
-        }
-    }
-
-    public static void main(String[] args) {
-        Parent value = new Child();
-
-        value.print(1);
-    }
-}
-```
 
 观察编译期选择的签名。
 
 ### 实验三：访问权限扩大
 
-```java
-public class AccessOverrideDemo {
-
-    static class Parent {
-
-        protected void execute() {
-        }
-    }
-
-    static class Child extends Parent {
-
-        @Override
-        public void execute() {
-        }
-    }
-}
-```
 
 尝试把子类方法改为 `private`，观察编译错误。
 
 ### 实验四：协变返回
 
-```java
-public class CovariantReturnDemo {
-
-    static class Parent {
-
-        Number value() {
-            return 1;
-        }
-    }
-
-    static class Child extends Parent {
-
-        @Override
-        Integer value() {
-            return 2;
-        }
-    }
-
-    public static void main(String[] args) {
-        Child child = new Child();
-
-        Integer value = child.value();
-
-        System.out.println(value);
-    }
-}
-```
 
 ### 实验五：受检异常缩小
 
-```java
-import java.io.FileNotFoundException;
-import java.io.IOException;
-
-public class ExceptionOverrideDemo {
-
-    static class Parent {
-
-        void load() throws IOException {
-        }
-    }
-
-    static class Child extends Parent {
-
-        @Override
-        void load()
-                throws FileNotFoundException {
-        }
-    }
-}
-```
 
 尝试改为 `throws Exception`。
 
 ### 实验六：private 方法不是重写
 
-```java
-public class PrivateMethodDemo {
-
-    static class Parent {
-
-        void run() {
-            execute();
-        }
-
-        private void execute() {
-            System.out.println("Parent");
-        }
-    }
-
-    static class Child extends Parent {
-
-        void execute() {
-            System.out.println("Child");
-        }
-    }
-
-    public static void main(String[] args) {
-        Child child = new Child();
-
-        child.run();
-        child.execute();
-    }
-}
-```
 
 ### 实验七：静态方法隐藏
 
-```java
-public class StaticHidingDemo {
-
-    static class Parent {
-
-        static void print() {
-            System.out.println("Parent");
-        }
-    }
-
-    static class Child extends Parent {
-
-        static void print() {
-            System.out.println("Child");
-        }
-    }
-
-    public static void main(String[] args) {
-        Parent value = new Child();
-
-        value.print();
-        Child.print();
-    }
-}
-```
 
 ### 实验八：字段隐藏
 
-```java
-public class FieldHidingDemo {
-
-    static class Parent {
-
-        String name = "Parent";
-
-        String name() {
-            return "Parent";
-        }
-    }
-
-    static class Child extends Parent {
-
-        String name = "Child";
-
-        @Override
-        String name() {
-            return "Child";
-        }
-    }
-
-    public static void main(String[] args) {
-        Parent value = new Child();
-
-        System.out.println(value.name);
-        System.out.println(value.name());
-    }
-}
-```
 
 ### 实验九：super 调用
 
-```java
-public class SuperMethodDemo {
-
-    static class Parent {
-
-        void execute() {
-            System.out.println("Parent");
-        }
-    }
-
-    static class Child extends Parent {
-
-        @Override
-        void execute() {
-            super.execute();
-            System.out.println("Child");
-        }
-    }
-
-    public static void main(String[] args) {
-        new Child().execute();
-    }
-}
-```
 
 ### 实验十：重新抽象
 
-```java
-public class ReabstractDemo {
-
-    static class Parent {
-
-        void execute() {
-            System.out.println("default");
-        }
-    }
-
-    static abstract class AbstractChild
-            extends Parent {
-
-        @Override
-        abstract void execute();
-    }
-
-    static final class ConcreteChild
-            extends AbstractChild {
-
-        @Override
-        void execute() {
-            System.out.println("concrete");
-        }
-    }
-
-    public static void main(String[] args) {
-        new ConcreteChild().execute();
-    }
-}
-```
 
 ### 实验十一：泛型桥接方法
 
-```java
-import java.lang.reflect.Method;
-
-public class BridgeMethodDemo {
-
-    static class Parent<T> {
-
-        T value() {
-            return null;
-        }
-    }
-
-    static class Child
-            extends Parent<String> {
-
-        @Override
-        String value() {
-            return "Java";
-        }
-    }
-
-    public static void main(String[] args) {
-        for (
-                Method method
-                : Child.class.getDeclaredMethods()
-        ) {
-            System.out.println(
-                    method
-                    + ", bridge="
-                    + method.isBridge()
-                    + ", synthetic="
-                    + method.isSynthetic()
-            );
-        }
-    }
-}
-```
 
 ### 实验十二：构造器调用可重写方法
 
-```java
-public class ConstructorOverrideDemo {
-
-    static class Parent {
-
-        Parent() {
-            print();
-        }
-
-        void print() {
-            System.out.println("Parent");
-        }
-    }
-
-    static class Child extends Parent {
-
-        private String name = "Java";
-
-        @Override
-        void print() {
-            System.out.println(name);
-        }
-    }
-
-    public static void main(String[] args) {
-        new Child();
-    }
-}
-```
 
 ### 实验十三：sealed 层次
 
-```java
-public class SealedDemo {
-
-    sealed interface Result
-            permits Success, Failure {
-    }
-
-    record Success(String value)
-            implements Result {
-    }
-
-    record Failure(String message)
-            implements Result {
-    }
-
-    static String describe(Result result) {
-        return switch (result) {
-            case Success success ->
-                    success.value();
-            case Failure failure ->
-                    failure.message();
-        };
-    }
-
-    public static void main(String[] args) {
-        System.out.println(
-                describe(
-                        new Success("OK")
-                )
-        );
-    }
-}
-```
 
 ### 实验十四：non-sealed 重新开放
 
-```java
-sealed class Vehicle
-        permits Car {
-}
-
-non-sealed class Car
-        extends Vehicle {
-}
-
-class ElectricCar
-        extends Car {
-}
-```
 
 ### 实验十五：record 不能被继承
 
-```java
-record Point(int x, int y) {
-}
-
-// class ColoredPoint extends Point {
-// }
-```
 
 取消注释，观察编译错误。
 
 ### 实验十六：数组协变
 
-```java
-public class ArrayCovarianceDemo {
-
-    public static void main(String[] args) {
-        String[] strings =
-                new String[1];
-
-        Object[] objects = strings;
-
-        try {
-            objects[0] = 100;
-        } catch (
-                ArrayStoreException exception
-        ) {
-            System.out.println(
-                    "invalid array element"
-            );
-        }
-    }
-}
-```
 
 ### 实验十七：组合替代继承
 
-```java
-import java.util.HashMap;
-import java.util.Map;
-
-public class CompositionDemo {
-
-    static final class Config {
-
-        private final Map<String, String>
-                values;
-
-        Config(
-                Map<String, String> values
-        ) {
-            this.values =
-                    Map.copyOf(values);
-        }
-
-        String require(String key) {
-            String value = values.get(key);
-
-            if (value == null) {
-                throw new IllegalArgumentException(
-                        "missing key: " + key
-                );
-            }
-
-            return value;
-        }
-    }
-
-    public static void main(String[] args) {
-        Map<String, String> values =
-                new HashMap<>();
-
-        values.put("host", "localhost");
-
-        Config config = new Config(values);
-
-        System.out.println(
-                config.require("host")
-        );
-    }
-}
-```
 
 ---
 

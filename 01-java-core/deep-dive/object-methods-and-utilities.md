@@ -358,19 +358,19 @@ synchronized (lock) {
 
 这段是对象 API 的边界示例，不在本页展开等待集、可见性、条件队列、中断、`Condition` 或生产者消费者协议。完整权威解释留给未来 `concurrency` 模块。
 
-## 19.40 finalization 状态
+## 19.36 finalization 状态
 
 `Object.finalize()` 已被标记为弃用并准备移除。终结机制执行时间不确定、可能永不执行、增加 GC 成本，并允许对象复活。
 
 现代代码不应新增 finalizer。
 
-## 19.41 为什么不能依赖 finalize
+## 19.37 为什么不能依赖 finalize
 
 文件描述符、数据库连接、Socket 和锁需要确定性释放；GC 只管理 Java 堆对象可达性，不保证及时触发底层资源关闭。
 
 依赖 finalizer 会造成资源耗尽和不可预测停顿。
 
-## 19.42 try-with-resources
+## 19.38 try-with-resources
 
 实现 AutoCloseable 的资源应使用：
 
@@ -382,25 +382,25 @@ try (InputStream input = Files.newInputStream(path)) {
 
 它在词法作用域结束时确定调用 close，并正确处理抑制异常，是资源管理首选。
 
-## 19.43 Cleaner
+## 19.39 Cleaner
 
 Cleaner 可作为忘记 close 时的安全网，用于清理本地资源，但仍依赖 GC 时机，不是及时释放保证。清理动作不能强引用被清理对象，否则会阻止其变为不可达。
 
-## 19.44 显式生命周期
+## 19.40 显式生命周期
 
 复杂组件应提供 `start`/`close` 或由容器管理生命周期，并明确资源所有权。兜底清理只负责防止永久泄漏，不应承担正常业务流程。
 
-## 19.45 System.identityHashCode
+## 19.41 System.identityHashCode
 
 `System.identityHashCode(object)` 返回对象身份语义哈希，不受当前类重写的 hashCode 影响。
 
 它适合诊断同值不同实例、对象图和锁对象身份；结果可能碰撞，也不保证跨运行稳定。
 
-## 19.46 身份哈希不是地址
+## 19.42 身份哈希不是地址
 
 JVM 可移动对象，身份哈希并不承诺等于内存地址。不要用它进行指针运算、持久化标识、分布式 ID 或安全令牌。
 
-## 19.47 Objects.requireNonNull
+## 19.43 Objects.requireNonNull
 
 ```java
 this.repository = Objects.requireNonNull(repository, "repository");
@@ -408,7 +408,7 @@ this.repository = Objects.requireNonNull(repository, "repository");
 
 它在边界快速失败并返回非 null 值，便于内联赋值。消息或 Supplier 应避免昂贵副作用。
 
-## 19.48 requireNonNullElse 系列
+## 19.44 requireNonNullElse 系列
 
 ```java
 Objects.requireNonNullElse(value, defaultValue)
@@ -417,7 +417,7 @@ Objects.requireNonNullElseGet(value, supplier)
 
 默认值本身也不能为 null。ElseGet 仅在需要默认值时调用 Supplier，适合延迟构造。
 
-## 19.49 isNull 与 nonNull
+## 19.45 isNull 与 nonNull
 
 `Objects.isNull` 和 `Objects.nonNull` 在方法引用中有时方便：
 
@@ -427,11 +427,11 @@ stream.filter(Objects::nonNull)
 
 普通 if 判断通常直接写 `value == null` / `!= null` 更清晰。
 
-## 19.50 Objects.deepEquals
+## 19.46 Objects.deepEquals
 
 `Objects.deepEquals(a,b)` 对两个数组使用深层比较语义，对非数组对象调用 equals。它适合通用容器工具，但业务类型最好明确知道字段类型并使用对应比较方法。
 
-## 19.51 Objects.compare
+## 19.47 Objects.compare
 
 ```java
 Objects.compare(a, b, comparator)
@@ -439,7 +439,7 @@ Objects.compare(a, b, comparator)
 
 若两个引用相同直接返回 0，否则委托 Comparator。Comparator 是否接受 null 由其实现决定，Objects.compare 不自动定义 null 排序。
 
-## 19.52 索引检查方法
+## 19.48 索引检查方法
 
 Java 提供：
 
@@ -449,17 +449,17 @@ Java 提供：
 
 它们统一验证边界并返回已验证参数，适合底层集合、缓冲区和切片 API。
 
-## 19.53 Objects 工具的边界
+## 19.49 Objects 工具的边界
 
 Objects 提供语言级常用操作的空安全包装，但不能替代领域校验。`requireNonNull(orderId)` 只能证明非 null，不能证明非空、格式合法、存在或属于当前租户。
 
-## 19.54 WMS 日志设计
+## 19.50 WMS 日志设计
 
 出库单 `toString` 建议输出：订单号、仓库、状态、明细数量和 trace 标识；不要输出完整收货地址、手机号、Token 或全部明细。
 
 稳定审计日志应使用结构化事件 DTO，而不是依赖对象 `toString`。
 
-## 19.55 WMS 快照复制
+## 19.51 WMS 快照复制
 
 库存快照应显式复制不可变值：
 
@@ -469,7 +469,7 @@ record StockSnapshot(StockKey key, long available, Instant capturedAt) { }
 
 不要 clone 持有数据库会话、锁或懒加载集合的实体对象。
 
-## 19.56 设计决策清单
+## 19.52 设计决策清单
 
 评审本章相关代码时确认：
 
@@ -482,21 +482,17 @@ record StockSnapshot(StockKey key, long available, Instant capturedAt) { }
 7. identityHashCode 是否仅用于诊断；
 8. Objects 工具是否掩盖了应有的领域校验。
 
-## 19.57 建议实验
+## 19.53 实验与 examples 边界
+
+本节保留原有实验清单与文字观察，不在正文维护完整 runnable class。需要执行回归时统一以 `examples/` 为唯一代码入口。
+
 
 ### 实验1：默认 toString 结构
 
 **目标**：观察类名、@ 与十六进制 hashCode。
 
-```java
-public class DefaultToStringDemo {
-    public static void main(String[] args) {
-        Object value = new Object();
-        String text = value.toString();
-        System.out.println(text.startsWith(Object.class.getName() + "@"));
-    }
-}
-```
+> 完整 runnable class 已移出正文；以下保留验证目标和观察结论。
+
 
 预期或观察重点：
 
@@ -508,14 +504,6 @@ true
 
 **目标**：证明默认后缀调用可重写 hashCode。
 
-```java
-public class HashAffectsDefaultToStringDemo {
-    static class Value { public int hashCode() { return 42; } }
-    public static void main(String[] args) {
-        System.out.println(new Value().toString().endsWith("@2a"));
-    }
-}
-```
 
 预期或观察重点：
 
@@ -527,16 +515,6 @@ true
 
 **目标**：只输出定位字段，不输出秘密。
 
-```java
-public class SafeToStringDemo {
-    record User(String id, String token) {
-        public String toString() { return "User{id='" + id + "'}"; }
-    }
-    public static void main(String[] args) {
-        System.out.println(new User("U1","secret"));
-    }
-}
-```
 
 预期或观察重点：
 
@@ -548,13 +526,6 @@ User{id='U1'}
 
 **目标**：验证 null 转换为文本 null。
 
-```java
-public class StringValueOfNullDemo {
-    public static void main(String[] args) {
-        System.out.println(String.valueOf((Object) null));
-    }
-}
-```
 
 预期或观察重点：
 
@@ -566,14 +537,6 @@ null
 
 **目标**：展示自定义 null 文本。
 
-```java
-import java.util.Objects;
-public class ObjectsToStringDemo {
-    public static void main(String[] args) {
-        System.out.println(Objects.toString(null,"<missing>"));
-    }
-}
-```
 
 预期或观察重点：
 
@@ -585,20 +548,6 @@ public class ObjectsToStringDemo {
 
 **目标**：绕过对象重写的 toString/hashCode。
 
-```java
-import java.util.Objects;
-public class IdentityStringDemo {
-    static class Value {
-        public int hashCode() { return 1; }
-        public String toString() { return "custom"; }
-    }
-    public static void main(String[] args) {
-        Value value = new Value();
-        System.out.println(value.toString());
-        System.out.println(Objects.toIdentityString(value).contains("@"));
-    }
-}
-```
 
 预期或观察重点：
 
@@ -611,16 +560,6 @@ true
 
 **目标**：区分引用声明类型与对象类型。
 
-```java
-public class RuntimeClassDemo {
-    static class Animal { }
-    static class Dog extends Animal { }
-    public static void main(String[] args) {
-        Animal animal = new Dog();
-        System.out.println(animal.getClass().getSimpleName());
-    }
-}
-```
 
 预期或观察重点：
 
@@ -632,15 +571,6 @@ Dog
 
 **目标**：验证可赋给 Class<? extends Number>。
 
-```java
-public class GenericGetClassDemo {
-    public static void main(String[] args) {
-        Number number = 1;
-        Class<? extends Number> type = number.getClass();
-        System.out.println(type.getSimpleName());
-    }
-}
-```
 
 预期或观察重点：
 
@@ -652,17 +582,6 @@ Integer
 
 **目标**：比较子类型判断和精确运行时类型。
 
-```java
-public class TypeCheckDemo {
-    static class Animal { }
-    static class Dog extends Animal { }
-    public static void main(String[] args) {
-        Animal value = new Dog();
-        System.out.println(value instanceof Animal);
-        System.out.println(value.getClass() == Animal.class);
-    }
-}
-```
 
 预期或观察重点：
 
@@ -675,24 +594,6 @@ false
 
 **目标**：观察副本共享内部可变列表。
 
-```java
-import java.util.ArrayList;
-import java.util.List;
-public class ShallowCloneDemo {
-    static class Order implements Cloneable {
-        List<String> items = new ArrayList<>();
-        public Order clone() {
-            try { return (Order) super.clone(); }
-            catch (CloneNotSupportedException e) { throw new AssertionError(e); }
-        }
-    }
-    public static void main(String[] args) {
-        Order source = new Order(); source.items.add("A");
-        Order copy = source.clone(); copy.items.add("B");
-        System.out.println(source.items);
-    }
-}
-```
 
 预期或观察重点：
 
@@ -704,22 +605,6 @@ public class ShallowCloneDemo {
 
 **目标**：与浅 clone 对比，建立独立列表。
 
-```java
-import java.util.ArrayList;
-import java.util.List;
-public class CopyConstructorDemo {
-    static class Order {
-        List<String> items = new ArrayList<>();
-        Order() { }
-        Order(Order source) { items = new ArrayList<>(source.items); }
-    }
-    public static void main(String[] args) {
-        Order source = new Order(); source.items.add("A");
-        Order copy = new Order(source); copy.items.add("B");
-        System.out.println(source.items); System.out.println(copy.items);
-    }
-}
-```
 
 预期或观察重点：
 
@@ -732,16 +617,6 @@ public class CopyConstructorDemo {
 
 **目标**：验证数组内容复制且对象不同。
 
-```java
-import java.util.Arrays;
-public class PrimitiveArrayCloneDemo {
-    public static void main(String[] args) {
-        int[] source = {1,2}; int[] copy = source.clone(); copy[0] = 9;
-        System.out.println(source == copy);
-        System.out.println(Arrays.toString(source));
-    }
-}
-```
 
 预期或观察重点：
 
@@ -754,15 +629,6 @@ false
 
 **目标**：观察两个数组共享元素对象。
 
-```java
-public class ObjectArrayCloneDemo {
-    static class Box { int value; }
-    public static void main(String[] args) {
-        Box[] source = {new Box()}; Box[] copy = source.clone(); copy[0].value = 7;
-        System.out.println(source[0].value);
-    }
-}
-```
 
 预期或观察重点：
 
@@ -774,17 +640,6 @@ public class ObjectArrayCloneDemo {
 
 **目标**：演示不可变对象的显式复制修改。
 
-```java
-public class WithMethodDemo {
-    record Order(String id, String status) {
-        Order withStatus(String status) { return new Order(id,status); }
-    }
-    public static void main(String[] args) {
-        Order a = new Order("O1","NEW"); Order b = a.withStatus("DONE");
-        System.out.println(a.status()); System.out.println(b.status());
-    }
-}
-```
 
 预期或观察重点：
 
@@ -801,16 +656,6 @@ Object 页面不再内嵌 `wait/notify` 的完整生产者消费者和异常实�
 
 **目标**：验证身份哈希不调用重写 hashCode。
 
-```java
-public class IdentityHashCodeDemo {
-    static class Value { public int hashCode() { return 42; } }
-    public static void main(String[] args) {
-        Value value = new Value();
-        System.out.println(value.hashCode());
-        System.out.println(System.identityHashCode(value) == value.hashCode() || System.identityHashCode(value) != value.hashCode());
-    }
-}
-```
 
 预期或观察重点：
 
@@ -823,17 +668,6 @@ true
 
 **目标**：验证非空时不调用 Supplier。
 
-```java
-import java.util.Objects;
-import java.util.concurrent.atomic.AtomicInteger;
-public class RequireElseGetDemo {
-    public static void main(String[] args) {
-        AtomicInteger calls = new AtomicInteger();
-        String value = Objects.requireNonNullElseGet("A", () -> { calls.incrementAndGet(); return "B"; });
-        System.out.println(value); System.out.println(calls.get());
-    }
-}
-```
 
 预期或观察重点：
 
@@ -846,15 +680,6 @@ A
 
 **目标**：验证通用深层数组比较。
 
-```java
-import java.util.Objects;
-public class ObjectsDeepEqualsDemo {
-    public static void main(String[] args) {
-        Object[] a = {new int[]{1,2}}; Object[] b = {new int[]{1,2}};
-        System.out.println(Objects.deepEquals(a,b));
-    }
-}
-```
 
 预期或观察重点：
 
@@ -866,17 +691,6 @@ true
 
 **目标**：使用 Objects.checkFromIndexSize 验证切片。
 
-```java
-import java.util.Objects;
-public class IndexCheckDemo {
-    public static void main(String[] args) {
-        int from = Objects.checkFromIndexSize(2,3,10);
-        System.out.println(from);
-        try { Objects.checkIndex(10,10); }
-        catch (IndexOutOfBoundsException e) { System.out.println("invalid"); }
-    }
-}
-```
 
 预期或观察重点：
 
@@ -885,7 +699,7 @@ public class IndexCheckDemo {
 invalid
 ```
 
-## 19.58 高频面试题
+## 19.54 高频面试题
 
 1. Object 在 Java 类层次中的位置是什么？
 2. 数组是否也是 Object？
@@ -968,7 +782,7 @@ invalid
 79. Objects.compare 是否自动支持 null？
 80. Objects.checkIndex 系列解决什么问题？
 
-## 19.59 易错点
+## 19.55 易错点
 
 ### 易错点 1：把默认 toString 后缀称为对象地址
 
@@ -1130,7 +944,7 @@ JVM 不作此保证。
 
 应使用返回的已验证值或保持参数一致。
 
-## 19.60 工程实践建议
+## 19.56 工程实践建议
 
 ### 工程实践 1：toString 只输出定位摘要
 
@@ -1292,7 +1106,7 @@ toString 和复制同样可能造成数据泄露。
 
 调用方必须知道共享哪些内部对象。
 
-## 19.61 官方参考资料
+## 19.57 官方参考资料
 
 - Java SE 26 `java.lang.Object` API；
 - Java SE 26 `java.util.Objects` API，包含 `toIdentityString` 和索引检查方法；
@@ -1300,7 +1114,7 @@ toString 和复制同样可能造成数据泄露。
 - Java Language Specification 17.2：等待集与通知；
 - JEP 421：Deprecate Finalization for Removal。
 
-## 19.62 本章总结
+## 19.58 本章总结
 
 ```text
 Object 提供所有对象的基础协议
@@ -1324,7 +1138,7 @@ identityHashCode 只表达诊断身份
 Objects 提供通用 null、比较、散列和边界工具，但不替代领域校验
 ```
 
-## 19.63 1.0 Java语言基础模块收口
+## 19.59 1.0 Java语言基础模块收口
 
 完成第 1～19 章后，应形成以下整体链路：
 
@@ -1340,6 +1154,6 @@ Objects 提供通用 null、比较、散列和边界工具，但不替代领域�
 
 该模块解决语言层和基础对象模型问题。下一阶段应进入集合、异常、泛型、IO、现代 Java 特性、并发和 JVM 等专题，避免在语言基础章节重复深入框架或虚拟机实现。
 
-## 19.64 面试口述版
+## 19.60 面试口述版
 
 `Object.toString` 默认返回类名、@ 和当前 hashCode 的十六进制形式，所以它不是对象地址，也会受重写 hashCode 影响。业务类应提供简洁、无副作用、不会泄露敏感信息的 toString，但不能把它当序列化、缓存 Key 或签名协议。`getClass` 返回运行时类型且不能重写，代理场景下可能返回生成子类。`Object.clone` 是 protected，依赖 Cloneable 标记，并按字段赋值执行浅复制，引用成员默认共享且构造器不按普通方式执行，所以现代业务代码通常更推荐拷贝构造器、copyOf 工厂、with 方法或显式映射。wait/notify 定义在 Object 是因为任何对象都能作为监视器，调用前必须持有该对象锁，wait 应放在 while 条件循环中。finalize 已弃用并准备移除，资源释放应使用 try-with-resources 和显式 close，Cleaner 只能兜底。System.identityHashCode 用于诊断对象身份，不是地址或业务 ID；Objects 工具类可以简化 null、深比较和索引检查，但不能替代领域校验。
