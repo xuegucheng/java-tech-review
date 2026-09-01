@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 780" role="img" aria-labelledby="title desc">
+  <title id="title">Java overload and polymorphic dispatch</title>
+  <desc id="desc">The compile-time type chooses the visible overload, while the runtime object chooses the overridden instance implementation.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#475569"/>
+    </marker>
+    <style>
+      .title { font: 700 30px sans-serif; fill: #0f172a; }
+      .label { font: 600 19px sans-serif; fill: #0f172a; }
+      .small { font: 16px sans-serif; fill: #334155; }
+      .box { stroke: #334155; stroke-width: 2; rx: 16; }
+      .arrow { stroke: #475569; stroke-width: 3; fill: none; marker-end: url(#arrow); }
+    </style>
+  </defs>
+  <rect width="1400" height="780" fill="#f8fafc"/>
+  <text x="70" y="65" class="title">多态调用：先重载，后动态分派</text>
+  <text x="70" y="98" class="small">编译时类型决定“能看到什么”；运行时类型决定可重写实例方法的最终实现</text>
+
+  <rect x="70" y="170" width="560" height="500" class="box" fill="#eff6ff"/>
+  <text x="350" y="220" text-anchor="middle" class="label">编译期：重载选择</text>
+  <rect x="135" y="275" width="430" height="90" class="box" fill="#dbeafe"/>
+  <text x="350" y="312" text-anchor="middle" class="label">Animal ref = new Dog()</text>
+  <text x="350" y="342" text-anchor="middle" class="small">ref.speak("x")</text>
+  <path d="M350 365 L350 445" class="arrow"/>
+  <rect x="135" y="445" width="430" height="125" class="box" fill="#bfdbfe"/>
+  <text x="350" y="487" text-anchor="middle" class="label">按 Animal 的可见候选</text>
+  <text x="350" y="522" text-anchor="middle" class="small">speak(Object) 被选中</text>
+
+  <rect x="770" y="170" width="560" height="500" class="box" fill="#f0fdf4"/>
+  <text x="1050" y="220" text-anchor="middle" class="label">运行期：重写分派</text>
+  <rect x="835" y="275" width="430" height="90" class="box" fill="#dcfce7"/>
+  <text x="1050" y="312" text-anchor="middle" class="label">运行时对象：Dog</text>
+  <text x="1050" y="342" text-anchor="middle" class="small">Dog 覆盖 speak(Object)</text>
+  <path d="M1050 365 L1050 445" class="arrow"/>
+  <rect x="835" y="445" width="430" height="125" class="box" fill="#bbf7d0"/>
+  <text x="1050" y="487" text-anchor="middle" class="label">最终执行 Dog.speak(Object)</text>
+  <text x="1050" y="522" text-anchor="middle" class="small">不会重新选择 Dog.speak(String)</text>
+
+  <path d="M630 365 C700 365 700 365 770 365" class="arrow"/>
+  <text x="700" y="345" text-anchor="middle" class="small">选中的签名</text>
+  <rect x="500" y="700" width="400" height="48" class="box" fill="#fef3c7"/>
+  <text x="700" y="731" text-anchor="middle" class="small">重载是编译期；重写实例方法才动态分派</text>
+</svg>

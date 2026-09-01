@@ -76,7 +76,7 @@ java-tech-review/
 mvn -f examples/pom.xml test
 ```
 
-当前可验证：参数传递、HashMap 冲突、LinkedHashMap LRU 和 Holder 类初始化。详见 [examples/README.md](examples/README.md)。
+当前可验证：参数传递、HashMap 冲突、LinkedHashMap LRU、Holder 类初始化、重载解析、多态分派和 `final` 引用边界。详见 [examples/README.md](examples/README.md)。
 
 ## 图示策略
 
@@ -84,7 +84,7 @@ mvn -f examples/pom.xml test
 - SVG 用于 bucket、链表、引用、队列和对象布局等空间结构。
 - 一张图只解决一个真正难理解的问题，不重复正文。
 
-入口：[图示规则](diagrams/README.md)、[Java 复习闭环](diagrams/java/review-loop.svg)、[HashMap resize](diagrams/collections/hashmap-resize.svg)、[LinkedHashMap/LRU](diagrams/collections/linkedhashmap-lru.svg)。
+入口：[图示规则](diagrams/README.md)、[Java 复习闭环](diagrams/java/review-loop.svg)、[重载解析](diagrams/java/overload-resolution.svg)、[参数传递](diagrams/java/java-pass-by-value.svg)、[多态分派](diagrams/java/polymorphism-dispatch.svg)、[类初始化](diagrams/java/class-initialization.svg)、[final 引用](diagrams/java/final-reference-vs-immutable.svg)、[HashMap resize](diagrams/collections/hashmap-resize.svg)、[LinkedHashMap/LRU](diagrams/collections/linkedhashmap-lru.svg)。
 
 ## Java 版本策略
 

@@ -850,7 +850,7 @@ ArrayList 不是线程安全的。
 - 读多写少时评估 CopyOnWriteArrayList；
 - 重新设计所有权，避免共享。
 
-具体并发实现放在 `1.2-并发编程`。
+具体并发实现放在未来 `concurrency` 模块。
 
 ---
 

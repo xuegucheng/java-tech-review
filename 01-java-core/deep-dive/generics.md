@@ -1,12 +1,14 @@
-# 泛型基础与集合类型安全
+# Java 泛型：语言规则与类型安全
 
-> 本章建立集合框架所需的泛型最小完备模型：既能读懂 JDK 集合签名，也能设计类型安全、对调用方友好的集合 API。
+> **本章定位：Java Core 泛型语言唯一权威来源 · P1 · JDK 5+ / Java 21 验证。**
+>
+> 本章负责类型参数、参数化类型、不变性、通配符、擦除、堆污染和桥接方法等语言规则。集合 API 中的具体签名只作为语言规则的例子；`addAll`、`Comparator`、`Collections.copy` 等 API 的选型与调用方视角，统一放在 [Collections 泛型 API 设计](../../02-collections/deep-dive/collection-generic-api-design.md)。
 
 ---
 
 ## 00.1 本章定位
 
-泛型是集合框架的类型基础。本章只讲后续集合章节必须具备的泛型能力，不追求一次覆盖反射泛型、复杂类型推断、字节码签名等全部高级主题。
+泛型是 Java 的类型系统能力，不只服务集合。本章建立可迁移到集合、比较器、领域 API 和框架边界的语言模型；反射泛型、复杂类型推断和完整字节码签名仍属于未来高级语言/JVM 主题。
 
 学完本章，应能够准确回答：
 
@@ -23,10 +25,11 @@
 
 本章与后续内容的边界：
 
-- 集合接口和实现体系：见 `collection-contracts.md`；
-- `ArrayList` 的具体实现：见 `arraylist.md`；
+- 集合接口和实现体系：见 [集合框架体系与核心契约](../../02-collections/deep-dive/collection-contracts.md)；
+- `ArrayList` 的具体实现：见 [ArrayList Deep Dive](../../02-collections/deep-dive/arraylist.md)；
 - 泛型擦除字节码、反射泛型和复杂推断：放在高级语言特性模块；
-- `equals()` 与 `hashCode()` 契约：见 [Java Core 对象契约](../../01-java-core/deep-dive/equals-and-hashcode-contract.md)。
+- `equals()` 与 `hashCode()` 契约：见 [Java Core 对象契约](./equals-and-hashcode-contract.md)；
+- 集合泛型签名的消费方式：见 [Collections 泛型 API 设计](../../02-collections/deep-dive/collection-generic-api-design.md)。
 
 ---
 
@@ -807,51 +810,15 @@ List<Integer>
 
 ---
 
-## 00.31 集合 API 中的 extends
+## 00.31 集合 API 中的 extends：语言规则边界
 
-典型添加批量元素的签名：
-
-```java
-boolean addAll(Collection<? extends E> values)
-```
-
-调用方可传入 `E` 的子类型集合：
-
-```java
-List<Number> numbers = new ArrayList<>();
-List<Integer> integers = List.of(1, 2);
-numbers.addAll(integers);
-```
-
-源集合向目标集合生产元素，因此使用 `extends`。若签名是 `Collection<E>`，就会不必要地拒绝 `Collection<Integer>` 写入 `Collection<Number>` 的安全场景。
+`? extends T` 表示一个未知的 `T` 子类型，适合把参数视为生产者；它不能安全接收任意新的 `T`，但可以读取为 `T`。集合 API 为什么在 `addAll` 上使用这个规则、以及调用方如何受益，统一见 [Collections 泛型 API 设计](../../02-collections/deep-dive/collection-generic-api-design.md)。
 
 ---
 
-## 00.32 集合 API 中的 super
+## 00.32 集合 API 中的 super：语言规则边界
 
-排序和查找 API 常把比较器声明为：
-
-```java
-Comparator<? super T>
-```
-
-因为能比较 `T` 父类型的比较器，也能比较 `T`：
-
-```java
-Comparator<Object> byText =
-        Comparator.comparing(Object::toString);
-
-List<String> names = new ArrayList<>();
-names.sort(byText);
-```
-
-比较器消费 `T`，因此使用下界更灵活。
-
-另一个典型场景是写入目标：
-
-```java
-static <T> void fill(List<? super T> target, T value)
-```
+`? super T` 表示一个未知的 `T` 父类型，适合把参数视为消费者；向其中写入 `T` 是安全的，但读取时只能保证得到 `Object`。`Comparator<? super T>`、`Collections.copy` 等 JDK 签名的具体推导与选型不在本章重复展开，见 [Collections 泛型 API 设计](../../02-collections/deep-dive/collection-generic-api-design.md)。
 
 ---
 
@@ -1356,30 +1323,7 @@ C
 
 ### 实验16：Comparator 下界
 
-
-
-```java
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-
-public class ComparatorSuperDemo {
-    public static void main(String[] args) {
-        Comparator<Object> byText =
-                Comparator.comparing(Object::toString);
-        List<String> names =
-                new ArrayList<>(List.of("C", "A", "B"));
-        names.sort(byText);
-        System.out.println(names);
-    }
-}
-```
-
-预期输出：
-
-```text
-[A, B, C]
-```
+`Comparator<? super T>` 的 JDK API 消费案例已迁移到 [Collections 泛型 API 设计](../../02-collections/deep-dive/collection-generic-api-design.md)，本章只保留 `super` 的语言规则。
 
 ### 实验17：泛型与装箱
 
@@ -1407,27 +1351,7 @@ public class GenericBoxingDemo {
 
 ### 实验18：addAll 接收子类型集合
 
-
-
-```java
-import java.util.ArrayList;
-import java.util.List;
-
-public class AddAllExtendsDemo {
-    public static void main(String[] args) {
-        List<Number> numbers = new ArrayList<>();
-        List<Integer> integers = List.of(1, 2);
-        numbers.addAll(integers);
-        System.out.println(numbers);
-    }
-}
-```
-
-预期输出：
-
-```text
-[1, 2]
-```
+`Collection<? extends E>` 的 JDK API 消费案例已迁移到 [Collections 泛型 API 设计](../../02-collections/deep-dive/collection-generic-api-design.md)，本章只保留 `extends` 的语言规则。
 
 ### 实验19：List<?> 与原始类型的差异
 

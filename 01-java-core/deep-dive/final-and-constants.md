@@ -2,6 +2,10 @@
 
 > 本章建立 `final` 在变量、字段、参数、方法和类上的统一模型，并把“只能赋值一次”“引用不可重新指向”“对象不可变”“编译期常量”“安全发布”这些容易混淆的概念彻底分开。重点落在可预测初始化、不可变边界、常量演进和二进制兼容。
 
+> **本章是 `final` 与常量变量的唯一权威页。** [final 引用与不可变对象图](../../diagrams/java/final-reference-vs-immutable.svg)用于区分引用槽和对象状态；类初始化触发顺序回到 [static-and-class-initialization.md](static-and-class-initialization.md)，完整并发安全发布留给未来并发模块。
+
+配套验证：[FinalReferenceDemo.java](../../examples/src/main/java/com/xuegucheng/javatechreview/FinalReferenceDemo.java) 与 [FinalReferenceDemoTest.java](../../examples/src/test/java/com/xuegucheng/javatechreview/FinalReferenceDemoTest.java)。
+
 ---
 
 ## 17.1 本章定位
@@ -207,25 +211,9 @@ thresholds[0] = 99; // 合法
 
 数组引用不能替换，但元素可修改。公开 `public static final` 数组会把全局可变状态暴露给所有调用方，是典型错误常量设计。
 
-## 17.13 final 集合
+## 17.13 final 集合与不可变设计的边界
 
-```java
-private final List<String> codes;
-```
-
-若构造器直接保存调用方传入的可变列表，即使字段 final，外部仍能修改对象内部状态。安全边界通常使用：
-
-```java
-this.codes = List.copyOf(codes);
-```
-
-返回时也不要暴露内部可变集合。
-
-## 17.14 不可修改视图与不可变快照
-
-`Collections.unmodifiableList(source)` 是只读视图，底层 `source` 变化仍会反映；`List.copyOf(source)` 创建独立不可修改快照（元素对象本身仍可能可变）。
-
-选择取决于是否需要观察源集合后续变化。常量和不可变对象通常更需要快照语义。
+`final List<String>` 只能固定字段引用，不能阻止列表元素变化，也不能阻止构造器保存的外部列表继续变化。`unmodifiableList` 是只读视图，`List.copyOf` 是不可修改快照；防御性复制、嵌套对象和不变量的完整设计统一见 [object-creation-and-immutability.md](object-creation-and-immutability.md)。
 
 ## 17.15 final 参数
 
@@ -298,15 +286,7 @@ public final class MutableUser {
 
 ## 17.23 record 与 final
 
-record 类隐式为 final，不能被普通类继承。record 组件对应的字段是 private final，但若组件类型本身可变，record 仍可能只是浅不可变。
-
-```java
-record Batch(List<String> items) {
-    Batch { items = List.copyOf(items); }
-}
-```
-
-需要防御性复制才能建立更强不可变边界。
+record 隐式为 `final`，组件字段是 `private final`；这只说明组件引用不能重绑，不自动提供深不可变。record 的防御性复制和对象图边界统一见 [object-creation-and-immutability.md](object-creation-and-immutability.md)。
 
 ## 17.24 enum 与 final
 
@@ -449,41 +429,17 @@ public static final List<String> TYPES = new ArrayList<>();
 
 字段引用不可替换，但任何调用方都可修改列表。公共常量必须避免暴露可变对象，使用 `List.of`、`Set.of`、`Map.of` 或防御性复制。
 
-## 17.41 final 字段的 JMM 语义
+## 17.41 JMM 与绕过手段：只保留提示
 
-Java 内存模型对正确构造对象的 final 字段提供特殊初始化保证：如果构造期间 `this` 未逸出，其他线程在获得该对象引用后，对 final 字段及其按规则可达状态具有比普通字段更强的可见性保证。
+正确构造且构造期间没有 `this` 逸出的对象，对 `final` 字段具有特殊初始化可见性；这不等于对象整体线程安全，也不能替代锁、`volatile`、不可变对象或正确发布。
 
-这不是说所有发布方式都推荐无同步，也不是说对象整体线程安全。
-
-## 17.42 构造期间 this 逸出
-
-```java
-static Holder leaked;
-Holder() {
-    leaked = this;
-    value = 42;
-}
+```text
+不要在 final 字段赋值完成前发布 this
+不要把 final 当作可变成员操作的原子性保证
+不要用反射、Unsafe、VarHandle 或序列化绕过来否定源码契约
 ```
 
-对象在 final 字段赋值完成前被其他线程看见，破坏安全构造前提。不要在构造器中注册监听器、启动线程、调用可重写方法或发布到静态集合。
-
-## 17.43 final 与线程安全
-
-final 可以帮助建立不可变状态和安全初始化，但不能让可变成员操作原子化：
-
-```java
-final List<String> items = new ArrayList<>();
-```
-
-多线程并发修改仍不安全。线程安全取决于对象是否不可变、是否正确同步以及发布方式。
-
-## 17.44 final 与性能
-
-不要为了猜测 JIT 优化而到处添加 final。JVM 能基于实际类层次、类型剖析和运行时假设进行去虚拟化；final 的首要价值是表达设计约束和保持不变量。
-
-## 17.45 反射与底层修改
-
-普通 Java 源码遵守 final 赋值限制。反射、Unsafe、VarHandle、序列化框架或 JVM 内部可能存在特殊能力和限制变化，不应以这些绕过手段否定语言语义，也不应把修改 final 作为业务方案。
+JMM、发布、重排和同步的完整推导留给未来并发模块；性能优化也不属于本章主线。
 
 ## 17.46 WMS 常量分类
 

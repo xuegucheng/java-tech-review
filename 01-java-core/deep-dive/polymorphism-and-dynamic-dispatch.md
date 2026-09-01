@@ -2,6 +2,10 @@
 
 > 本章聚焦 Java 如何通过父类型引用统一操作不同子类型对象，以及编译器和 JVM 如何共同决定“能调用什么”和“最终执行哪个实现”。核心是区分编译时类型、运行时类型、重载解析与实例方法动态绑定。
 
+> **配套结构图**：[多态分派图](../../diagrams/java/polymorphism-dispatch.svg)。本页拥有编译时类型、运行时类型和实例方法分派的解释；重载阶段细节回到 [methods-and-overloading.md](methods-and-overloading.md)。
+
+配套验证：[PolymorphismDispatchDemo.java](../../examples/src/main/java/com/xuegucheng/javatechreview/PolymorphismDispatchDemo.java) 与 [PolymorphismDispatchDemoTest.java](../../examples/src/test/java/com/xuegucheng/javatechreview/PolymorphismDispatchDemoTest.java)。
+
 ## 12.1 本章定位
 
 学完本章，应能够准确回答：

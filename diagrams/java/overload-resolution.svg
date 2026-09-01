@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 760" role="img" aria-labelledby="title desc">
+  <title id="title">Java overload resolution</title>
+  <desc id="desc">A method invocation moves through strict fixed arity, loose fixed arity, and variable arity phases before selecting the most specific candidate.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#475569"/>
+    </marker>
+    <style>
+      .title { font: 700 30px sans-serif; fill: #0f172a; }
+      .label { font: 600 19px sans-serif; fill: #0f172a; }
+      .small { font: 16px sans-serif; fill: #334155; }
+      .box { stroke: #334155; stroke-width: 2; rx: 18; }
+      .arrow { stroke: #475569; stroke-width: 3; fill: none; marker-end: url(#arrow); }
+    </style>
+  </defs>
+  <rect width="1400" height="760" fill="#f8fafc"/>
+  <text x="70" y="65" class="title">重载解析：先阶段，再选最具体</text>
+  <text x="70" y="98" class="small">同一次调用不会因为运行时对象类型而重新执行普通重载匹配</text>
+
+  <rect x="70" y="180" width="220" height="120" class="box" fill="#dbeafe"/>
+  <text x="180" y="225" text-anchor="middle" class="label">调用表达式</text>
+  <text x="180" y="260" text-anchor="middle" class="small">f(actual arguments)</text>
+
+  <rect x="375" y="140" width="270" height="145" class="box" fill="#dcfce7"/>
+  <text x="510" y="185" text-anchor="middle" class="label">阶段 1</text>
+  <text x="510" y="220" text-anchor="middle" class="small">固定参数</text>
+  <text x="510" y="248" text-anchor="middle" class="small">恒等 / 基本宽化 / 引用宽化</text>
+
+  <rect x="375" y="355" width="270" height="145" class="box" fill="#fef3c7"/>
+  <text x="510" y="400" text-anchor="middle" class="label">阶段 2</text>
+  <text x="510" y="435" text-anchor="middle" class="small">固定参数</text>
+  <text x="510" y="463" text-anchor="middle" class="small">装箱 / 拆箱 / 引用宽化</text>
+
+  <rect x="375" y="570" width="270" height="120" class="box" fill="#fee2e2"/>
+  <text x="510" y="615" text-anchor="middle" class="label">阶段 3</text>
+  <text x="510" y="650" text-anchor="middle" class="small">可变参数打包为数组</text>
+
+  <path d="M290 240 L375 212" class="arrow"/>
+  <path d="M510 285 L510 355" class="arrow"/>
+  <path d="M510 500 L510 570" class="arrow"/>
+  <text x="305" y="198" class="small">收集可见候选</text>
+  <text x="535" y="330" class="small">无严格候选</text>
+  <text x="535" y="545" class="small">无宽松候选</text>
+
+  <rect x="770" y="255" width="250" height="145" class="box" fill="#e0e7ff"/>
+  <text x="895" y="300" text-anchor="middle" class="label">最具体比较</text>
+  <text x="895" y="335" text-anchor="middle" class="small">同阶段候选之间</text>
+  <text x="895" y="363" text-anchor="middle" class="small">保留唯一最具体方法</text>
+
+  <rect x="1120" y="150" width="210" height="105" class="box" fill="#bbf7d0"/>
+  <text x="1225" y="193" text-anchor="middle" class="label">唯一匹配</text>
+  <text x="1225" y="225" text-anchor="middle" class="small">编译期绑定重载</text>
+
+  <rect x="1120" y="330" width="210" height="105" class="box" fill="#fecaca"/>
+  <text x="1225" y="373" text-anchor="middle" class="label">无唯一最具体</text>
+  <text x="1225" y="405" text-anchor="middle" class="small">编译错误：歧义</text>
+
+  <rect x="1120" y="510" width="210" height="105" class="box" fill="#fecaca"/>
+  <text x="1225" y="553" text-anchor="middle" class="label">无适用方法</text>
+  <text x="1225" y="585" text-anchor="middle" class="small">编译错误</text>
+
+  <path d="M645 212 C690 212 720 285 770 300" class="arrow"/>
+  <path d="M645 427 C695 427 720 370 770 355" class="arrow"/>
+  <path d="M645 630 C700 630 735 420 770 390" class="arrow"/>
+  <path d="M1020 300 L1120 210" class="arrow"/>
+  <path d="M1020 350 L1120 380" class="arrow"/>
+  <path d="M645 630 L1120 560" class="arrow"/>
+</svg>

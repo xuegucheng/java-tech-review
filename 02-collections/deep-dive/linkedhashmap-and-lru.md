@@ -12,6 +12,8 @@
 >
 > 语义以 **Java 21** 为基准，底层核心实现按 JDK 8+ 主线理解。重点机制优先使用 Mermaid 图，不要求背完整源码，只要求能顺着关键钩子讲清楚。
 
+> **本章唯一负责 LinkedHashMap 的顺序链表、`accessOrder`、LRU 和 Java 21 `SequencedMap` 增量。** HashMap 的桶/resize 回到 [HashMap](hashmap.md)，key 的 equality 契约回到 [Java Core 对象契约](../../01-java-core/deep-dive/equals-and-hashcode-contract.md)。
+
 ---
 
 ## 07.1 一张图建立整章的面试地图

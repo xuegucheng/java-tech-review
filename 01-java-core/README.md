@@ -17,7 +17,7 @@
 
 ### 7 天复习中的 Java Core
 
-先完成上面的 P0，再补 [运行链路与版本边界](interview/runtime-and-version-boundaries.md)、[类型转换陷阱](interview/type-and-conversion-traps.md) 和 [类初始化与 final](interview/class-initialization-and-final.md)。需要证明结论时，直接跳到对应 Deep Dive 或 [examples](../examples/README.md)。
+先完成上面的 P0，再补 [运行链路与版本边界](interview/runtime-and-version-boundaries.md)、[类型转换陷阱](interview/type-and-conversion-traps.md)、[类初始化与 final](interview/class-initialization-and-final.md) 和 [方法重载与调用解析](interview/method-overloading.md)。需要证明结论时，直接跳到对应 Deep Dive 或 [examples](../examples/README.md)。
 
 ## Interview Review
 
@@ -30,13 +30,14 @@
 | P1 | [运行链路与版本边界](interview/runtime-and-version-boundaries.md) | 区分 JDK/JVM/字节码与 JDK 8/17/21/25 |
 | P1 | [类型转换陷阱](interview/type-and-conversion-traps.md) | 处理数值提升、溢出、浮点和金额问题 |
 | P1 | [类初始化与 final](interview/class-initialization-and-final.md) | 解释初始化顺序、编译期常量与安全发布边界 |
+| P1 | [方法重载与调用解析](interview/method-overloading.md) | 解释签名、宽化、装箱、可变参数和歧义 |
 
 ## Deep Dive 资产
 
 这些文章保留了原仓库的长文、规范边界、工程讨论、源码阅读清单和面试题；它们不是首页的必读顺序。
 
-| 主题 | Deep Dive |
-| --- | --- |
+| 主题 | Deep Dive | 保留范围 |
+| --- | --- | --- |
 | 运行与工具链 | [platform-and-execution.md](deep-dive/platform-and-execution.md) | JDK/JRE/JVM、字节码、JIT |
 | 类型与变量 | [types-and-variables.md](deep-dive/types-and-variables.md) | 静态类型、基本类型、引用、作用域与遮蔽 |
 | 转换与数值精度 | [conversions-and-numeric-precision.md](deep-dive/conversions-and-numeric-precision.md) | 宽化/窄化、二元数值提升、溢出、浮点与 BigDecimal |
@@ -56,6 +57,7 @@
 | final 与常量 | [final-and-constants.md](deep-dive/final-and-constants.md) | final、编译期常量、初始化安全与兼容性 |
 | equals 与 hashCode | [equals-and-hashcode-contract.md](deep-dive/equals-and-hashcode-contract.md) | equals、hashCode 与对象相等性契约 |
 | Object 方法与工具 | [object-methods-and-utilities.md](deep-dive/object-methods-and-utilities.md) | toString、getClass、clone 与 Object 方法 |
+| 泛型语言规则 | [generics.md](deep-dive/generics.md) | 类型参数、通配符、擦除、堆污染与桥接方法 |
 
 ## 版本边界
 
@@ -71,5 +73,9 @@
 ## 图示与实验
 
 - mental model 总入口：[Java 复习闭环](../diagrams/java/review-loop.svg)
+- 方法重载：[重载解析](../diagrams/java/overload-resolution.svg)
+- 参数与对象状态：[Java 参数传递](../diagrams/java/java-pass-by-value.svg)
+- 多态：[多态分派](../diagrams/java/polymorphism-dispatch.svg)
+- 初始化与 final：[类初始化](../diagrams/java/class-initialization.svg)、[final 引用与不可变对象](../diagrams/java/final-reference-vs-immutable.svg)
 - 可运行验证：[examples/](../examples/README.md)
 - 图示职责：[diagrams/README.md](../diagrams/README.md)

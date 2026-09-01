@@ -2,6 +2,8 @@
 
 > 本章聚焦 Java 接口的语言规则、契约设计和工程边界。接口不是“只有抽象方法的特殊类”，而是独立的引用类型：它可以定义行为契约、默认实现、静态工厂和内部复用逻辑，并允许一个类同时承担多个角色。
 
+> **本页唯一负责接口声明、默认方法和实现兼容性。** ISP、DIP、接口拆分的变化轴统一放在 [composition-and-design-principles.md](composition-and-design-principles.md)；本页只保留接口语言层的隔离边界。
+
 ## 14.1 本章定位
 
 学完本章，应能够准确回答：
@@ -1962,61 +1964,11 @@ HttpInventoryClientInterface
 
 ---
 
-## 14.37 接口隔离的语言层准备
+## 14.37 接口隔离：本页只保留语言边界
 
-调用方不应依赖自己不使用的方法。
+接口应围绕调用方真正依赖的角色保持内聚；实现类大量空实现、频繁抛 `UnsupportedOperationException` 或只使用巨大接口的一小部分，都是需要重新切分的信号。
 
-反例：
-
-```java
-public interface WarehouseSystem {
-
-    void receive();
-
-    void putAway();
-
-    void pick();
-
-    void pack();
-
-    void ship();
-
-    void audit();
-}
-```
-
-某个盘点组件可能只需要：
-
-```java
-public interface InventoryAuditor {
-
-    AuditResult audit(AuditCommand command);
-}
-```
-
-### 14.37.1 小接口不是越碎越好
-
-接口隔离强调：
-
-```text
-围绕调用方角色保持内聚
-```
-
-不是：
-
-```text
-每个方法单独建接口
-```
-
-### 14.37.2 拆分信号
-
-- 实现类大量空实现；
-- 方法经常抛 `UnsupportedOperationException`；
-- 调用方只使用很小子集；
-- 不同方法由完全不同团队演进；
-- 实现类依赖集合差异巨大。
-
-系统设计原则将在第 15 章展开。
+“接口不是越碎越好”、ISP 与 DIP 的完整变化轴和重构方法由 [组合与设计原则](composition-and-design-principles.md) 唯一维护。本页继续负责接口声明、默认方法冲突和实现兼容性，不再复制整套设计原则教材。
 
 ---
 

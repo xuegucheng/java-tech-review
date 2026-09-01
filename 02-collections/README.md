@@ -14,7 +14,7 @@
 
 ### 7 天复习中的 Collections
 
-先走完上面的 P0，再补 [List 选型](interview/list-choice.md)、泛型 Deep Dive 和各实现源码主线。不要从 `ArrayList`、`LinkedList`、`HashMap` 的 API 清单开始背；先确定数据语义、顺序、并发边界和主要操作。
+先走完上面的 P0，再补 [List 选型](interview/list-choice.md)、[Collections 泛型 API 设计](deep-dive/collection-generic-api-design.md) 和各实现源码主线。Java 泛型语言规则统一见 [Java Core 泛型权威文档](../01-java-core/deep-dive/generics.md)。不要从 `ArrayList`、`LinkedList`、`HashMap` 的 API 清单开始背；先确定数据语义、顺序、并发边界和主要操作。
 
 ## Interview Review
 
@@ -29,7 +29,7 @@
 
 | 主题 | Deep Dive |
 | --- | --- |
-| 泛型与类型安全 | [generics-and-type-safety.md](deep-dive/generics-and-type-safety.md) |
+| 集合泛型 API 设计 | [collection-generic-api-design.md](deep-dive/collection-generic-api-design.md) |
 | 集合接口与核心契约 | [collection-contracts.md](deep-dive/collection-contracts.md) |
 | ArrayList | [arraylist.md](deep-dive/arraylist.md) |
 | LinkedList | [linkedlist.md](deep-dive/linkedlist.md) |

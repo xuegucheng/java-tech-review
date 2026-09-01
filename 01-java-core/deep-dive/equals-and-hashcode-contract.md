@@ -2,6 +2,8 @@
 
 > 本章把 Java 对象相等性视为一项长期 API 契约，而不是 IDE 自动生成的样板代码。重点是区分身份相等、值相等和业务身份，正确实现 `equals`/`hashCode`，理解继承、代理、可变字段和哈希容器中的边界，并能为 WMS 实体、值对象和复合键选择稳定语义。
 
+> **Authoritative source：Java equality language contract。** 本文唯一维护 `==`、`Object.equals`、身份/值/实体相等、五项 equals 契约、hashCode 契约、继承与代理边界、record、可变 equality 和契约测试。Collections 只解释哈希结构如何消费这些规则，见 [Hash 集合如何消费 equals/hashCode 契约](../../02-collections/deep-dive/hash-collections-and-set-contract.md)。
+
 ---
 
 ## 18.1 本章定位
@@ -29,7 +31,7 @@
 - IdentityHashMap 与普通 HashMap 的相等性语义有何不同？
 - 如何用属性测试和契约测试验证相等性实现？
 
-`toString`、`clone`、`getClass` 的通用使用以及 `Objects` 其他工具方法见第 19 章；HashMap 数据结构和扩容算法见集合模块。
+`toString`、`clone`、`getClass` 的通用使用以及 `Objects` 其他工具方法见第 19 章；HashMap 数据结构和扩容算法见集合模块。本文不负责解释 HashMap 的 bucket、resize 或 LinkedHashMap 的顺序链表。
 
 ## 18.2 学习主线
 

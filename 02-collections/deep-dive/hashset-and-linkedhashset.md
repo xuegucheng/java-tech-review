@@ -14,6 +14,8 @@
 >
 > 为了方便理解，本章对核心机制优先使用 Mermaid 流程图。语义以 **Java 21** 为基准，HashSet / LinkedHashSet 的核心实现按 JDK 8+ 主线理解。
 
+> **边界声明**：`equals`、`hashCode`、相等性五条规则、继承/代理相等策略的唯一权威来源是 [Java Core：equals 与 hashCode 契约](../../01-java-core/deep-dive/equals-and-hashcode-contract.md)。本章只解释 HashSet/LinkedHashSet 如何消费该契约；HashMap 的扰动、桶、树化和 resize 细节见 [HashMap](hashmap.md)。
+
 ---
 
 ## 06.1 一张图建立整章的面试地图
@@ -240,148 +242,26 @@ flowchart LR
 
 ---
 
-## 06.4 四种情况：hashCode 和 equals 到底如何影响 HashSet？
+## 06.4 HashSet 如何消费相等性契约
 
-这是面试特别喜欢变形问的地方。
+本节只保留容器侧的后果，不重新定义 `equals`/`hashCode`：
 
-假设：
+| 对象关系 | HashSet 的容器侧结果 |
+| --- | --- |
+| hash 不同、equals 不同 | 通常落入不同候选桶，两个元素都可保留 |
+| hash 相同、equals 不同 | 这是正常碰撞；同桶不同节点，两个元素都可保留 |
+| hash 相同、equals 相同 | 命中已有 key，第二次 `add` 返回 `false` |
+| equals 相同、hash 不同 | 违反契约，可能落入不同桶并出现重复逻辑元素 |
 
-```java
-Set<User> set = new HashSet<>();
-set.add(user1);
-set.add(user2);
-```
+记忆链路只有一句：
 
-关键看两个对象之间的关系。
+> **hash 负责缩小候选范围，`==`/`equals` 负责在候选节点上确认；契约定义回 Java Core，桶实现定义回 HashMap。**
 
----
-
-### 情况一：hash 不同，equals 也不同
-
-```text
-user1.hashCode() != user2.hashCode()
-user1.equals(user2) == false
-```
-
-通常会去不同桶：
-
-```mermaid
-flowchart LR
-    U1[user1] --> H1[hash H1]
-    U2[user2] --> H2[hash H2]
-
-    H1 --> B1[bucket 3]
-    H2 --> B2[bucket 9]
-
-    B1 --> R1[保留 user1]
-    B2 --> R2[保留 user2]
-```
-
-结果：
-
-```text
-两个元素都存在
-```
-
----
-
-### 情况二：hash 相同，但 equals 不同
-
-```text
-user1.hashCode() == user2.hashCode()
-user1.equals(user2) == false
-```
-
-这是正常哈希冲突。
-
-```mermaid
-flowchart TD
-    U1[user1] --> H[相同 hash]
-    U2[user2] --> H
-    H --> B[同一个 bucket]
-
-    B --> C{equals 是否相等}
-    C -- 否 --> D[作为不同节点保存]
-    D --> E[HashSet 中两个元素都存在]
-```
-
-所以：
-
-> **HashSet 并不是 hashCode 相同就去重。**
-
-hashCode 冲突完全允许存在。
-
----
-
-### 情况三：hash 相同，equals 也相同
-
-```text
-user1.hashCode() == user2.hashCode()
-user1.equals(user2) == true
-```
-
-这才是 HashSet 判定重复的典型情况：
-
-```mermaid
-flowchart TD
-    U1[user1] --> H[相同 hash]
-    U2[user2] --> H
-    H --> B[同一个 bucket]
-    B --> E{equals}
-    E -- true --> F[认定是同一个逻辑元素]
-    F --> G[第二次 add 返回 false]
-```
-
----
-
-### 情况四：equals 相同，但 hashCode 不同
-
-这代表：
-
-```text
-equals/hashCode 契约被破坏
-```
-
-例如只重写 equals，没有重写 hashCode。
-
-```mermaid
-flowchart TD
-    U1[user1] --> H1[hash 100]
-    U2[user2] --> H2[hash 900]
-
-    H1 --> B1[bucket 4]
-    H2 --> B2[bucket 12]
-
-    B1 --> X1[保存 user1]
-    B2 --> X2[保存 user2]
-
-    X1 --> R[HashSet 出现两个逻辑相等对象]
-    X2 --> R
-```
-
-即使：
-
-```text
-user1.equals(user2) == true
-```
-
-HashMap 也可能根本不会把它们放到同一个桶里比较 equals。
-
-所以最终：
-
-```text
-HashSet 去重失败
-```
-
-这正是为什么上一章强调：
-
-> **equals 相等 ⇒ hashCode 必须相等。**
-
----
+因此本章不会再次展开相等性的五条规则、`getClass`/`instanceof` 策略、record 或 ORM 代理选择；这些内容统一放在 [equals 与 hashCode 契约](../../01-java-core/deep-dive/equals-and-hashcode-contract.md)。
 
 ### ⭐ 面试口述版（2）
 
-> HashSet 的判重分两层。第一层用 hash 定位桶，所以 hashCode 只是缩小查找范围；第二层在桶内通过引用相等或 equals 做最终判定。因此 hashCode 相同但 equals 不同只是普通哈希冲突，两个元素仍然可以同时存在；只有 hash 能把它们定位到候选桶，并且 equals 最终判定相等时，才会认为重复。如果 equals 相等但 hashCode 不同，就违反了 Java 的 hashCode 契约，HashSet 可能出现两个逻辑相等元素。
+> HashSet 的判重先按 hash 找候选桶，再在桶内按引用相等或 equals 做最终判断。hash 相同但 equals 不同只是碰撞；equals 相同但 hash 不同则违反契约，可能导致去重失败。不要把 HashSet 的实现流程和 equality 规则混成两套教材。
 
 ---
 

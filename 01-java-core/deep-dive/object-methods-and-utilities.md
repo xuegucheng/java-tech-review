@@ -344,33 +344,9 @@ DTO 快照、领域对象和持久化对象之间应使用显式映射。序列�
 
 文件、Socket、数据库连接、线程、锁和事务上下文通常没有合理的 clone 语义。复制这些包装对象并不会复制底层操作系统资源，容易导致双重关闭和所有权混乱。
 
-## 19.35 wait/notify 在 Object 中
+## 19.35 wait/notify：Object 页只保留边界
 
-任意对象都可以作为内置监视器：
-
-```java
-synchronized (lock) {
-    lock.wait();
-}
-```
-
-因此 wait、notify、notifyAll 定义在 Object。它们操作的是该对象的监视器等待集，而不是 Thread 对象本身。
-
-## 19.36 持有监视器要求
-
-线程调用对象的 wait/notify 前必须拥有该对象监视器，否则抛 `IllegalMonitorStateException`。
-
-拥有方式包括同步实例方法、`synchronized(object)` 代码块，以及 Class 对象对应的静态同步方法。
-
-## 19.37 wait 释放什么锁
-
-`wait` 会释放当前对象的监视器，并进入该对象等待集；线程持有的其他锁不会自动释放。
-
-被 notify 唤醒后也不会立即运行，必须重新竞争并获得同一监视器。
-
-## 19.38 条件循环
-
-由于虚假唤醒、多个条件共享等待集和竞争，wait 应放在 while 条件循环中：
+`wait`、`notify`、`notifyAll` 定义在 `Object`，因为任意对象都可以作为内置监视器。调用前必须持有同一对象的监视器；`wait` 只释放该监视器，唤醒后还要重新竞争并在 `while` 中复查条件。
 
 ```java
 synchronized (lock) {
@@ -380,13 +356,7 @@ synchronized (lock) {
 }
 ```
 
-完整生产者消费者、interrupt 和 LockSupport 见并发章节。
-
-## 19.39 notify 与 notifyAll
-
-notify 任意唤醒一个等待线程，无法指定条件；notifyAll 唤醒全部等待线程，再由它们竞争锁和检查条件。
-
-复杂条件通常使用 `Lock`/`Condition` 或更高层并发工具，避免直接手写监视器协议。
+这段是对象 API 的边界示例，不在本页展开等待集、可见性、条件队列、中断、`Condition` 或生产者消费者协议。完整权威解释留给未来 `concurrency` 模块。
 
 ## 19.40 finalization 状态
 
@@ -823,54 +793,9 @@ NEW
 DONE
 ```
 
-### 实验15：wait/notify 正确监视器
+### 实验15-16：并发实验迁移说明
 
-**目标**：验证持有锁后等待和唤醒。
-
-```java
-public class WaitNotifyDemo {
-    public static void main(String[] args) throws Exception {
-        Object lock = new Object(); boolean[] ready = {false};
-        Thread worker = new Thread(() -> {
-            synchronized (lock) {
-                while (!ready[0]) {
-                    try { lock.wait(); } catch (InterruptedException e) { Thread.currentThread().interrupt(); return; }
-                }
-                System.out.println("ready");
-            }
-        });
-        worker.start();
-        synchronized (lock) { ready[0] = true; lock.notifyAll(); }
-        worker.join();
-    }
-}
-```
-
-预期或观察重点：
-
-```text
-ready
-```
-
-### 实验16：未持有监视器的异常
-
-**目标**：观察 IllegalMonitorStateException。
-
-```java
-public class MonitorOwnershipDemo {
-    public static void main(String[] args) {
-        Object lock = new Object();
-        try { lock.notify(); }
-        catch (IllegalMonitorStateException e) { System.out.println(e.getClass().getSimpleName()); }
-    }
-}
-```
-
-预期或观察重点：
-
-```text
-IllegalMonitorStateException
-```
+Object 页面不再内嵌 `wait/notify` 的完整生产者消费者和异常实验，避免与未来 `concurrency` 模块形成第二套权威内容。这里只保留 API 边界：调用必须持有同一监视器，等待应在条件 `while` 中复查。
 
 ### 实验17：identityHashCode 绕过重写
 
@@ -1021,37 +946,27 @@ invalid
 57. 不可变对象的 with 方法是什么？
 58. 序列化往返能否作为通用深复制？
 59. 资源对象为什么通常不可 clone？
-60. wait/notify 为什么定义在 Object？
-61. wait 操作的是 Thread 还是对象监视器？
-62. 调用 wait/notify 前必须满足什么？
-63. 未持有监视器会抛什么异常？
-64. wait 会释放哪个锁？
-65. wait 会释放线程持有的所有锁吗？
-66. notify 后等待线程是否立即执行？
-67. 为什么 wait 要放在 while 中？
-68. 什么是虚假唤醒？
-69. notify 与 notifyAll 有何区别？
-70. 复杂条件为何更适合 Condition？
-71. finalize 当前是什么状态？
-72. 为什么 finalization 不可靠？
-73. 对象复活是什么风险？
-74. 为什么 GC 不能保证及时关闭文件？
-75. try-with-resources 依赖什么接口？
-76. try-with-resources 如何处理多个异常？
-77. Cleaner 适合什么定位？
-78. Cleaner 能否保证及时释放资源？
-79. 清理动作为什么不能强引用被清理对象？
-80. System.identityHashCode 与重写 hashCode 有何关系？
-81. identityHashCode 是否保证唯一？
-82. identityHashCode 是否等于内存地址？
-83. identityHashCode 能否作为业务 ID？
-84. Objects.requireNonNull 返回什么？
-85. requireNonNull 的 Supplier 消息应注意什么？
-86. requireNonNullElse 与 ElseGet 有何区别？
-87. Objects.nonNull 何时有用？
-88. Objects.deepEquals 如何处理数组？
-89. Objects.compare 是否自动支持 null？
-90. Objects.checkIndex 系列解决什么问题？
+60. wait/notify 为什么属于 Object？（并发完整模型见未来 concurrency 模块。）
+61. finalize 当前是什么状态？
+62. 为什么 finalization 不可靠？
+63. 对象复活是什么风险？
+64. 为什么 GC 不能保证及时关闭文件？
+65. try-with-resources 依赖什么接口？
+66. try-with-resources 如何处理多个异常？
+67. Cleaner 适合什么定位？
+68. Cleaner 能否保证及时释放资源？
+69. 清理动作为什么不能强引用被清理对象？
+70. System.identityHashCode 与重写 hashCode 有何关系？
+71. identityHashCode 是否保证唯一？
+72. identityHashCode 是否等于内存地址？
+73. identityHashCode 能否作为业务 ID？
+74. Objects.requireNonNull 返回什么？
+75. requireNonNull 的 Supplier 消息应注意什么？
+76. requireNonNullElse 与 ElseGet 有何区别？
+77. Objects.nonNull 何时有用？
+78. Objects.deepEquals 如何处理数组？
+79. Objects.compare 是否自动支持 null？
+80. Objects.checkIndex 系列解决什么问题？
 
 ## 19.59 易错点
 

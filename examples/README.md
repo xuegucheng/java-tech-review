@@ -23,6 +23,9 @@ java -cp examples/target/classes com.xuegucheng.javatechreview.ParameterPassingD
 java -cp examples/target/classes com.xuegucheng.javatechreview.HashMapCollisionDemo
 java -cp examples/target/classes com.xuegucheng.javatechreview.LinkedHashMapLruDemo
 java -cp examples/target/classes com.xuegucheng.javatechreview.ClassInitializationDemo
+java -cp examples/target/classes com.xuegucheng.javatechreview.OverloadResolutionDemo
+java -cp examples/target/classes com.xuegucheng.javatechreview.PolymorphismDispatchDemo
+java -cp examples/target/classes com.xuegucheng.javatechreview.FinalReferenceDemo
 ```
 
 ## 示例索引
@@ -33,5 +36,8 @@ java -cp examples/target/classes com.xuegucheng.javatechreview.ClassInitializati
 | `HashMapCollisionDemo` | hash 冲突不等于 key 相等，最终还要使用 equals |
 | `LinkedHashMapLruDemo` | access-order、访问后移动和 `removeEldestEntry` |
 | `ClassInitializationDemo` | Holder 的延迟初始化和类初始化边界 |
+| `OverloadResolutionDemo` | 严格转换、基本类型宽化与可变参数优先级 |
+| `PolymorphismDispatchDemo` | 编译时重载选择与运行时重写分派 |
+| `FinalReferenceDemo` | final 引用可变与不可变快照的差异 |
 
 新增示例时，必须同时增加可重复执行的测试，并从对应 Interview Review 或 Deep Dive 反向链接回来。

@@ -8,6 +8,8 @@
 >
 > 实现语义以 **Java 21 / JDK 8+ HashMap** 为主。
 
+> **本章唯一负责 HashMap 的 hash 扰动、桶定位、冲突结构、树化与 resize。** `equals/hashCode` 的语言契约由 [Java Core 对象契约](../../01-java-core/deep-dive/equals-and-hashcode-contract.md)维护；本章只说明 HashMap 在桶内如何消费它。
+
 ---
 
 ## 04.1 先把 HashMap 的面试地图背下来

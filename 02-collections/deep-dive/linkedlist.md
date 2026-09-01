@@ -28,7 +28,7 @@
 - `reversed()` 为什么是视图而不是拷贝？
 - LinkedList 在内存、GC、CPU Cache 上为什么可能输给 ArrayList？
 
-本章不讨论并发链表或阻塞队列；并发集合留在 `1.2-并发编程`。
+本章不讨论并发链表或阻塞队列；并发集合留在未来 `concurrency` 模块。
 
 ---
 
@@ -2229,10 +2229,9 @@ LinkedList 是 Java 集合框架中的双向链表实现，同时实现 List 和
 
 关联模块：
 
-```text
-generics-and-type-safety
-collection-contracts
-arraylist
-hashmap
-1.2-并发编程 / 并发集合
-```
+- [Java Core 泛型语言规则](../../01-java-core/deep-dive/generics.md)
+- [Collections 泛型 API 设计](collection-generic-api-design.md)
+- [集合接口与核心契约](collection-contracts.md)
+- [ArrayList](arraylist.md)
+- [HashMap](hashmap.md)
+- 未来并发模块 / 并发集合

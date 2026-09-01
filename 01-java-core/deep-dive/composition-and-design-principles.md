@@ -3,6 +3,8 @@
 
 > 本章承接 `inheritance-and-overriding.md`、`polymorphism-and-dynamic-dispatch.md`、`abstract-classes.md` 和 `interfaces.md`，把语言能力上升为工程设计能力。重点不是背诵 SOLID 缩写，而是识别变化轴、控制依赖方向、选择继承或组合、判断抽象是否值得，并能把已经失控的代码渐进式重构为可测试、可替换、可演进的结构。
 
+> **本章拥有设计原则层的唯一解释**：LSP、ISP、DIP、DI、组合/继承选择、策略与委托。语言规则页只保留到这里的边界链接，不在各自章节复制整套设计原则。
+
 ---
 
 ## 15.1 本章定位

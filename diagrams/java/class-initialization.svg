@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 720" role="img" aria-labelledby="title desc">
+  <title id="title">Java class initialization lifecycle</title>
+  <desc id="desc">A class moves from loading through linking to initialization. Preparation supplies default static values; initialization runs explicit static fields and blocks in source order.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#475569"/>
+    </marker>
+    <style>
+      .title { font: 700 30px sans-serif; fill: #0f172a; }
+      .label { font: 600 19px sans-serif; fill: #0f172a; }
+      .small { font: 16px sans-serif; fill: #334155; }
+      .box { stroke: #334155; stroke-width: 2; rx: 18; }
+      .arrow { stroke: #475569; stroke-width: 3; fill: none; marker-end: url(#arrow); }
+    </style>
+  </defs>
+  <rect width="1400" height="720" fill="#f8fafc"/>
+  <text x="70" y="65" class="title">类初始化：加载、链接、初始化不是一回事</text>
+  <text x="70" y="98" class="small">准备阶段给静态字段默认值；初始化阶段执行显式赋值和静态代码块</text>
+
+  <rect x="70" y="235" width="210" height="130" class="box" fill="#dbeafe"/>
+  <text x="175" y="282" text-anchor="middle" class="label">Loading</text>
+  <text x="175" y="318" text-anchor="middle" class="small">读取类定义</text>
+
+  <rect x="360" y="160" width="300" height="280" class="box" fill="#e0e7ff"/>
+  <text x="510" y="210" text-anchor="middle" class="label">Linking</text>
+  <rect x="405" y="240" width="210" height="55" class="box" fill="#eef2ff"/>
+  <text x="510" y="275" text-anchor="middle" class="small">Verification</text>
+  <rect x="405" y="310" width="210" height="55" class="box" fill="#eef2ff"/>
+  <text x="510" y="345" text-anchor="middle" class="small">Preparation：默认值</text>
+  <rect x="405" y="380" width="210" height="55" class="box" fill="#eef2ff"/>
+  <text x="510" y="415" text-anchor="middle" class="small">Resolution（按需）</text>
+
+  <rect x="740" y="215" width="310" height="170" class="box" fill="#dcfce7"/>
+  <text x="895" y="262" text-anchor="middle" class="label">Initialization</text>
+  <text x="895" y="300" text-anchor="middle" class="small">父类 / 默认方法接口先行</text>
+  <text x="895" y="332" text-anchor="middle" class="small">显式静态字段与代码块</text>
+  <text x="895" y="364" text-anchor="middle" class="small">按源码顺序执行一次</text>
+
+  <rect x="1130" y="235" width="210" height="130" class="box" fill="#fef3c7"/>
+  <text x="1235" y="282" text-anchor="middle" class="label">Ready</text>
+  <text x="1235" y="318" text-anchor="middle" class="small">可安全使用类状态</text>
+
+  <path d="M280 300 L360 300" class="arrow"/>
+  <path d="M660 300 L740 300" class="arrow"/>
+  <path d="M1050 300 L1130 300" class="arrow"/>
+  <text x="80" y="515" class="small">主动使用示例：new、访问非编译期静态字段、调用静态方法、反射主动初始化</text>
+  <text x="80" y="555" class="small">常量变量、类字面量和某些数组创建可能只是被动引用，不触发声明类初始化</text>
+  <text x="80" y="625" class="small">初始化由类初始化锁协调；失败后该类进入错误状态，不能当作普通重试处理</text>
+</svg>

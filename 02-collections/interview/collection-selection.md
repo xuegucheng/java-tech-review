@@ -26,7 +26,7 @@ List / Set / Queue / Deque / Map
 ## Deep Dive
 
 - [集合接口与核心契约](../deep-dive/collection-contracts.md)
-- [泛型与类型安全](../deep-dive/generics-and-type-safety.md)
+- [Collections 泛型 API 设计](../deep-dive/collection-generic-api-design.md)（语言规则见 [Java Core 泛型](../../01-java-core/deep-dive/generics.md)）
 
 ## 一句话复盘
 

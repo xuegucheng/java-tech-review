@@ -120,16 +120,33 @@ Deep Dive 允许保留完整推理、关键源码片段、图和工程讨论，�
 
 “面试追问链”必须表达因果顺序，例如 HashMap 的 `是什么 → 如何定位桶 → 冲突 → 树化 → resize → equals/hashCode → 并发边界`，不能只是罗列问题。
 
-## 7. One Source of Truth
+## 7. One Source of Truth：概念 ownership matrix
 
-| 概念 | 唯一权威 | 其他模块允许写什么 |
+下面的矩阵是内容边界，而不是目录装饰。Owner 负责定义规则、版本边界和完整推理；Consumer 只能说明自己如何调用、继承或消费该规则，并链接回 Owner。
+
+| 概念 | 唯一权威 Owner | Consumer 允许保留的内容 |
 | --- | --- | --- |
-| 变量、引用、参数传递 | `01-java-core` | 只引用；集合可用一个短例子说明消费方式 |
-| `equals/hashCode` 契约 | `01-java-core/deep-dive/equals-and-hashcode-contract.md` | Collections 只解释 HashMap/HashSet 如何消费 |
-| HashMap 的 hash、bucket、树化、resize | `02-collections/deep-dive/hashmap.md` | HashSet/LinkedHashMap 只写复用关系和增量结构 |
-| 集合接口、视图、fail-fast | `02-collections/deep-dive/collection-contracts.md` | 实现专题只引用契约，不重写全表 |
-| `wait/notify`、中断、LockSupport、条件队列 | 未来 `concurrency` | Object 主题只说明历史归属和调用边界 |
-| 泛型语言规则 | `01-java-core` 的类型专题 | Collections 只说明 `extends/super` 在 API 中的用法 |
+| 变量、引用、参数传递 | `01-java-core/deep-dive/parameter-passing.md` | 对象创建、集合 API 可用短例子说明别名/所有权 |
+| 泛型语言规则 | `01-java-core/deep-dive/generics.md` | Collections 只解释 `addAll`、`Comparator`、`Collections.copy` 等 API 签名 |
+| `equals/hashCode` 契约 | `01-java-core/deep-dive/equals-and-hashcode-contract.md` | Collections 只解释 HashMap/HashSet 如何消费 equality |
+| 不可变对象、防御性复制、对象不变量 | `01-java-core/deep-dive/object-creation-and-immutability.md` | 参数传递只说明共享风险并链接回 Owner |
+| `extends`、重写、协变返回、异常规则、构造链 | `01-java-core/deep-dive/inheritance-and-overriding.md` | 抽象类/接口只写自身增量能力 |
+| 抽象类、抽象方法、模板方法、骨架实现 | `01-java-core/deep-dive/abstract-classes.md` | 设计专题只比较何时使用，不重写语言规则 |
+| 接口规则、default/static/private、冲突和函数式接口 | `01-java-core/deep-dive/interfaces.md` | 组合专题只讨论依赖方向和替换边界 |
+| 继承 vs 组合、委托、变化轴、SOLID/DIP | `01-java-core/deep-dive/composition-and-design-principles.md` | 语言专题只引用设计取舍，不维护第二套 SOLID 教程 |
+| `static` 语义、主动/被动使用、初始化顺序 | `01-java-core/deep-dive/static-and-class-initialization.md` | Object/类设计只引用初始化边界 |
+| `final`、blank final、常量内联、二进制兼容 | `01-java-core/deep-dive/final-and-constants.md` | 参数页只说明 final 参数不改变传参语义 |
+| `wait/notify`、中断、LockSupport、条件队列 | 未来 `concurrency` | Object 页只保留监视器 API 边界和链接 |
+| HashMap 的 hash、bucket、树化、resize | `02-collections/deep-dive/hashmap.md` | Hash 集合/LinkedHashMap 只写复用关系和增量结构 |
+| 集合接口、视图、迭代器、fail-fast | `02-collections/deep-dive/collection-contracts.md` | 实现专题只引用契约，不重写全表 |
+| HashSet/LinkedHashSet 的结构与顺序增量 | `02-collections/deep-dive/hashset-and-linkedhashset.md` | Hash consumer 页只写 equality 消费链 |
+| LinkedHashMap 顺序链表、access-order、LRU | `02-collections/deep-dive/linkedhashmap-and-lru.md` | HashSet 只说明复用 LinkedHashMap 的增量 |
+
+当前已落地的跨模块链接包括：
+
+- [Java equality contract](../01-java-core/deep-dive/equals-and-hashcode-contract.md) ← [Hash consumer](../02-collections/deep-dive/hash-collections-and-set-contract.md)；
+- [Java generics owner](../01-java-core/deep-dive/generics.md) ← [Collection generic API](../02-collections/deep-dive/collection-generic-api-design.md)；
+- [Object immutability owner](../01-java-core/deep-dive/object-creation-and-immutability.md) ← parameter passing / final 主题的共享边界说明。
 
 当一个概念出现第二次时，先问它是在定义契约，还是在说明另一个组件如何消费契约；如果是后者，使用链接而不是复制完整解释。
 

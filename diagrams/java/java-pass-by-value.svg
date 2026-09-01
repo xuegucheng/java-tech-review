@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 720" role="img" aria-labelledby="title desc">
+  <title id="title">Java pass by value for reference values</title>
+  <desc id="desc">The caller and callee each hold a copy of the same reference value. Mutation reaches the shared object; rebinding changes only the callee variable.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#475569"/>
+    </marker>
+    <style>
+      .title { font: 700 30px sans-serif; fill: #0f172a; }
+      .label { font: 600 19px sans-serif; fill: #0f172a; }
+      .small { font: 16px sans-serif; fill: #334155; }
+      .box { stroke: #334155; stroke-width: 2; rx: 16; }
+      .arrow { stroke: #475569; stroke-width: 3; fill: none; marker-end: url(#arrow); }
+      .mutate { stroke: #15803d; stroke-width: 4; fill: none; marker-end: url(#arrow); }
+      .rebind { stroke: #b91c1c; stroke-width: 4; fill: none; stroke-dasharray: 10 8; marker-end: url(#arrow); }
+    </style>
+  </defs>
+  <rect width="1400" height="720" fill="#f8fafc"/>
+  <text x="70" y="65" class="title">Java 只有值传递：引用值也会被复制</text>
+  <text x="70" y="98" class="small">关键区别：修改共享对象可见；形参重绑不可见</text>
+
+  <rect x="70" y="170" width="300" height="400" class="box" fill="#dbeafe"/>
+  <text x="220" y="220" text-anchor="middle" class="label">调用方栈帧</text>
+  <rect x="135" y="275" width="170" height="75" class="box" fill="#eff6ff"/>
+  <text x="220" y="320" text-anchor="middle" class="label">text = ref A</text>
+  <text x="220" y="430" text-anchor="middle" class="small">原变量仍保存 ref A</text>
+
+  <rect x="520" y="170" width="300" height="400" class="box" fill="#fef3c7"/>
+  <text x="670" y="220" text-anchor="middle" class="label">被调用方法栈帧</text>
+  <rect x="585" y="275" width="170" height="75" class="box" fill="#fffbeb"/>
+  <text x="670" y="320" text-anchor="middle" class="label">builder = ref A</text>
+  <text x="670" y="430" text-anchor="middle" class="small">形参是引用值副本</text>
+
+  <rect x="1000" y="235" width="280" height="220" class="box" fill="#dcfce7"/>
+  <text x="1140" y="285" text-anchor="middle" class="label">堆对象 A</text>
+  <text x="1140" y="330" text-anchor="middle" class="small">StringBuilder("old")</text>
+  <text x="1140" y="375" text-anchor="middle" class="small">append("!") → old!</text>
+
+  <path d="M305 312 L585 312" class="arrow"/>
+  <path d="M755 312 L1000 312" class="arrow"/>
+  <text x="390" y="292" class="small">复制 ref A</text>
+  <text x="850" y="292" class="small">共享同一对象</text>
+
+  <path d="M670 350 C670 490 1140 500 1140 455" class="mutate"/>
+  <text x="780" y="535" class="small">mutate：对象状态改变，调用方可见</text>
+
+  <rect x="520" y="600" width="300" height="70" class="box" fill="#fee2e2"/>
+  <text x="670" y="643" text-anchor="middle" class="small">builder = new Object()：只改形参</text>
+  <path d="M670 350 L670 600" class="rebind"/>
+  <text x="690" y="480" class="small">rebind</text>
+</svg>
