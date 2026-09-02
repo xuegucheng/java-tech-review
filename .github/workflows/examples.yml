@@ -1,4 +1,4 @@
-name: 示例代码
+name: Java examples
 
 on:
   push:
@@ -16,5 +16,5 @@ jobs:
           distribution: temurin
           java-version: '21'
           cache: maven
-      - name: 运行示例代码测试
-        run: mvn -f 示例代码/pom.xml test
+      - name: 运行全部示例测试
+        run: mvn test
