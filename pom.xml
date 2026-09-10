@@ -22,6 +22,7 @@
     <modules>
         <module>01-Java核心/04-示例代码</module>
         <module>02-集合框架/04-示例代码</module>
+        <module>03-并发编程/04-示例代码</module>
     </modules>
 
     <dependencyManagement>

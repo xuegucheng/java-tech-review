@@ -61,7 +61,7 @@
 | HashSet / LinkedHashSet | [HashSet 与 LinkedHashSet](02-深度解析/HashSet与LinkedHashSet.md) | HashMap 复用、去重和 encounter order | 文章与 Mermaid 流程 |
 | LinkedHashMap / LRU | [LinkedHashMap 与 LRU 缓存](02-深度解析/LinkedHashMap与LRU缓存.md) | before/after 链表、access-order、淘汰边界 | LRU 示例 + 测试 |
 
-`equals/hashCode` 的语言契约继续由 Java 核心模块维护；`ConcurrentHashMap` 等并发集合归入未来的并发模块。本轮不为每个 API 机械创建 Demo，优先验证会改变理解的机制。
+`equals/hashCode` 的语言契约继续由 Java 核心模块维护；`ConcurrentHashMap` 的并发语义归入 [03-并发编程](../03-并发编程/README.md)，本模块只维护 HashMap 基础结构及其集合消费关系。本轮不为每个 API 机械创建 Demo，优先验证会改变理解的机制。
 
 ## 主题资源地图
 
@@ -74,14 +74,14 @@ Hash 集合与 List 等主题暂时只有文章层；未来新增实验时仍按
 
 ## P2 backlog
 
-TreeMap、TreeSet、PriorityQueue、ArrayDeque、ConcurrentHashMap、CopyOnWriteArrayList 和 BlockingQueue 还没有在仓库中伪装成“已完成”。新增时先决定它属于 Collections 还是未来的 Concurrency，并为每个主题指定唯一权威来源。
+TreeMap、TreeSet、PriorityQueue、ArrayDeque、CopyOnWriteArrayList 和 BlockingQueue 还没有在仓库中伪装成“已完成”；ConcurrentHashMap 已在 [Concurrency 模块](../03-并发编程/02-深度解析/ConcurrentHashMap并发容器.md) 建立第一版。新增主题时先决定它属于 Collections 还是 Concurrency，并为每个主题指定唯一权威来源。
 
 ## One Source of Truth
 
 - `equals/hashCode` 的语言契约唯一维护在 [Java Core 的对象契约](../01-Java核心/02-深度解析/equals与hashCode契约.md)。
 - 本模块只解释哈希容器如何消费该契约，不重新完整定义相等性规则。
 - HashMap 拥有 hash 扰动、桶定位、树化和 resize 的实现主线；HashSet、LinkedHashSet、LinkedHashMap 只解释各自的复用和增量结构。
-- 并发集合属于未来的 Concurrency 模块，避免在此处形成第二套并发语义。
+- 并发集合属于 [Concurrency 模块](../03-并发编程/README.md)，避免在此处形成第二套并发语义。
 
 ## 运行示例
 
