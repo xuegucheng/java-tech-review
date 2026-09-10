@@ -1383,11 +1383,11 @@ TreeSet 仍然认为它们“重复”。
 例如用户输入：
 
 ```text
-SKU-3
-SKU-1
-SKU-3
-SKU-2
-SKU-1
+RESOURCE-3
+RESOURCE-1
+RESOURCE-3
+RESOURCE-2
+RESOURCE-1
 ```
 
 需求：
@@ -1400,34 +1400,34 @@ SKU-1
 期望结果：
 
 ```text
-SKU-3
-SKU-1
-SKU-2
+RESOURCE-3
+RESOURCE-1
+RESOURCE-2
 ```
 
 最直接：
 
 ```java
-List<String> skuList = List.of(
-        "SKU-3", "SKU-1", "SKU-3", "SKU-2", "SKU-1"
+List<String> resourceIdList = List.of(
+        "RESOURCE-3", "RESOURCE-1", "RESOURCE-3", "RESOURCE-2", "RESOURCE-1"
 );
 
-Set<String> unique = new LinkedHashSet<>(skuList);
+Set<String> unique = new LinkedHashSet<>(resourceIdList);
 ```
 
 流程：
 
 ```mermaid
 flowchart TD
-    A[原始输入 SKU3 SKU1 SKU3 SKU2 SKU1] --> B[LinkedHashSet]
+    A[原始输入 RESOURCE3 RESOURCE1 RESOURCE3 RESOURCE2 RESOURCE1] --> B[LinkedHashSet]
 
-    B --> C1[第一次 SKU3 → 插入]
-    C1 --> C2[第一次 SKU1 → 插入]
-    C2 --> C3[第二次 SKU3 → 已存在 跳过]
-    C3 --> C4[SKU2 → 插入]
-    C4 --> C5[第二次 SKU1 → 已存在 跳过]
+    B --> C1[第一次 RESOURCE3 → 插入]
+    C1 --> C2[第一次 RESOURCE1 → 插入]
+    C2 --> C3[第二次 RESOURCE3 → 已存在 跳过]
+    C3 --> C4[RESOURCE2 → 插入]
+    C4 --> C5[第二次 RESOURCE1 → 已存在 跳过]
 
-    C5 --> D[SKU3 → SKU1 → SKU2]
+    C5 --> D[RESOURCE3 → RESOURCE1 → RESOURCE2]
 ```
 
 这比：
@@ -1446,35 +1446,35 @@ new HashSet<>(list)
 
 ---
 
-## 06.25 工程场景二：WMS 扫码去重但不能打乱作业顺序
+## 06.25 工程场景二：事件去重但不能打乱首次顺序
 
-例如拣货员连续扫码：
+例如系统连续接收事件：
 
 ```text
-箱码 A
-箱码 B
-箱码 A
-箱码 C
+事件 A
+事件 B
+事件 A
+事件 C
 ```
 
 业务要求：
 
 ```text
-同一箱码只处理一次
-同时保留首次扫描顺序
+同一事件标识只处理一次
+同时保留首次接收顺序
 ```
 
 可以用：
 
 ```java
-LinkedHashSet<String> scannedBoxes = new LinkedHashSet<>();
+LinkedHashSet<String> seenIds = new LinkedHashSet<>();
 ```
 
 业务流程：
 
 ```mermaid
 flowchart TD
-    A[扫码 boxCode] --> B{scannedBoxes.add 返回 true 吗}
+    A[接收 eventId] --> B{seenIds.add 返回 true 吗}
 
     B -- 是 --> C[首次扫描]
     C --> D[进入后续处理]
@@ -1507,13 +1507,13 @@ HashSet
 假设请求：
 
 ```text
-[sku5, sku2, sku8]
+[sku5, resource2, sku8]
 ```
 
 数据库：
 
 ```sql
-WHERE sku_code IN (...)
+WHERE resource_id IN (...)
 ```
 
 返回顺序未必和入参一致。
@@ -1521,7 +1521,7 @@ WHERE sku_code IN (...)
 一种常见业务需求是：
 
 ```text
-去掉重复请求 SKU
+去掉重复请求资源 ID
 并保留原请求 encounter order
 ```
 
@@ -1529,9 +1529,9 @@ LinkedHashSet 可以先处理请求：
 
 ```mermaid
 flowchart TD
-    A[请求 SKU 列表] --> B[LinkedHashSet 去重保序]
+    A[请求资源 ID 列表] --> B[LinkedHashSet 去重保序]
     B --> C[批量数据库查询]
-    C --> D[Map sku -> entity]
+    C --> D[Map resourceId -> entity]
     D --> E[按 LinkedHashSet 顺序重新组装]
     E --> F[最终结果顺序与首次请求一致]
 ```

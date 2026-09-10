@@ -1,6 +1,6 @@
 # Java Tech Review
 
-> 面向 3～10 年 Java 后端工程师的技术复习仓库：先恢复面试表达，再进入 mental model、源码路径和可运行验证。
+> 面向有经验 Java 后端工程师的通用技术复习仓库，重点服务 5 年以上工程师的面试复盘、原理深挖和源码理解：先恢复面试表达，再进入 mental model、源码路径和可运行验证。
 
 仓库按技术域组织。每个主题尽量形成：
 
@@ -14,6 +14,7 @@ Interview Review → Deep Dive → Diagram → Runnable Example → Test
 - **1 天路线**：先 Java 对象模型、参数传递、相等性，再集合契约、HashMap 和 LRU。
 - **7 天路线**：Day 1 Java Core + Collections，Day 2 Concurrency，Day 3 JVM，Day 4 MySQL，Day 5 Redis + MQ，Day 6 Spring，Day 7 Distributed + System Design。尚未创建的模块会保持为待建设。
 - **验证结论**：从主题文章进入同域 `03-图示/`、`04-示例代码/` 和测试。
+- **阅读边界**：正文优先使用通用领域模型；订单、缓存、资源分配等工程案例用于解释取舍，特定行业案例只作为可选补充，不要求读者了解作者的工作背景。
 
 ## P0：面试高频 / 核心机制
 
@@ -34,6 +35,13 @@ P0 是导航权重，不是内容价值评级。完整原理文章仍然保留�
 java-tech-review/
 ├── README.md
 ├── pom.xml
+├── LICENSE
+├── mvnw / mvnw.cmd
+├── .mvn/wrapper/maven-wrapper.properties
+├── .editorconfig
+├── .gitattributes
+├── CONTRIBUTING.md
+├── scripts/check_markdown.py
 ├── 01-Java核心/
 │   ├── README.md
 │   ├── 01-面试速记/
@@ -74,21 +82,32 @@ java-tech-review/
 
 ## 统一验证
 
-示例工程默认 Java 21、Maven 3.9+、JUnit 5。仓库根目录提供聚合 POM：
+示例工程默认 Java 21、Maven Wrapper（固定 Maven 3.9.16）和 JUnit 5。仓库根目录提供 Wrapper 和聚合 POM；首次运行会自动准备固定版本的 Maven：
+
+```powershell
+# Windows PowerShell
+.\mvnw.cmd test
+.\mvnw.cmd -pl '01-Java核心/04-示例代码' test
+.\mvnw.cmd -pl '02-集合框架/04-示例代码' test
+```
 
 ```bash
-mvn test
-mvn -pl '01-Java核心/04-示例代码' test
-mvn -pl '02-集合框架/04-示例代码' test
+# macOS / Linux
+./mvnw test
+./mvnw -pl '01-Java核心/04-示例代码' test
+./mvnw -pl '02-集合框架/04-示例代码' test
 ```
+
+如果首次在 macOS / Linux 使用时 Git 没有保留脚本可执行位，先执行 `chmod +x mvnw`。
 
 模块 README 提供各自的示例索引；完整类和测试不嵌入正文。
 
 ## Java 版本策略
 
 - 经典面试主线默认 `JDK 8+`。
-- `Java 17+`、`Java 21+`、`Java 25+` 的语法和 API 会显式标记。
-- 示例代码默认 Java 21；未来 Java 25 实验必须使用独立 profile/module，不破坏默认构建。
+- `Java 17+`、`Java 21+`、`Java 25+`、`Java 26+` 的语法和 API 会显式标记。
+- 示例代码默认 Java 21；Java 25/26 的语法、API 或预览能力属于版本专题，不纳入默认构建。
+- 版本专题必须说明所需 JDK、是否为预览能力，以及能否通过默认 `mvnw test` 验证。
 - 规范保证、OpenJDK 实现和版本相关观察要分开表述。
 
 ## 维护入口
@@ -96,7 +115,8 @@ mvn -pl '02-集合框架/04-示例代码' test
 - [仓库架构说明](项目文档/仓库架构说明.md)：目录、分层、P0/P1/P2、One Source of Truth 和新增内容规则。
 - [Benchmark 研究报告](调研/Java技术复习仓库Benchmark.md)：公开项目比较和结构重构依据。
 - [笔记编写规范](笔记编写规范.md)：结论优先、追问链、图示、版本和示例规范。
+- [贡献指南](CONTRIBUTING.md)：本地验证、内容边界和 Pull Request 检查清单。
 
-## 许可证状态
+## 许可证
 
-当前仓库没有检测到 `LICENSE` 文件。若要对外复用或分发，请先补充并确认明确的许可证，不从旧 README 的徽章推断授权范围。
+本仓库采用 [MIT License](LICENSE)。仓库作者创作的笔记、示例代码和图示按 MIT License 发布；外部链接指向的资料及另有说明的第三方内容仍受其各自许可证约束。

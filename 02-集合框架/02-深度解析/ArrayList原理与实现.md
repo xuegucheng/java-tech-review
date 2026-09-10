@@ -951,32 +951,32 @@ ArrayList 实现 Serializable，不代表适合把 Java 默认序列化作为长
 
 ---
 
-## 02.44 WMS 批量扫描场景
+## 02.44 可选工程案例：批量记录场景
 
-条码扫描批次：
+批量输入记录：
 
 ```java
-List<Barcode> scanned =
+List<InputRecord> records =
         new ArrayList<>(expectedCount);
 ```
 
 适合原因：
 
-- 扫描顺序有意义；
+- 输入顺序有意义；
 - 主要是尾部追加；
 - 后续可能按索引定位异常项；
 - 批量提交可直接遍历；
-- 容量上限可从波次任务估算。
+- 容量上限可从批处理任务估算。
 
 若还需去重：
 
 ```text
-ArrayList 保留全部扫描事件
-LinkedHashSet 保存首次出现的唯一条码
+ArrayList 保留全部输入事件
+LinkedHashSet 保存首次出现的唯一标识
 Map 统计重复次数
 ```
 
-不要为了去重直接把所有数据改成 HashSet，导致扫描顺序和重复审计信息丢失。
+不要为了去重直接把所有数据改成 HashSet，导致输入顺序和重复审计信息丢失。
 
 ---
 

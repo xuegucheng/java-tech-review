@@ -7,14 +7,23 @@
 在仓库根目录执行：
 
 ```bash
-mvn -pl '02-集合框架/04-示例代码' test
+# macOS / Linux
+./mvnw -pl '02-集合框架/04-示例代码' test
+```
+
+Windows PowerShell：
+
+```powershell
+.\mvnw.cmd -pl '02-集合框架/04-示例代码' test
 ```
 
 也可以执行整个仓库的统一验证：
 
 ```bash
-mvn test
+./mvnw test
 ```
+
+Windows PowerShell 使用 `.\mvnw.cmd test`。
 
 ## 示例索引
 

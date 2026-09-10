@@ -1271,7 +1271,7 @@ synchronized (safe) {
 
 ---
 
-## 03.47 WMS 工程场景
+## 03.47 可选工程案例：任务与批量记录
 
 ### 场景一：待处理任务普通 FIFO
 
@@ -1657,7 +1657,7 @@ AX
 66. Collections.synchronizedList 能否让复合操作自动原子？
 67. 同步包装后遍历为什么仍需要外部同步？
 68. 并发队列为什么不建议 LinkedList + synchronized 自己实现？
-69. WMS FIFO 任务队列为什么通常优先 ArrayDeque？
+69. FIFO 任务队列为什么通常优先 ArrayDeque？
 70. 什么业务场景下 LinkedList 可能真正有优势？
 71. 频繁 contains 的 LinkedList 应该如何优化？
 72. 如果需要按 key 查找为什么应该考虑 Map？
@@ -1872,9 +1872,9 @@ AX
 33. 对外暴露可修改 reversed 视图要谨慎，避免双向修改难追踪。
 34. 评审性能优化时要求基准，而不是凭“数组/链表”印象。
 35. 微基准使用 JMH，避免用简单 nanoTime 循环得出错误结论。
-36. WMS 扫描、导出、批处理通常更偏 ArrayList。
-37. WMS FIFO 内存队列若非并发通常更偏 ArrayDeque。
-38. WMS 并发消费队列使用 BlockingQueue/ConcurrentLinkedQueue 等专用结构。
+36. 批量输入、导出、批处理通常更偏 ArrayList。
+37. FIFO 内存队列若非并发通常更偏 ArrayDeque。
+38. 并发消费队列使用 BlockingQueue/ConcurrentLinkedQueue 等专用结构。
 39. 代码审查重点搜索 LinkedList.get(i) 出现在循环中的情况。
 40. 面试表达一定补充：已知节点时修改 O(1)，按 index 定位后总体 O(n)。
 

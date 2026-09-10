@@ -12,7 +12,7 @@
 ├── 01-面试速记/       # 5～15 分钟恢复面试表达
 ├── 02-深度解析/       # 原理长文、规范边界、源码阅读清单
 ├── 03-图示/           # 本模块的 mental model 资产
-└── 04-示例代码/       # Java 21 + Maven + JUnit 5
+└── 04-示例代码/       # Java 21 + Maven Wrapper + JUnit 5
 ```
 
 技术域内按认知层级组织；同一主题的 Interview Review、Deep Dive、Diagram、Runnable Example 和 Test 都从这里互相定位。
@@ -87,9 +87,9 @@
 ## 版本边界
 
 - 经典语言结论默认按 `JDK 8+` 表达。
-- `Java 17+`、`Java 21+`、`Java 25+` 的新语法或 API 必须在标题、段落或代码前显式标记。
+- `Java 17+`、`Java 21+`、`Java 25+`、`Java 26+` 的新语法或 API 必须在标题、段落或代码前显式标记。
 - `record` 从 Java 16 正式可用，`sealed` 从 Java 17 正式可用，Sequenced Collections 从 Java 21 可用。
-- Java 25 的新入口或构造器语法是补充，不改变企业工程中最常见的传统写法。
+- Java 25/26 的新入口、构造器语法或预览能力是补充，不改变企业工程中最常见的传统写法。
 
 ## One Source of Truth
 

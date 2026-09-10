@@ -31,7 +31,7 @@
 - 构造期间 `this` 逸出为什么会破坏 final 字段初始化保证？
 - final 是否能代替锁、volatile 或不可变对象设计？
 - 常量类、枚举、值对象和配置对象分别适合什么语义？
-- WMS 状态码、阈值、库位类型和运行时配置应如何建模？
+- 业务状态码、阈值、类型和运行时配置应如何建模？
 
 `static` 与初始化触发规则见第 16 章；不可变对象的完整设计见第 10 章；并发安全发布的完整推导见并发模块。
 
@@ -231,7 +231,7 @@ final 参数防止在方法体内重新给形参赋值，不保护调用方变�
 变量未显式写 `final`，但初始化后从未重新赋值，则是 effectively final：
 
 ```java
-String prefix = "WMS";
+String prefix = "APP";
 Runnable task = () -> System.out.println(prefix);
 ```
 
@@ -335,7 +335,7 @@ static final Object TOKEN = new Object();
 ## 17.29 字符串常量表达式
 
 ```java
-static final String PREFIX = "WMS-";
+static final String PREFIX = "APP-";
 static final String CODE = PREFIX + "001";
 ```
 
@@ -415,7 +415,7 @@ enum OrderStatus { CREATED, ALLOCATED, CANCELLED }
 
 ## 17.38 值对象替代复合常量
 
-金额、时间窗口、尺寸、库位坐标等语义不应拆成互不关联的原始常量。值对象可以统一校验、单位和相等性：
+金额、时间窗口、尺寸、空间坐标等语义不应拆成互不关联的原始常量。值对象可以统一校验、单位和相等性：
 
 ```java
 record WeightLimit(BigDecimal kilograms) { }
@@ -441,7 +441,7 @@ public static final List<String> TYPES = new ArrayList<>();
 
 JMM、发布、重排和同步的完整推导留给未来并发模块；性能优化也不属于本章主线。
 
-## 17.41 WMS 常量分类
+## 17.41 业务常量分类
 
 ```text
 协议字段长度、固定算法参数
@@ -450,10 +450,10 @@ JMM、发布、重排和同步的完整推导留给未来并发模块；性能�
 订单状态、作业类型
 → enum 或 sealed 值
 
-重量、体积、库位坐标
+重量、体积、空间坐标
 → 值对象
 
-超时、重试、波次阈值
+超时、重试、批处理阈值
 → 运行时配置
 
 租户策略
@@ -604,7 +604,7 @@ test
 预期或观察重点：
 
 ```text
-WMS
+APP
 ```
 
 ### 实验12：final 方法固定模板
@@ -684,7 +684,7 @@ initialized
 预期或观察重点：
 
 ```text
-WMS-001
+APP-001
 ```
 
 ### 实验19：枚举替代魔法值
@@ -795,9 +795,9 @@ new
 82. 为什么不应使用反射修改 final 字段作为业务设计？
 83. 框架反序列化 final 字段时应注意什么？
 84. 静态 final 配置能否热更新？
-85. WMS 固定协议长度适合用什么？
-86. WMS 订单状态适合用什么？
-87. WMS 重试次数适合常量还是运行时配置？
+85. 业务固定协议长度适合用什么？
+86. 业务订单状态适合用什么？
+87. 业务重试次数适合常量还是运行时配置？
 88. 多租户阈值为什么应使用注入配置？
 89. 评审 public 常量时最重要的问题是什么？
 90. 本章区分 final 与不可变的核心表达是什么？
@@ -1040,7 +1040,7 @@ sealed 允许受控子类型，final 完全禁止。
 
 ### 工程实践 19：常量按领域分组
 
-例如 ProtocolLimits、InventoryDefaults，而不是 GlobalConstants。
+例如 ProtocolLimits、ResourceDefaults，而不是 GlobalConstants。
 
 ### 工程实践 20：优先枚举表达封闭状态
 

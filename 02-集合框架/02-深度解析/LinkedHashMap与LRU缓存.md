@@ -1647,7 +1647,7 @@ flowchart TD
 ```json
 {
   "orderNo": "...",
-  "skuCode": "...",
+  "resourceCode": "...",
   "qty": 10
 }
 ```
@@ -1658,7 +1658,7 @@ flowchart TD
 Map<String, Object> fields = new LinkedHashMap<>();
 
 fields.put("orderNo", orderNo);
-fields.put("skuCode", skuCode);
+fields.put("resourceCode", resourceCode);
 fields.put("qty", qty);
 ```
 
@@ -1688,13 +1688,13 @@ flowchart LR
 假设请求顺序：
 
 ```text
-sku3 → sku1 → sku2
+resource3 → resource1 → resource2
 ```
 
 你可以：
 
 ```text
-LinkedHashMap<sku, result>
+LinkedHashMap<resourceId, result>
 ```
 
 按照请求 encounter order 组装。
@@ -1703,12 +1703,12 @@ LinkedHashMap<sku, result>
 
 ```mermaid
 flowchart TD
-    A[请求 sku3 sku1 sku2] --> B[批量查询]
+    A[请求 resource3 resource1 resource2] --> B[批量查询]
     B --> C[查询结果无固定顺序]
     C --> D[按原请求顺序 put 到 LinkedHashMap]
-    D --> E[sku3 -> result3]
-    E --> F[sku1 -> result1]
-    F --> G[sku2 -> result2]
+    D --> E[resource3 -> result3]
+    E --> F[resource1 -> result1]
+    F --> G[resource2 -> result2]
 ```
 
 如果只用 HashMap：
@@ -1725,7 +1725,7 @@ flowchart TD
 例如后台管理页面只需要：
 
 ```text
-记录当前用户最近查看过的 20 个 SKU
+记录当前用户最近查看过的 20 个资源 ID
 ```
 
 数据量很小、单线程上下文：
@@ -1740,7 +1740,7 @@ LinkedHashMap accessOrder
 
 ```mermaid
 flowchart TD
-    A[查看 SKU] --> B{Map 已存在吗}
+    A[查看资源 ID] --> B{Map 已存在吗}
     B -- 是 --> C[get / put 使其移动到 tail]
     B -- 否 --> D[新增到 tail]
     C --> E[最近访问顺序更新]
@@ -1761,12 +1761,12 @@ flowchart TD
 
 ---
 
-## 07.37 工程场景四：WMS 最近操作单据缓存
+## 07.37 工程场景四：最近访问对象缓存
 
-例如某个客户端本地想保留：
+例如某个客户端或边缘服务本地想保留：
 
 ```text
-最近查看的 50 个出库单
+最近查看的 50 个对象
 ```
 
 用途只是：
@@ -1781,7 +1781,7 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    A[查看 outboundNo] --> B[访问本地 LinkedHashMap]
+    A[查看 objectId] --> B[访问本地 LinkedHashMap]
     B --> C[命中则移动到最近位置]
     B --> D[未命中则查询数据源]
     D --> E[写入 tail]
@@ -1796,7 +1796,7 @@ flowchart TD
 缓存不是事实源
 ```
 
-真正库存、订单状态等仍然以数据库 / 权威服务为准。
+真正的业务状态等仍然以数据库 / 权威服务为准。
 
 ---
 
@@ -2301,7 +2301,7 @@ TreeMap
 8. **不要为了“输出好看”无意义依赖 Map 顺序；先确认顺序是否属于业务契约。**
 9. **Java 21 项目中把 LinkedHashMap 当 SequencedMap 理解，首尾语义会更清晰。**
 10. **理解 `reversed()` 是视图，避免误认为一定复制数据。**
-11. **缓存不能成为权威事实源，库存、订单等核心状态仍应以数据库/权威服务为准。**
+11. **缓存不能成为权威事实源，核心业务状态仍应以数据库/权威服务为准。**
 12. **面试讲 LRU 时先讲数据结构和 O(1) 原因，再讲 LinkedHashMap 实现，不要只背四行代码。**
 
 ---

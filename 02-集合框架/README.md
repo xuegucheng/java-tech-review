@@ -12,7 +12,7 @@
 ├── 01-面试速记/       # 5～15 分钟恢复面试表达
 ├── 02-深度解析/       # 契约、结构、源码路径和工程边界
 ├── 03-图示/           # HashMap、LinkedHashMap 等结构图
-└── 04-示例代码/       # Java 21 + Maven + JUnit 5
+└── 04-示例代码/       # Java 21 + Maven Wrapper + JUnit 5
 ```
 
 每个主题在本模块内按 Interview Review、Deep Dive、Diagram、Runnable Example 和 Test 定位，避免读者在资源类型之间来回猜目录。
@@ -51,6 +51,18 @@
 | HashSet 与 LinkedHashSet | [HashSet与LinkedHashSet.md](02-深度解析/HashSet与LinkedHashSet.md) |
 | LinkedHashMap 与 LRU | [LinkedHashMap与LRU缓存.md](02-深度解析/LinkedHashMap与LRU缓存.md) |
 
+## 集合冻结范围
+
+当前集合模块先冻结三条高价值主线。新增文章或示例必须归属于下表中的职责，不能重新定义已有契约：
+
+| 主线 | 唯一权威内容 | 本模块负责的关键机制 | 当前验证状态 |
+| --- | --- | --- | --- |
+| HashMap | [HashMap 原理与源码分析](02-深度解析/HashMap原理与源码分析.md) | hash 扰动、桶定位、put、treeify、resize | 冲突示例 + 测试 |
+| HashSet / LinkedHashSet | [HashSet 与 LinkedHashSet](02-深度解析/HashSet与LinkedHashSet.md) | HashMap 复用、去重和 encounter order | 文章与 Mermaid 流程 |
+| LinkedHashMap / LRU | [LinkedHashMap 与 LRU 缓存](02-深度解析/LinkedHashMap与LRU缓存.md) | before/after 链表、access-order、淘汰边界 | LRU 示例 + 测试 |
+
+`equals/hashCode` 的语言契约继续由 Java 核心模块维护；`ConcurrentHashMap` 等并发集合归入未来的并发模块。本轮不为每个 API 机械创建 Demo，优先验证会改变理解的机制。
+
 ## 主题资源地图
 
 | 主题 | Interview Review | Deep Dive | Diagram | Runnable Example | Test |
@@ -75,8 +87,14 @@ TreeMap、TreeSet、PriorityQueue、ArrayDeque、ConcurrentHashMap、CopyOnWrite
 
 在仓库根目录执行本模块测试：
 
+```powershell
+.\mvnw.cmd -pl '02-集合框架/04-示例代码' test
+```
+
+macOS / Linux：
+
 ```bash
-mvn -pl '02-集合框架/04-示例代码' test
+./mvnw -pl '02-集合框架/04-示例代码' test
 ```
 
 完整索引见 [本模块的 `04-示例代码/`](04-示例代码/README.md)。

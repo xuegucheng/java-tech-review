@@ -1,6 +1,6 @@
 # equals 与 hashCode
 
-> 本章把 Java 对象相等性视为一项长期 API 契约，而不是 IDE 自动生成的样板代码。重点是区分身份相等、值相等和业务身份，正确实现 `equals`/`hashCode`，理解继承、代理、可变字段和哈希容器中的边界，并能为 WMS 实体、值对象和复合键选择稳定语义。
+> 本章把 Java 对象相等性视为一项长期 API 契约，而不是 IDE 自动生成的样板代码。重点是区分身份相等、值相等和业务身份，正确实现 `equals`/`hashCode`，理解继承、代理、可变字段和哈希容器中的边界，并能为业务实体、值对象和复合键选择稳定语义。
 
 > **Authoritative source：Java equality language contract。** 本文唯一维护 `==`、`Object.equals`、身份/值/实体相等、五项 equals 契约、hashCode 契约、继承与代理边界、record、可变 equality 和契约测试。Collections 只解释哈希结构如何消费这些规则，见 [Hash 集合如何消费 equals/hashCode 契约](../../02-集合框架/02-深度解析/Hash集合与equals-hashCode契约.md)。
 
@@ -136,9 +136,9 @@ Integer d = 1000;
 @Override
 public boolean equals(Object other) {
     if (this == other) return true;
-    if (!(other instanceof SkuKey key)) return false;
-    return Objects.equals(warehouseId, key.warehouseId)
-            && Objects.equals(skuId, key.skuId);
+    if (!(other instanceof ResourceKey key)) return false;
+    return Objects.equals(ownerId, key.ownerId)
+            && Objects.equals(resourceId, key.resourceId);
 }
 ```
 
@@ -245,7 +245,7 @@ a == b || (a != null && a.equals(b))
 ## 18.21 Objects.hash 与手工散列
 
 ```java
-return Objects.hash(warehouseId, skuId);
+return Objects.hash(ownerId, resourceId);
 ```
 
 简洁但使用可变参数，会创建数组并装箱基本类型。普通业务对象通常足够；性能热点可使用 `31 * result + fieldHash` 或专用实现，并通过基准验证。
@@ -394,7 +394,7 @@ ORM 可能使用运行时子类代理实体。严格 `getClass()` 判断会让�
 ```java
 Set<Key> set = new HashSet<>();
 set.add(key);
-key.changeWarehouse("W2");
+key.changeOwner("OWNER-2");
 set.contains(key); // 可能 false
 ```
 
@@ -438,27 +438,27 @@ IDE、record 和 Lombok 可以减少样板，但无法替你决定：
 
 生成后仍必须评审契约。
 
-## 18.45 WMS 值对象
+## 18.45 可选工程案例：多维资源值对象
 
 ```java
-public record StockKey(
-        String warehouseId,
-        String skuId,
-        String batchNo
+public record ResourceKey(
+        String ownerId,
+        String resourceId,
+        String variantId
 ) {
-    public StockKey {
-        warehouseId = requireText(warehouseId);
-        skuId = requireText(skuId);
-        batchNo = requireText(batchNo);
+    public ResourceKey {
+        ownerId = requireText(ownerId);
+        resourceId = requireText(resourceId);
+        variantId = requireText(variantId);
     }
 }
 ```
 
-库存维度键适合不可变值相等，可安全用于 Map key；展示名称、可用库存数量和更新时间不应参与。
+资源、租户标识或配置快照都可能需要多维度键。稳定维度适合不可变值相等，可安全用于 Map key；展示名称、可用数量和更新时间等易变信息不应参与。
 
-## 18.46 WMS 实体
+## 18.46 可选工程案例：业务实体
 
-出库单实体通常按稳定 `outboundOrderId` 识别。状态、优先级、操作人和时间会变化，不应参与实体身份。
+订单或任务实体通常按稳定 `orderId` 或 `taskId` 识别。状态、优先级、操作人和时间会变化，不应参与实体身份。
 
 若 ID 在持久化后才生成，应避免把暂态对象放入 HashSet，或改为创建时分配业务 ID。
 
@@ -723,7 +723,7 @@ true
 false
 ```
 
-### 实验20：WMS 复合库存键
+### 实验20：多维复合键
 
 **目标**：验证稳定值对象可作为 HashMap key。
 
@@ -820,8 +820,8 @@ false
 82. 子类继承父类 equals 时新增字段怎么办？
 83. IDE 自动生成 equals 是否保证业务正确？
 84. Lombok 生成 equals 仍需评审哪些问题？
-85. WMS 库存复合键应包含哪些稳定字段？
-86. 库存数量是否应参与 StockKey 相等性？
+85. 多维业务复合键应包含哪些稳定字段？
+86. 可变数量是否应参与 ResourceKey 相等性？
 87. 订单状态是否应参与订单实体相等性？
 88. 如何测试 equals 五项契约？
 89. 相等性属性测试有什么价值？
@@ -1129,7 +1129,7 @@ equals 应返回 false 而非异常。
 
 ### 工程实践 35：复合键包含完整一致性边界
 
-仓库、SKU、批次等按业务准确选择。
+所有者、资源 ID、变体或版本等按业务准确选择。
 
 ### 工程实践 36：实体身份不包含状态
 

@@ -75,18 +75,18 @@ ClassLoader 隔离与延迟初始化
 `static` 把成员与类型关联，而不是与某个实例关联。
 
 ```java
-public final class Warehouse {
-    private static int warehouseCount;
+public final class Resource {
+    private static int resourceCount;
     private final String code;
 
-    public Warehouse(String code) {
+    public Resource(String code) {
         this.code = code;
-        warehouseCount++;
+        resourceCount++;
     }
 }
 ```
 
-`code` 是每个对象自己的状态；`warehouseCount` 是当前 `Warehouse` 类型在当前类加载器命名空间中的类级状态。
+`code` 是每个对象自己的状态；`resourceCount` 是当前 `Resource` 类型在当前类加载器命名空间中的类级状态。
 
 “静态字段只有一份”应补充边界：通常是**每个定义该类的 `ClassLoader` 各有一份对应的静态状态**，不是整个物理机器、整个容器集群或所有 JVM 全局只有一份。
 
@@ -142,8 +142,8 @@ public static String normalize(String code) {
 静态方法不能直接访问实例字段，是因为无法确定哪一个对象：
 
 ```java
-public static String readCode(Warehouse warehouse) {
-    return warehouse.code;
+public static String readCode(Resource resource) {
+    return resource.code;
 }
 ```
 
@@ -157,9 +157,9 @@ public static String readCode(Warehouse warehouse) {
 
 ```java
 public final class AllocationService {
-    private final InventoryRepository repository;
+    private final ResourceRepository repository;
 
-    public AllocationService(InventoryRepository repository) {
+    public AllocationService(ResourceRepository repository) {
         this.repository = repository;
     }
 }
@@ -225,7 +225,7 @@ import static java.util.Objects.requireNonNull;
 每个已加载类型在某个类加载器命名空间中对应一个 `Class` 对象。
 
 ```java
-synchronized (Warehouse.class) {
+synchronized (Resource.class) {
 }
 ```
 
@@ -540,20 +540,20 @@ private static final Map<String, Handler> HANDLERS =
 
 对重要类级组件应暴露：初始化耗时、成功或失败状态、缓存大小、命中率、最后刷新时间和失败原因。不要仅靠静态代码块中的一条日志推断运行状态。
 
-## 16.44 WMS 场景：库位规则注册表
+## 16.44 可选工程案例：固定规则注册表
 
 ```java
-public final class LocationRuleRegistry {
-    private static final Map<String, LocationRule> RULES =
+public final class RuleRegistry {
+    private static final Map<String, Rule> RULES =
             Map.of(
-                    "NORMAL", new NormalRule(),
-                    "COLD", new ColdStorageRule()
+                    "DEFAULT", new DefaultRule(),
+                    "STRICT", new StrictRule()
             );
 
-    private LocationRuleRegistry() { }
+    private RuleRegistry() { }
 
-    public static LocationRule require(String type) {
-        LocationRule rule = RULES.get(type);
+    public static Rule require(String type) {
+        Rule rule = RULES.get(type);
         if (rule == null) {
             throw new IllegalArgumentException(type);
         }
@@ -920,7 +920,7 @@ true
 86. 工具类为什么通常是 `final` 且私有构造？
 87. 静态工具方法什么时候比依赖注入更合适？
 88. 多租户系统为什么应谨慎使用静态业务状态？
-89. WMS 固定规则注册表何时适合使用静态不可变 Map？
+89. 固定规则注册表何时适合使用静态不可变 Map？
 90. 本章分析初始化输出题的标准步骤是什么？
 
 ## 16.49 易错点
