@@ -25,6 +25,12 @@ chmod +x mvnw
 python scripts/check_markdown.py
 ```
 
+检查已知文本污染：
+
+```bash
+python scripts/check_text_sanity.py
+```
+
 ## 内容约定
 
 - 面向有经验的 Java 后端工程师，不写从零开始的语法教程或 API 清单。
@@ -50,6 +56,7 @@ python scripts/check_markdown.py
 - [ ] 是否更新了对应模块 README 或主题资源地图？
 - [ ] 是否避免创建第二个“唯一权威”解释？
 - [ ] `python scripts/check_markdown.py` 通过。
+- [ ] `python scripts/check_text_sanity.py` 通过。
 - [ ] `./mvnw test` 或 Windows 下的 `.\mvnw.cmd test` 通过（涉及示例代码时）。
 - [ ] 新增图示、代码和外部资料的许可证边界明确。
 

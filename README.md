@@ -41,7 +41,9 @@ java-tech-review/
 ├── .editorconfig
 ├── .gitattributes
 ├── CONTRIBUTING.md
-├── scripts/check_markdown.py
+├── scripts/
+│   ├── check_markdown.py
+│   └── check_text_sanity.py
 ├── 01-Java核心/
 │   ├── README.md
 │   ├── 01-面试速记/
@@ -116,6 +118,7 @@ java-tech-review/
 - [Benchmark 研究报告](调研/Java技术复习仓库Benchmark.md)：公开项目比较和结构重构依据。
 - [笔记编写规范](笔记编写规范.md)：结论优先、追问链、图示、版本和示例规范。
 - [贡献指南](CONTRIBUTING.md)：本地验证、内容边界和 Pull Request 检查清单。
+- [历史审计快照](项目文档/审计/2026-09-09-仓库重构审计.md)：记录上一轮仓库接管与重构基线，不作为动态状态页。
 
 ## 许可证
 
