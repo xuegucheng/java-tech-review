@@ -1,6 +1,8 @@
 # 并发编程
 
-> 面向 3～10 年 Java 后端工程师的并发复习模块。主线不是 JUC API 清单，而是从线程运行、内存语义到同步器、线程池和现代并发模型建立因果链。
+> 面向 Java 后端复习、面试准备和源码理解的并发模块，重点服务 3～10 年工程师，但不把工作年限当作知识前提。主线不是 JUC API 清单，而是从线程运行、内存语义到同步器、线程池和现代并发模型建立因果链。
+
+每个主题先交代“是什么、为什么需要、解决什么问题”，再进入结构、流程、Java 21 源码和工程边界；读者可以从零进入，也可以直接跳到面试或源码段落。
 
 返回 [仓库首页](../README.md)。Java 语言层的对象、final 和相等性契约由 [Java 核心](../01-Java核心/README.md)维护；HashMap 的基础结构由 [集合框架](../02-集合框架/README.md)维护。
 
@@ -145,7 +147,7 @@ StampedLock、ReadWriteLock、Phaser、Exchanger、ForkJoinPool 深度源码、V
 
 ## 图示状态
 
-正文已按认知难点就近嵌入 Mermaid 流程图：AQS exclusive 获取路径（[AQS 核心原理](02-深度解析/AQS核心原理.md)）、execute 三步决策与二次检查（[ThreadPoolExecutor 线程池](02-深度解析/ThreadPoolExecutor线程池.md)）、Condition 双队列与节点转移（[ReentrantLock 与 Condition](02-深度解析/ReentrantLock与Condition.md)）、ThreadLocalMap 弱引用链（[ThreadLocal 原理与内存泄漏](02-深度解析/ThreadLocal原理与内存泄漏.md)）。目前已补充 7 张独立高清 SVG，新增 AQS 概念与职责分工图，完整索引见 [03-图示/README.md](03-图示/README.md)。
+正文已按认知难点就近嵌入 Mermaid 流程图：AQS exclusive 获取路径（[AQS 核心原理](02-深度解析/AQS核心原理.md)）、execute 三步决策与二次检查（[ThreadPoolExecutor 线程池](02-深度解析/ThreadPoolExecutor线程池.md)）、Condition 双队列与节点转移（[ReentrantLock 与 Condition](02-深度解析/ReentrantLock与Condition.md)）、ThreadLocalMap 弱引用链（[ThreadLocal 原理与内存泄漏](02-深度解析/ThreadLocal原理与内存泄漏.md)）。目前已补充 8 张独立高清 SVG，新增 AQS 概念、职责分工与 synchronized/ObjectMonitor 等待模型图，完整索引见 [03-图示/README.md](03-图示/README.md)。
 
 ## 运行示例
 

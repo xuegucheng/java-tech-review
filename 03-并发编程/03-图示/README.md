@@ -17,6 +17,7 @@
 - [ThreadPoolExecutor 执行与状态](ThreadPoolExecutor/ThreadPoolExecutor执行与状态.svg) → [ThreadPoolExecutor 线程池](../02-深度解析/ThreadPoolExecutor线程池.md)；
 - [AQS 是什么与职责分工](AQS/AQS是什么与职责分工.svg) → [AQS 核心原理](../02-深度解析/AQS核心原理.md)；
 - [AQS 与 Condition 双队列](AQS/AQS与Condition双队列.svg) → [AQS 核心原理](../02-深度解析/AQS核心原理.md)；
-- [ThreadLocalMap 弱引用链](ThreadLocal/ThreadLocalMap弱引用链.svg) → [ThreadLocal 原理与内存泄漏](../02-深度解析/ThreadLocal原理与内存泄漏.md)。
+- [ThreadLocalMap 弱引用链](ThreadLocal/ThreadLocalMap弱引用链.svg) → [ThreadLocal 原理与内存泄漏](../02-深度解析/ThreadLocal原理与内存泄漏.md)；
+- [synchronized 与 ObjectMonitor 等待模型](synchronized/synchronized与ObjectMonitor等待模型.svg) → [synchronized 原理与锁实现](../02-深度解析/synchronized原理与锁实现.md)。
 
 图示必须服务于一个明确的 mental model，并从对应文章反向链接；不为了填满目录生成低价值图。

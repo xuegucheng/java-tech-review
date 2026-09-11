@@ -72,11 +72,13 @@ ReentrantLock 的无参 tryLock 明确允许在公平锁上直接尝试获取；
 
 | API | 边界 |
 | --- | --- |
-| lock | 一直等待获取，不响应等待期间的 interrupt |
-| lockInterruptibly | 等待获取期间可响应中断 |
+| lock | 等待期间不会因 interrupt 提前退出，也不会抛 `InterruptedException`；成功获取后恢复等待期间收到的中断状态 |
+| lockInterruptibly | 等待获取期间响应中断，并抛出 `InterruptedException` |
 | tryLock | 立即尝试，失败返回 false；无参形式可能插队 |
-| tryLock(timeout) | 在时间上限内等待，可响应中断 |
+| tryLock(timeout) | 在时间上限内等待，可响应中断并抛出 `InterruptedException` |
 | unlock | 释放一次重入层级，必须由持有线程调用 |
+
+`lock()` 不是“完全不处理中断”：它把中断从控制流中延后处理，先完成获取，再把中断状态补回当前线程；真正把中断作为等待取消点的是 `lockInterruptibly()` 和带超时的 `tryLock`。阅读 AQS 时，这正对应非 interruptible 与 interruptible 获取入口的区别。
 
 超时不是失败后的自动回滚，业务要明确返回、降级或重试策略。
 
@@ -135,7 +137,8 @@ signal 不能在不持有锁时调用，因为它需要修改该 Condition 的�
 - tryAcquire：重入计数和队列前驱判断；
 - tryRelease：减少 state、释放 owner；
 - ConditionObject：条件队列、signal 转移和重新获取；
-- AQS.acquire / release：通用排队、阻塞和唤醒。
+- AQS.acquire / release：通用排队、阻塞和唤醒；
+- Java 21 源码对照：[OpenJDK ReentrantLock.java](https://github.com/openjdk/jdk21u/blob/master/src/java.base/share/classes/java/util/concurrent/locks/ReentrantLock.java)。
 
 ## Runnable Example
 

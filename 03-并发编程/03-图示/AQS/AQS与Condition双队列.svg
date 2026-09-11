@@ -32,8 +32,8 @@
   <text x="215" y="278" text-anchor="middle" class="label">tryAcquire(arg)</text>
   <text x="215" y="304" text-anchor="middle" class="body">先走快速路径</text>
   <rect x="395" y="245" width="220" height="75" class="node" fill="#fef3c7" stroke="#fbbf24"/>
-  <text x="505" y="278" text-anchor="middle" class="label">enq(node)</text>
-  <text x="505" y="304" text-anchor="middle" class="body">失败则入队</text>
+  <text x="505" y="278" text-anchor="middle" class="label">加入同步队列</text>
+  <text x="505" y="304" text-anchor="middle" class="body">CAS tail / 建立前驱关系</text>
   <rect x="685" y="245" width="250" height="75" class="node" fill="#ede9fe" stroke="#a78bfa"/>
   <text x="810" y="278" text-anchor="middle" class="label">检查前驱 / 获取资格</text>
   <text x="810" y="304" text-anchor="middle" class="body">取消或继续等待</text>

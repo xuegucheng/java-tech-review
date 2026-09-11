@@ -1,0 +1,107 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">synchronized 与 ObjectMonitor 等待模型</title>
+  <desc id="desc">区分 synchronized 竞争进入 monitor 的 EntryList 与 Object.wait 条件等待的 WaitSet，并说明 notify 不会直接把 monitor 交给被唤醒线程。</desc>
+  <defs>
+    <marker id="arrow-blue" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L10,3 L0,6 Z" fill="#2563eb"/>
+    </marker>
+    <marker id="arrow-purple" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L10,3 L0,6 Z" fill="#7c3aed"/>
+    </marker>
+    <marker id="arrow-green" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L10,3 L0,6 Z" fill="#16a34a"/>
+    </marker>
+    <marker id="arrow-amber" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L10,3 L0,6 Z" fill="#d97706"/>
+    </marker>
+    <style>
+      .title { font:700 38px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif; fill:#0f172a; }
+      .subtitle { font:400 19px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif; fill:#475569; }
+      .section { font:700 24px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif; fill:#0f172a; }
+      .label { font:700 18px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif; fill:#0f172a; }
+      .body { font:400 16px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif; fill:#334155; }
+      .small { font:400 14px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif; fill:#475569; }
+      .inverse { fill:#ffffff; }
+      .node { rx:13; stroke-width:2; }
+    </style>
+  </defs>
+
+  <rect width="1600" height="900" fill="#f8fafc"/>
+  <text x="70" y="62" class="title">synchronized：一个 monitor，两个等待语境</text>
+  <text x="70" y="99" class="subtitle">EntryList 等待进入 synchronized；WaitSet 等待 Object.wait 条件。两者都要重新竞争 monitor，唤醒不等于直接获得。</text>
+
+  <rect x="70" y="145" width="330" height="255" rx="18" fill="#eff6ff" stroke="#60a5fa" stroke-width="2"/>
+  <text x="105" y="188" class="section">Java 语义入口</text>
+  <rect x="105" y="220" width="260" height="58" class="node" fill="#ffffff" stroke="#93c5fd"/>
+  <text x="235" y="255" text-anchor="middle" class="label">synchronized(obj)</text>
+  <rect x="105" y="298" width="260" height="58" class="node" fill="#ffffff" stroke="#93c5fd"/>
+  <text x="235" y="333" text-anchor="middle" class="label">obj.wait / notify</text>
+  <text x="105" y="382" class="small">稳定语义：互斥、可重入、释放/获取可见性</text>
+
+  <rect x="460" y="145" width="420" height="255" rx="18" fill="#fefce8" stroke="#facc15" stroke-width="2"/>
+  <text x="495" y="188" class="section">对象布局：HotSpot 观察</text>
+  <rect x="495" y="220" width="350" height="58" class="node" fill="#ffffff" stroke="#fde047"/>
+  <text x="670" y="255" text-anchor="middle" class="label">对象头</text>
+  <rect x="495" y="298" width="350" height="58" class="node" fill="#ffffff" stroke="#fde047"/>
+  <text x="670" y="333" text-anchor="middle" class="label">Mark Word：锁状态/关联信息</text>
+  <text x="495" y="382" class="small">竞争时可能关联 ObjectMonitor；不是 Java 语言规范布局</text>
+
+  <rect x="940" y="145" width="590" height="255" rx="18" fill="#f0fdf4" stroke="#4ade80" stroke-width="2"/>
+  <text x="975" y="188" class="section">ObjectMonitor：竞争与条件等待的容器</text>
+  <rect x="975" y="220" width="160" height="105" class="node" fill="#dcfce7" stroke="#4ade80"/>
+  <text x="1055" y="258" text-anchor="middle" class="label">Owner</text>
+  <text x="1055" y="288" text-anchor="middle" class="body">当前持有者</text>
+  <text x="1055" y="312" text-anchor="middle" class="small">重入深度</text>
+  <rect x="1170" y="220" width="160" height="105" class="node" fill="#dbeafe" stroke="#60a5fa"/>
+  <text x="1250" y="258" text-anchor="middle" class="label">EntryList</text>
+  <text x="1250" y="288" text-anchor="middle" class="body">竞争进入 monitor</text>
+  <text x="1250" y="312" text-anchor="middle" class="small">B、C 等候选者</text>
+  <rect x="1365" y="220" width="130" height="105" class="node" fill="#f3e8ff" stroke="#a78bfa"/>
+  <text x="1430" y="258" text-anchor="middle" class="label">WaitSet</text>
+  <text x="1430" y="288" text-anchor="middle" class="body">条件等待</text>
+  <text x="1430" y="312" text-anchor="middle" class="small">Object.wait</text>
+  <text x="975" y="365" class="small">EntryList 与 WaitSet 是不同语境：前者等锁，后者等条件</text>
+
+  <line x1="410" y1="270" x2="450" y2="270" stroke="#2563eb" stroke-width="4" marker-end="url(#arrow-blue)"/>
+  <text x="430" y="248" text-anchor="middle" class="small">进入</text>
+  <line x1="890" y1="270" x2="930" y2="270" stroke="#d97706" stroke-width="4" marker-end="url(#arrow-amber)"/>
+  <text x="910" y="248" text-anchor="middle" class="small">实现关联</text>
+
+  <rect x="70" y="455" width="720" height="300" rx="18" fill="#eff6ff" stroke="#93c5fd" stroke-width="2"/>
+  <text x="105" y="500" class="section">路径 A：等待进入 synchronized</text>
+  <rect x="105" y="545" width="190" height="72" class="node" fill="#ffffff" stroke="#60a5fa"/>
+  <text x="200" y="575" text-anchor="middle" class="label">线程 B / C</text>
+  <text x="200" y="600" text-anchor="middle" class="body">monitorenter</text>
+  <rect x="350" y="545" width="215" height="72" class="node" fill="#dbeafe" stroke="#60a5fa"/>
+  <text x="457" y="575" text-anchor="middle" class="label">EntryList</text>
+  <text x="457" y="600" text-anchor="middle" class="body">等待竞争 monitor</text>
+  <rect x="620" y="545" width="130" height="72" class="node" fill="#dcfce7" stroke="#4ade80"/>
+  <text x="685" y="575" text-anchor="middle" class="label">Owner 空闲</text>
+  <text x="685" y="600" text-anchor="middle" class="body">重新竞争</text>
+  <line x1="305" y1="581" x2="340" y2="581" stroke="#2563eb" stroke-width="3" marker-end="url(#arrow-blue)"/>
+  <line x1="575" y1="581" x2="610" y2="581" stroke="#16a34a" stroke-width="3" marker-end="url(#arrow-green)"/>
+  <text x="105" y="675" class="body">等待 monitor 的线程处于竞争关系，interrupt 不会把这次获取变成</text>
+  <text x="105" y="702" class="body">像 lockInterruptibly 一样的可中断获取；获得后才进入临界区。</text>
+  <text x="105" y="733" class="small">退出临界区执行 monitorexit，Owner 释放后才给其他候选者竞争机会。</text>
+
+  <rect x="820" y="455" width="710" height="300" rx="18" fill="#faf5ff" stroke="#c4b5fd" stroke-width="2"/>
+  <text x="855" y="500" class="section">路径 B：Object.wait 的条件等待</text>
+  <rect x="855" y="545" width="160" height="72" class="node" fill="#dcfce7" stroke="#4ade80"/>
+  <text x="935" y="575" text-anchor="middle" class="label">Owner</text>
+  <text x="935" y="600" text-anchor="middle" class="body">调用 wait()</text>
+  <rect x="1070" y="545" width="180" height="72" class="node" fill="#f3e8ff" stroke="#a78bfa"/>
+  <text x="1160" y="575" text-anchor="middle" class="label">WaitSet</text>
+  <text x="1160" y="600" text-anchor="middle" class="body">释放 monitor 后等待</text>
+  <rect x="1305" y="545" width="190" height="72" class="node" fill="#fef3c7" stroke="#fbbf24"/>
+  <text x="1400" y="575" text-anchor="middle" class="label">候选者回到竞争</text>
+  <text x="1400" y="600" text-anchor="middle" class="body">重新获取 monitor</text>
+  <line x1="1025" y1="581" x2="1060" y2="581" stroke="#7c3aed" stroke-width="3" marker-end="url(#arrow-purple)"/>
+  <line x1="1260" y1="581" x2="1295" y2="581" stroke="#d97706" stroke-width="3" marker-end="url(#arrow-amber)"/>
+  <text x="855" y="675" class="body">notify / notifyAll 的作用是让 WaitSet 中的等待者成为候选者，</text>
+  <text x="855" y="702" class="body">不是直接把 monitor 的 Owner 身份交给它。</text>
+  <text x="855" y="733" class="small">wait 返回前仍需重新获得同一个 monitor；条件判断必须放在 while 循环中重新检查。</text>
+
+  <rect x="70" y="805" width="1460" height="55" rx="14" fill="#0f172a"/>
+  <text x="105" y="840" class="label inverse">关键边界：</text>
+  <text x="225" y="840" class="body inverse">EntryList 是“等进入”，WaitSet 是“等条件”；唤醒只改变候选资格，真正继续执行仍取决于重新竞争 monitor。</text>
+</svg>

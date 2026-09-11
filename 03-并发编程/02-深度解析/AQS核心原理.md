@@ -18,6 +18,14 @@ AQS 本身不决定“什么情况下算获取成功”。它把这个问题交�
 
 概念图：[AQS 是什么与职责分工 SVG](../03-图示/AQS/AQS是什么与职责分工.svg)。
 
+## 为什么需要 AQS
+
+如果每一种同步器都自己实现“失败后怎么办”，就会反复面对同一组难题：线程竞争失败后如何排队，如何避免一直自旋，释放后唤醒谁，线程中断或超时后如何取消，以及共享模式如何继续传播。
+
+例如线程 A 持有锁，线程 B、C、D 同时获取失败。简单自旋会持续消耗 CPU；一个没有前驱关系的全局等待集合又很难判断谁更接近获取资格，也很难在 B 超时取消后让 C 继续前进。
+
+AQS 的价值就在于把问题拆开：具体同步器只定义“什么状态算成功”，AQS 统一处理失败线程的节点、前驱关系、阻塞、唤醒、取消和 shared 传播。这样 `ReentrantLock`、`Semaphore`、`CountDownLatch` 可以复用同一套等待骨架，却保留不同的同步语义。
+
 ### 先看最小源码骨架
 
 下面只摘出能说明职责的源码行，完整的入队、取消、唤醒和重试循环不在这里展开。字段与方法名按 Java 21；完整实现可查看 [OpenJDK JDK 21 的 AQS 源码](https://github.com/openjdk/jdk21u/blob/master/src/java.base/share/classes/java/util/concurrent/locks/AbstractQueuedSynchronizer.java)。
@@ -108,7 +116,7 @@ final int acquire(Node node, int arg,
 
 这也是为什么阅读 AQS 源码时不能只背 `state`：同一个模板在不同同步器里代表不同协议。AQS 负责通用等待机制，子类负责同步语义。
 
-## 先说结论
+## 最小心智模型
 
 AQS 的核心可以分成两层：
 
@@ -158,6 +166,18 @@ AQS 通用等待机制
 
 源码阅读时要先确认目标 JDK。JDK 8 资料中常见的 waitStatus、thread 等名称，在 Java 21 中不能直接照抄。
 
+### Node 状态先分清
+
+下面是 Java 21 中最值得记住的状态含义；它们是节点状态位，不是“线程生命周期”的完整枚举：
+
+| 状态 | Java 21 含义 | 阅读时要抓住的边界 |
+| --- | --- | --- |
+| `WAITING` | 节点需要在合适时机被唤醒 | 先声明等待再 park，避免释放方先发信号而等待方随后永久睡眠 |
+| `CANCELLED` | 当前获取已经取消，例如中断或超时 | 节点不再代表有效获取者，清理路径会跳过或摘除它 |
+| `COND` | 节点位于 Condition 等待队列 | `signal` 后才转移到同步队列，不能把 Condition 队列和同步队列混为一谈 |
+
+常量和字段名称以 [OpenJDK JDK 21 的 AQS 源码](https://github.com/openjdk/jdk21u/blob/master/src/java.base/share/classes/java/util/concurrent/locks/AbstractQueuedSynchronizer.java) 为准；旧资料中的 `waitStatus` 不能无版本说明地当成 Java 21 代码。
+
 ## exclusive 获取路径
 
 ```mermaid
@@ -186,6 +206,87 @@ flowchart TD
 | `tryAcquireSharedNanos(arg, nanos)` | true | true | 中断抛异常；超时摘除节点返回 false |
 
 对照阅读时先确认目标方法落在哪一行，再把中断/超时语义叠加到这条主线上。
+
+### `acquire(...)` 的 Java 21 教学剥离版
+
+> 下面按 Java 21 AQS 主循环改写为教学版本，保留真实的分支意图和关键辅助方法名；它不是可直接编译的 OpenJDK 源码复制，省略了旋转优化、链路修复和异常清理细节。
+
+~~~java
+final int acquire(Node node, int arg,
+                  boolean shared, boolean interruptible,
+                  boolean timed, long deadline) {
+    Thread current = Thread.currentThread();
+    boolean interrupted = false;
+    Node predecessor;
+
+    for (;;) {
+        predecessor = node == null ? null : node.prev;
+
+        if (node != null && predecessor == head) {
+            // 只有排在 head 后面的节点才获得再次尝试的资格
+            int result = shared
+                    ? tryAcquireShared(arg)
+                    : (tryAcquire(arg) ? 1 : -1);
+            if (result >= 0) {
+                // 出队并成为新的 head；shared 可能继续唤醒后继
+                setHead(node);
+                if (shared) signalNextIfShared(node);
+                if (interrupted) current.interrupt();
+                return result;
+            }
+        } else if (tail == null) {
+            initializeHead();             // 先建立哨兵 head/tail
+        } else if (node == null) {
+            node = newNode(shared, current); // 独占或共享节点
+        } else if (predecessor == null) {
+            node.waiter = current;
+            node.prev = tail;
+            if (casTail(tail, node)) {
+                tail.next = node;         // 概念化表示入同步队列
+            }
+        } else if (node.status == 0) {
+            node.status = WAITING;        // 先声明需要唤醒
+        } else {
+            if (!timed) {
+                LockSupport.park(this);
+            } else {
+                long remaining = deadline - System.nanoTime();
+                if (remaining <= 0L) break;
+                LockSupport.parkNanos(this, remaining);
+            }
+            node.status = 0;
+            if ((interrupted |= Thread.interrupted()) && interruptible) break;
+        }
+    }
+    return cancelAcquire(node, interrupted, interruptible);
+}
+~~~
+
+读这段代码只抓四个动作：靠近 head 才重试；先把节点标成 `WAITING` 再 park；被 unpark 后只是恢复运行资格，仍然要重新执行 `tryAcquire`；同一条主循环用 `shared`、`interruptible` 和 `timed` 三个开关承载不同公开入口的差异。
+
+### `release(...)` 的最小闭环
+
+> 下面同样是 Java 21 关键路径的教学剥离版，重点是“释放状态”和“唤醒候选者”两件事，不复制清理分支。
+
+~~~java
+public final boolean release(int arg) {
+    if (!tryRelease(arg)) {
+        return false;                 // 还没有完全释放同步状态
+    }
+    signalNext(head);                  // 只唤醒后继候选者
+    return true;
+}
+
+private static void signalNext(Node head) {
+    Node successor = head == null ? null : head.next;
+    if (successor != null && successor.status != 0) {
+        successor.getAndUnsetStatus(WAITING);
+        LockSupport.unpark(successor.waiter);
+    }
+}
+~~~
+
+`release` 不把锁直接交给某个线程；它只在子类确认同步状态已经释放后，给后继一个重新竞争的机会。后继被唤醒后仍要回到 `tryAcquire`，所以 `unpark` 不等于“立即获得锁”。
 
 抽象流程：
 

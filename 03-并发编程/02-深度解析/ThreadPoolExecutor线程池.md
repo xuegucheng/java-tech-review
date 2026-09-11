@@ -6,6 +6,12 @@
 > 前置知识：线程生命周期、阻塞队列和中断
 > 本文不负责：逐位展开 ctl 的所有常量计算
 
+## ThreadPoolExecutor 是什么
+
+如果每个任务都直接创建一个平台线程，任务突发时线程数量、创建成本、上下文切换和下游压力都会失去统一控制。线程池把“线程复用”和“任务排队”组合成一个有状态的执行器：提交者只提交任务，线程池负责决定由哪个 Worker 执行、是否排队、是否扩容以及过载时如何处理。
+
+它解决的不是“让任务自动变快”，而是把线程数量、队列容量、任务执行和拒绝策略放进同一个容量协议中。理解这个协议，才知道 `corePoolSize`、`maximumPoolSize` 和 `workQueue` 为什么不能孤立配置。
+
 ## 先说结论
 
 ThreadPoolExecutor 把运行状态和 worker 数量压缩在 ctl 中，用 Worker 集合、BlockingQueue 和拒绝策略共同管理任务。execute 的主线是核心线程、队列和最大线程，但每一步都要和线程池运行状态竞争，入队之后还会二次检查。
@@ -83,6 +89,68 @@ flowchart TD
 ~~~
 
 二次检查是重点：任务刚入队，shutdown 可能已经发生。若只记第一眼的“入队成功”，就会漏掉关闭竞争和无人消费队列的情况。
+
+### `execute` 的 Java 21 教学剥离版
+
+> 下面按 Java 21 的 `execute` 主线改写为教学版本，保留三步决策和入队后的二次检查；它不是可直接替换的 OpenJDK 源码复制，省略了字段访问、并发重试和实现防御细节。
+>
+> 源码对照：[OpenJDK JDK 21 ThreadPoolExecutor.java](https://github.com/openjdk/jdk21u/blob/master/src/java.base/share/classes/java/util/concurrent/ThreadPoolExecutor.java)
+
+~~~java
+public void execute(Runnable task) {
+    if (task == null) throw new NullPointerException();
+
+    int snapshot = ctl.get();
+    if (workerCountOf(snapshot) < corePoolSize) {
+        if (addWorker(task, true)) return;       // 第一选择：核心 Worker
+        snapshot = ctl.get();                    // 创建失败，重新观察状态
+    }
+
+    if (isRunning(snapshot) && workQueue.offer(task)) {
+        int recheck = ctl.get();                 // 入队后必须二次检查
+        if (!isRunning(recheck) && remove(task)) {
+            reject(task);                        // 关闭竞争：移出并拒绝
+        } else if (workerCountOf(recheck) == 0) {
+            addWorker(null, false);              // 队列有人但没有消费者
+        }
+    } else if (!addWorker(task, false)) {
+        reject(task);                             // 队列满且无法扩到最大值
+    }
+}
+~~~
+
+源码阅读时把它压缩成一句话：先补核心线程，再尝试入队，入队后重新确认池状态；只有运行中且队列满，才尝试创建非核心线程，最后才进入拒绝策略。`addWorker` 的状态预检也意味着关闭后的任务不会因为“队列满”而偷偷创建新 Worker。
+
+### Worker 为什么继承 AQS
+
+Java 21 的 `ThreadPoolExecutor.Worker` 继承 AQS，但它不是用 AQS 实现线程池主锁，而是把自己当成一个简单的独占锁：Worker 正在执行任务时持有这个锁，空闲等待任务时通常不持有。线程池的 `interruptIdleWorkers` 可以先 `tryLock`，成功说明 Worker 没有执行任务，才允许中断它；正在执行任务的 Worker 获取失败，因此不会被“空闲线程清理”路径误伤。
+
+~~~java
+private final class Worker
+        extends AbstractQueuedSynchronizer implements Runnable {
+    Worker(Runnable firstTask) {
+        setState(-1);                    // 启动前先禁止中断
+        this.firstTask = firstTask;
+        this.thread = threadFactory.newThread(this);
+    }
+
+    protected boolean tryAcquire(int ignored) {
+        if (!compareAndSetState(0, 1)) return false;
+        setExclusiveOwnerThread(Thread.currentThread());
+        return true;                      // Worker 进入“执行中”
+    }
+
+    protected boolean tryRelease(int ignored) {
+        setExclusiveOwnerThread(null);
+        setState(0);
+        return true;                      // Worker 回到可被检查状态
+    }
+
+    public void run() { runWorker(this); }
+}
+~~~
+
+`runWorker` 启动任务循环前会先解开 Worker 的启动保护状态，执行每个任务前再持有这个 Worker 锁，任务结束后释放。这个 AQS 用法的价值是表达“空闲”和“执行中”的边界，而不是给每个任务再加一把业务锁；它也解释了为什么 `Worker` 的 lock 状态与线程池的 `mainLock`、workQueue 不能混为一谈。
 
 ## Worker、runWorker 与 getTask
 

@@ -12,6 +12,14 @@ synchronized 的语义核心是对象 monitor：同一个 monitor 同时只允�
 
 Java 21 可以讨论 CAS、自旋、竞争和 monitor 膨胀等实现方向，但不能把“无锁 → 偏向锁 → 轻量级锁 → 重量级锁”当成当前运行时必然经历的完整升级流程。偏向锁属于历史实现背景，较新的 JDK 已禁用或移除相关路径。
 
+## 为什么需要 synchronized
+
+两个线程同时执行“读取共享值 → 判断条件 → 修改共享值”时，单次字段读写即使看起来很简单，整个复合动作仍可能交错，产生丢更新或破坏对象不变量。只靠 `volatile` 可以改善可见性，但不能把多步更新组合成一个互斥临界区。
+
+`synchronized` 给这段代码绑定一个稳定的对象 monitor：同一时刻只有一个线程能进入，退出 monitor 的线程对随后成功进入的线程建立可见性关系。同一线程再次进入同一个 monitor 还会递增重入深度，因此嵌套调用不会把自己阻塞。
+
+快速图示：[synchronized 与 ObjectMonitor 等待模型 SVG](../03-图示/synchronized/synchronized与ObjectMonitor等待模型.svg)。图中对象头、Mark Word 和 ObjectMonitor 属于 HotSpot 实现观察；真正稳定的 Java 语义仍是互斥、可重入和 monitor 的释放/获取边界。
+
 ## 30 秒回答
 
 > synchronized 可以修饰实例方法、静态方法和代码块。实例方法锁 this，静态方法锁对应 Class 对象，代码块锁显式对象。线程进入 monitor 后执行临界区，退出时无论正常还是异常都会释放；同一线程再次进入同一 monitor 是可重入的。竞争时 HotSpot 可能先尝试快速路径或自旋，必要时让线程进入 monitor 等待，但这些是实现优化。synchronized 既保护互斥更新，又通过 monitor 释放/获取建立可见性；它不提供公平性，也不支持在等待获取 monitor 时由 interrupt 直接取消。

@@ -12,6 +12,8 @@ Virtual Thread 不是更快的 Platform Thread，也不会让 CPU 密集计算�
 
 Java 21 中应关注 platform thread、virtual thread、carrier thread 和阻塞行为的关系；不要把后续 JDK 对 pinning 等实现的优化倒灌成 Java 21 的固定事实。
 
+版本入口：[Java SE 21 Thread API](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Thread.html)；`ofVirtual`、`startVirtualThread` 和 `isVirtual` 均以 Java 21 API 为准。
+
 ## 30 秒回答
 
 > 平台线程通常直接映射到操作系统线程，创建和阻塞成本较高；虚拟线程由 JVM 调度到少量 carrier platform threads 上。对大量阻塞 I/O、每请求一个轻量执行单元的服务，虚拟线程可以减少线程资源成本，让同步写法保留较好的可读性。它不增加 CPU 核心，也不让 CPU 密集任务更快；数据库连接、远程服务、文件描述符和下游限流仍然是瓶颈。Java 21 中长时间在 synchronized 或 native 调用内阻塞可能 pin carrier，因此要关注临界区和阻塞点；虚拟线程不应像平台线程一样放进固定大小线程池，但资源并发仍需要 semaphore、连接池和业务限流。
