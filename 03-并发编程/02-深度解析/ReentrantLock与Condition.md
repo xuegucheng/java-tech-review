@@ -3,8 +3,22 @@
 > 面试定位：AQS 在独占锁和条件等待中的落地
 > Java 版本：ReentrantLock 与 AQS 关键路径按 Java 21
 > P0/P1：P0
-> 前置知识：AQS、CAS 和线程生命周期
+> 前置知识：CAS 和线程生命周期；AQS 基本概念见 [AQS 核心原理](AQS核心原理.md)
 > 本文不负责：复制全部 Lock API 和完整 ConditionObject 源码
+
+## ReentrantLock 和 Condition 是什么
+
+### ReentrantLock
+
+`ReentrantLock` 是 JDK 提供的显式互斥锁实现。它基于 AQS 的 exclusive 模式，允许同一个线程重复获取同一把锁；每获取一次，重入层级增加一次，必须配对 `unlock` 才能真正释放。
+
+与 `synchronized` 相比，`ReentrantLock` 把获取和释放写进 API，因此可以额外提供可中断获取、限时获取、公平模式和多个 Condition 等能力，但也把释放责任交给调用方。
+
+### Condition
+
+`Condition` 是绑定在某把 Lock 上的条件等待协议，不是另一把锁。它把“等待条件”和“竞争锁”分成两步：`await` 释放当前锁并进入条件队列，`signal` 把节点转移到同步队列，线程重新获取锁后 `await` 才返回。
+
+完整的同步器骨架见 [AQS 核心原理](AQS核心原理.md)；本文只关注它在独占锁和条件等待中的具体落地。
 
 ## 先说结论
 

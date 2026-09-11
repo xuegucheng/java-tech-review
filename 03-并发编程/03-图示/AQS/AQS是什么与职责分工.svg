@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">AQS 是什么与职责分工</title>
+  <desc id="desc">展示 AQS 作为同步器骨架，如何连接具体同步器定义的状态协议、AQS 提供的排队阻塞机制以及调用方的使用责任。</desc>
+  <defs>
+    <marker id="arrow-blue" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L10,3 L0,6 Z" fill="#2563eb"/>
+    </marker>
+    <marker id="arrow-green" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L10,3 L0,6 Z" fill="#16a34a"/>
+    </marker>
+    <marker id="arrow-purple" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L10,3 L0,6 Z" fill="#7c3aed"/>
+    </marker>
+    <style>
+      .title { font:700 40px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif; fill:#0f172a; }
+      .subtitle { font:400 20px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif; fill:#475569; }
+      .section { font:700 25px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif; fill:#0f172a; }
+      .label { font:700 19px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif; fill:#0f172a; }
+      .body { font:400 17px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif; fill:#334155; }
+      .small { font:400 15px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif; fill:#475569; }
+      .inverse { fill:#ffffff; }
+      .node { rx:14; stroke-width:2; }
+    </style>
+  </defs>
+
+  <rect width="1600" height="900" fill="#f8fafc"/>
+  <text x="70" y="70" class="title">AQS 是什么：同步器骨架，而不是具体锁</text>
+  <text x="70" y="108" class="subtitle">先看职责边界，再看源码：子类定义“能否获取”，AQS 组织“失败后如何等待”。</text>
+
+  <rect x="70" y="150" width="390" height="275" rx="18" fill="#eff6ff" stroke="#60a5fa" stroke-width="2"/>
+  <text x="105" y="198" class="section">具体同步器：定义协议</text>
+  <rect x="105" y="230" width="320" height="62" class="node" fill="#ffffff" stroke="#93c5fd"/>
+  <text x="265" y="268" text-anchor="middle" class="label">state 代表什么？</text>
+  <rect x="105" y="312" width="320" height="62" class="node" fill="#ffffff" stroke="#93c5fd"/>
+  <text x="265" y="350" text-anchor="middle" class="label">tryAcquire / tryRelease</text>
+  <text x="105" y="405" class="small">决定独占、共享、重入、公平等同步语义</text>
+
+  <rect x="535" y="150" width="530" height="275" rx="18" fill="#ede9fe" stroke="#a78bfa" stroke-width="2"/>
+  <text x="575" y="198" class="section">AQS：提供通用等待机制</text>
+  <rect x="575" y="230" width="450" height="62" class="node" fill="#ffffff" stroke="#c4b5fd"/>
+  <text x="800" y="268" text-anchor="middle" class="label">AbstractQueuedSynchronizer</text>
+  <rect x="575" y="312" width="215" height="62" class="node" fill="#ffffff" stroke="#c4b5fd"/>
+  <text x="682" y="350" text-anchor="middle" class="label">同步等待队列</text>
+  <rect x="810" y="312" width="215" height="62" class="node" fill="#ffffff" stroke="#c4b5fd"/>
+  <text x="917" y="350" text-anchor="middle" class="label">CAS + park/unpark</text>
+  <text x="575" y="405" class="small">还处理前驱关系、取消、中断、超时和 shared 传播</text>
+
+  <rect x="1140" y="150" width="390" height="275" rx="18" fill="#ecfdf5" stroke="#4ade80" stroke-width="2"/>
+  <text x="1175" y="198" class="section">调用方：遵守使用边界</text>
+  <rect x="1175" y="230" width="320" height="62" class="node" fill="#ffffff" stroke="#86efac"/>
+  <text x="1335" y="268" text-anchor="middle" class="label">lock / acquire</text>
+  <rect x="1175" y="312" width="320" height="62" class="node" fill="#ffffff" stroke="#86efac"/>
+  <text x="1335" y="350" text-anchor="middle" class="label">finally 释放 + 检查条件</text>
+  <text x="1175" y="405" class="small">调用方负责配对释放、业务谓词和异常清理</text>
+
+  <line x1="470" y1="287" x2="525" y2="287" stroke="#2563eb" stroke-width="4" marker-end="url(#arrow-blue)"/>
+  <text x="497" y="267" text-anchor="middle" class="small">定义协议</text>
+  <line x1="1075" y1="287" x2="1130" y2="287" stroke="#16a34a" stroke-width="4" marker-end="url(#arrow-green)"/>
+  <text x="1102" y="267" text-anchor="middle" class="small">提供能力</text>
+
+  <text x="70" y="490" class="section">常见同步器如何复用同一骨架</text>
+  <rect x="70" y="530" width="330" height="150" class="node" fill="#dbeafe" stroke="#60a5fa"/>
+  <text x="235" y="570" text-anchor="middle" class="label">ReentrantLock</text>
+  <text x="235" y="610" text-anchor="middle" class="body">exclusive</text>
+  <text x="235" y="642" text-anchor="middle" class="body">state = 重入次数</text>
+  <rect x="440" y="530" width="330" height="150" class="node" fill="#fef3c7" stroke="#fbbf24"/>
+  <text x="605" y="570" text-anchor="middle" class="label">Semaphore</text>
+  <text x="605" y="610" text-anchor="middle" class="body">shared</text>
+  <text x="605" y="642" text-anchor="middle" class="body">state = 剩余许可</text>
+  <rect x="810" y="530" width="330" height="150" class="node" fill="#fce7f3" stroke="#f472b6"/>
+  <text x="975" y="570" text-anchor="middle" class="label">CountDownLatch</text>
+  <text x="975" y="610" text-anchor="middle" class="body">shared</text>
+  <text x="975" y="642" text-anchor="middle" class="body">state = 剩余计数</text>
+  <rect x="1180" y="530" width="350" height="150" class="node" fill="#dcfce7" stroke="#4ade80"/>
+  <text x="1355" y="570" text-anchor="middle" class="label">ReentrantReadWriteLock</text>
+  <text x="1355" y="610" text-anchor="middle" class="body">读 shared / 写 exclusive</text>
+  <text x="1355" y="642" text-anchor="middle" class="body">state = 读写组合编码</text>
+
+  <rect x="70" y="735" width="1460" height="78" rx="16" fill="#0f172a"/>
+  <text x="105" y="783" class="label inverse">一句话：</text>
+  <text x="245" y="783" class="body inverse">子类定义同步语义，AQS 管理竞争与等待，调用方负责正确使用。</text>
+</svg>

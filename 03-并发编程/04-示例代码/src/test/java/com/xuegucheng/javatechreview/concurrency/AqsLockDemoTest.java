@@ -12,9 +12,11 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+/** 验证自定义 AQS 独占同步器的互斥性和持有者校验。 */
 class AqsLockDemoTest {
 
     @Test
+    /** 验证多个线程并发竞争时，临界区最大并发数始终为 1。 */
     void teachingMutexAllowsOnlyOneCriticalSectionAtATime() {
         AqsLockDemo.Result result = assertTimeoutPreemptively(
                 Duration.ofSeconds(5),
@@ -25,6 +27,7 @@ class AqsLockDemoTest {
     }
 
     @Test
+    /** 验证未持有锁、重复释放锁都会抛出非法监视器状态异常。 */
     void unlockWithoutOwnershipThrowsIllegalMonitorStateException() {
         assertTimeoutPreemptively(Duration.ofSeconds(5), () -> {
             AqsLockDemo.Mutex mutex = new AqsLockDemo.Mutex();
@@ -40,6 +43,7 @@ class AqsLockDemoTest {
     }
 
     @Test
+    /** 验证其他线程不能越权释放锁，原持有者随后仍能正常解锁和再次加锁。 */
     void unlockFromAnotherThreadWhileHeldThrowsIllegalMonitorStateException() {
         assertTimeoutPreemptively(Duration.ofSeconds(5), () -> {
             AqsLockDemo.Mutex mutex = new AqsLockDemo.Mutex();

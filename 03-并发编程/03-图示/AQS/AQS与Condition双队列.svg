@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">AQS 获取路径与 Condition 双队列</title>
+  <desc id="desc">展示 AQS 失败获取后的同步队列、park/unpark 和重新竞争，以及 Condition 队列向同步队列转移的过程。</desc>
+  <defs>
+    <marker id="arrow-blue" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L10,3 L0,6 Z" fill="#2563eb"/>
+    </marker>
+    <marker id="arrow-purple" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L10,3 L0,6 Z" fill="#7c3aed"/>
+    </marker>
+    <marker id="arrow-green" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L10,3 L0,6 Z" fill="#16a34a"/>
+    </marker>
+    <style>
+      .title { font:700 40px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif; fill:#0f172a; }
+      .subtitle { font:400 20px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif; fill:#475569; }
+      .section { font:700 25px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif; fill:#0f172a; }
+      .label { font:700 19px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif; fill:#0f172a; }
+      .body { font:400 17px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif; fill:#334155; }
+      .small { font:400 15px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif; fill:#475569; }
+      .node { rx:13; stroke-width:2; }
+    </style>
+  </defs>
+
+  <rect width="1600" height="900" fill="#f8fafc"/>
+  <text x="70" y="70" class="title">AQS：失败者排队，唤醒后仍要重新竞争</text>
+  <text x="70" y="108" class="subtitle">state 是同步状态容器；同步队列负责等待与取消，Condition 队列负责条件等待，二者不是同一条队列。</text>
+
+  <rect x="70" y="150" width="1460" height="300" rx="18" fill="#eff6ff" stroke="#93c5fd" stroke-width="2"/>
+  <text x="105" y="198" class="section">AQS exclusive 获取主线</text>
+  <rect x="105" y="245" width="220" height="75" class="node" fill="#ffffff" stroke="#60a5fa"/>
+  <text x="215" y="278" text-anchor="middle" class="label">tryAcquire(arg)</text>
+  <text x="215" y="304" text-anchor="middle" class="body">先走快速路径</text>
+  <rect x="395" y="245" width="220" height="75" class="node" fill="#fef3c7" stroke="#fbbf24"/>
+  <text x="505" y="278" text-anchor="middle" class="label">enq(node)</text>
+  <text x="505" y="304" text-anchor="middle" class="body">失败则入队</text>
+  <rect x="685" y="245" width="250" height="75" class="node" fill="#ede9fe" stroke="#a78bfa"/>
+  <text x="810" y="278" text-anchor="middle" class="label">检查前驱 / 获取资格</text>
+  <text x="810" y="304" text-anchor="middle" class="body">取消或继续等待</text>
+  <rect x="1005" y="245" width="190" height="75" class="node" fill="#e2e8f0" stroke="#94a3b8"/>
+  <text x="1100" y="278" text-anchor="middle" class="label">park()</text>
+  <text x="1100" y="304" text-anchor="middle" class="body">释放执行权</text>
+  <rect x="1265" y="245" width="220" height="75" class="node" fill="#dcfce7" stroke="#4ade80"/>
+  <text x="1375" y="278" text-anchor="middle" class="label">unpark 后重试</text>
+  <text x="1375" y="304" text-anchor="middle" class="body">仍需 tryAcquire</text>
+  <line x1="335" y1="282" x2="385" y2="282" stroke="#2563eb" stroke-width="3" marker-end="url(#arrow-blue)"/>
+  <line x1="625" y1="282" x2="675" y2="282" stroke="#2563eb" stroke-width="3" marker-end="url(#arrow-blue)"/>
+  <line x1="945" y1="282" x2="995" y2="282" stroke="#2563eb" stroke-width="3" marker-end="url(#arrow-blue)"/>
+  <line x1="1205" y1="282" x2="1255" y2="282" stroke="#16a34a" stroke-width="3" marker-end="url(#arrow-green)"/>
+  <path d="M1375 335 C1375 390 215 390 215 325" fill="none" stroke="#16a34a" stroke-width="3" stroke-dasharray="9 7" marker-end="url(#arrow-green)"/>
+  <text x="800" y="415" text-anchor="middle" class="small">释放方修改 state 并唤醒后继；被唤醒线程必须重新竞争，不能把 unpark 当成直接交接锁。</text>
+
+  <rect x="70" y="490" width="1460" height="310" rx="18" fill="#faf5ff" stroke="#c4b5fd" stroke-width="2"/>
+  <text x="105" y="538" class="section">Condition：await 释放锁，signal 只负责转移节点</text>
+
+  <rect x="105" y="590" width="190" height="75" class="node" fill="#ffffff" stroke="#a78bfa"/>
+  <text x="200" y="623" text-anchor="middle" class="label">线程持有锁</text>
+  <text x="200" y="649" text-anchor="middle" class="body">await()</text>
+  <rect x="365" y="590" width="300" height="75" class="node" fill="#ede9fe" stroke="#a78bfa"/>
+  <text x="515" y="623" text-anchor="middle" class="label">Condition queue</text>
+  <text x="515" y="649" text-anchor="middle" class="body">C1 → C2 → C3</text>
+  <line x1="305" y1="628" x2="355" y2="628" stroke="#7c3aed" stroke-width="3" marker-end="url(#arrow-purple)"/>
+  <text x="330" y="608" text-anchor="middle" class="small">释放全部重入次数</text>
+
+  <rect x="805" y="590" width="300" height="75" class="node" fill="#dbeafe" stroke="#60a5fa"/>
+  <text x="955" y="623" text-anchor="middle" class="label">AQS sync queue</text>
+  <text x="955" y="649" text-anchor="middle" class="body">head → C1 → B</text>
+  <rect x="1245" y="590" width="240" height="75" class="node" fill="#dcfce7" stroke="#4ade80"/>
+  <text x="1365" y="623" text-anchor="middle" class="label">重新获取锁</text>
+  <text x="1365" y="649" text-anchor="middle" class="body">成功后 await 返回</text>
+  <line x1="675" y1="628" x2="795" y2="628" stroke="#7c3aed" stroke-width="3" marker-end="url(#arrow-purple)"/>
+  <text x="735" y="608" text-anchor="middle" class="small">signal 转移节点</text>
+  <line x1="1115" y1="628" x2="1235" y2="628" stroke="#16a34a" stroke-width="3" marker-end="url(#arrow-green)"/>
+  <text x="1175" y="608" text-anchor="middle" class="small">排队后竞争</text>
+  <text x="105" y="735" class="body">关键边界：</text>
+  <text x="225" y="735" class="body">signal 不等于把锁直接交给被唤醒线程；线程必须重新进入同步队列并重新获取锁。</text>
+  <text x="105" y="770" class="small">head 是队列哨兵或已出队头节点，不等于当前持锁线程；exclusive/shared 是获取协议，不固定业务含义。</text>
+</svg>

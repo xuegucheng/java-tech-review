@@ -6,9 +6,29 @@
 > 前置知识：CAS、volatile、线程阻塞与唤醒
 > 本文不负责：完整复制 AbstractQueuedSynchronizer 源码
 
+## AQS 是什么
+
+AQS（`AbstractQueuedSynchronizer`）是 JDK 提供的同步器骨架，不是一把具体的锁。它把“竞争失败后如何排队、阻塞、唤醒和取消”做成通用框架，具体同步器只需要定义 `state` 的含义以及获取、释放成功的条件。
+
+可以这样分工：
+
+~~~text
+具体同步器：定义 state 和 tryAcquire / tryRelease
+        ↓
+AQS：维护同步队列、CAS、park / unpark 和取消
+        ↓
+调用方：配对释放，并维护业务条件
+~~~
+
+`ReentrantLock`、`Semaphore`、`CountDownLatch` 都可以复用 AQS；`Condition` 是绑定在锁上的条件等待协议，不是另一把独立的锁。
+
+快速理解：[AQS 是什么与职责分工 SVG](../03-图示/AQS/AQS是什么与职责分工.svg)。
+
+源码只看最小骨架即可，见 [AQS 核心原理](../02-深度解析/AQS核心原理.md) 的“先看最小源码骨架”小节；不要在速记页重复完整源码。
+
 ## 先说结论
 
-AQS 是同步器骨架，不是某一把具体的锁。它把同步状态 state、FIFO 风格的双向等待队列、CAS 和 LockSupport.park/unpark 组合起来；子类通过 tryAcquire、tryRelease 或 shared 版本定义“状态代表什么”。
+AQS 把同步状态 `state`、FIFO 风格的双向等待队列、CAS 和 `LockSupport.park/unpark` 组合起来；子类通过 `tryAcquire`、`tryRelease` 或 shared 版本定义“状态代表什么”。
 
 ## 30 秒回答
 

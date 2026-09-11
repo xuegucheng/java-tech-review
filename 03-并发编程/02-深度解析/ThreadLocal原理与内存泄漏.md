@@ -60,6 +60,8 @@ flowchart LR
 
 GC 根指向 Thread，Thread 强引用链 ThreadLocalMap → Entry → value；key 一侧只剩弱引用，回收后 Entry 变 stale，value 是否滞留取决于后续是否触清理。
 
+独立结构图：[ThreadLocalMap 弱引用链 SVG](../03-图示/ThreadLocal/ThreadLocalMap弱引用链.svg)。
+
 ## 为什么不是 HashMap
 
 ThreadLocalMap 是 ThreadLocal 专用的轻量结构，使用数组和开放寻址，而不是 HashMap 的桶、链表和树：

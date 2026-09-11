@@ -8,7 +8,12 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-/** Demonstrates bounded saturation and CallerRunsPolicy back pressure. */
+/**
+ * 演示有界线程池达到饱和后的执行策略。
+ *
+ * <p>这个示例验证：核心线程和最大线程都被占用、队列也已满时，
+ * {@code CallerRunsPolicy} 会让提交任务的线程直接执行溢出任务，形成反压。</p>
+ */
 public final class ThreadPoolSaturationDemo {
 
     private static final long TIMEOUT_SECONDS = 2;
@@ -16,6 +21,7 @@ public final class ThreadPoolSaturationDemo {
     private ThreadPoolSaturationDemo() {
     }
 
+    /** 按“核心线程、队列、最大线程、溢出任务”的顺序填满线程池并观察 CallerRunsPolicy。 */
     public static Result run() throws InterruptedException {
         CountDownLatch firstStarted = new CountDownLatch(1);
         CountDownLatch thirdStarted = new CountDownLatch(1);
@@ -24,6 +30,7 @@ public final class ThreadPoolSaturationDemo {
         AtomicInteger completed = new AtomicInteger();
         ThreadFactory factory = new NamedThreadFactory();
 
+        // 容量为：1 个核心线程 + 1 个队列槽位 + 1 个非核心线程。
         ThreadPoolExecutor executor = new ThreadPoolExecutor(
                 1,
                 2,
@@ -35,6 +42,7 @@ public final class ThreadPoolSaturationDemo {
 
         try {
             executor.execute(() -> {
+                // 第一个任务占住核心线程。
                 firstStarted.countDown();
                 awaitRelease(releaseHolders);
                 completed.incrementAndGet();
@@ -46,6 +54,7 @@ public final class ThreadPoolSaturationDemo {
             executor.execute(completed::incrementAndGet);
 
             executor.execute(() -> {
+                // 第三个任务触发创建最大线程，填满线程池的工作能力。
                 thirdStarted.countDown();
                 awaitRelease(releaseHolders);
                 completed.incrementAndGet();
@@ -55,6 +64,7 @@ public final class ThreadPoolSaturationDemo {
             }
 
             executor.execute(() -> {
+                // 此时线程和队列都满，任务由提交者线程直接执行。
                 callerRan.set(true);
                 completed.incrementAndGet();
             });
@@ -72,6 +82,7 @@ public final class ThreadPoolSaturationDemo {
         }
     }
 
+    /** 让占用线程等待统一释放信号，用于稳定制造线程池饱和状态。 */
     private static void awaitRelease(CountDownLatch releaseHolders) {
         try {
             if (!releaseHolders.await(TIMEOUT_SECONDS, TimeUnit.SECONDS)) {
@@ -82,19 +93,23 @@ public final class ThreadPoolSaturationDemo {
         }
     }
 
+    /** 运行线程池饱和与 CallerRunsPolicy 反压演示。 */
     public static void main(String[] args) throws InterruptedException {
         System.out.println(run());
     }
 
+    /** 为工作线程生成稳定、可读的名称，便于观察任务到底由谁执行。 */
     private static final class NamedThreadFactory implements ThreadFactory {
         private final AtomicInteger sequence = new AtomicInteger();
 
+        /** 创建带有递增编号的工作线程。 */
         @Override
         public Thread newThread(Runnable runnable) {
             return new Thread(runnable, "saturation-demo-" + sequence.incrementAndGet());
         }
     }
 
+    /** 保存 CallerRunsPolicy 是否生效、完成任务数和最大线程数。 */
     public record Result(boolean callerRan, int completed, int largestPoolSize) {
     }
 }

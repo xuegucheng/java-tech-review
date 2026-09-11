@@ -6,19 +6,126 @@
 > 前置知识：volatile、CAS、park/unpark 和线程中断
 > 本文不负责：复制 AbstractQueuedSynchronizer 全部源码
 
-## 先说结论
+## AQS 是什么
 
-AQS 把同步器拆成两部分：
+AQS 是 `AbstractQueuedSynchronizer` 的缩写，是 JDK 提供的同步器骨架。它位于 `java.util.concurrent.locks` 包中，目标不是直接提供一把“万能锁”，而是把多个同步器都会遇到的竞争、排队、阻塞、唤醒和取消流程抽出来复用。
 
-~~~text
-volatile state
-+ FIFO 风格的双向同步等待队列
-+ CAS
-+ LockSupport.park/unpark
-+ 子类模板方法
+AQS 本身不决定“什么情况下算获取成功”。它把这个问题交给具体同步器的子类；子类定义同步状态 `state` 的含义以及 `tryAcquire`、`tryRelease` 或 shared 版本的成功条件，AQS 再负责把失败线程组织进等待队列，并在状态变化后安排重新竞争。
+
+因此可以先记住这句话：
+
+> AQS 是“同步状态协议 + 阻塞等待框架”的组合。它不是具体锁，也不是存放业务任务的普通队列。
+
+概念图：[AQS 是什么与职责分工 SVG](../03-图示/AQS/AQS是什么与职责分工.svg)。
+
+### 先看最小源码骨架
+
+下面只摘出能说明职责的源码行，完整的入队、取消、唤醒和重试循环不在这里展开。字段与方法名按 Java 21；完整实现可查看 [OpenJDK JDK 21 的 AQS 源码](https://github.com/openjdk/jdk21u/blob/master/src/java.base/share/classes/java/util/concurrent/locks/AbstractQueuedSynchronizer.java)。
+
+首先，AQS 只保存同步状态，并提供原子读写能力；它不解释 `state` 到底代表重入次数、许可数还是计数器：
+
+~~~java
+// AQS：保存同步状态，但不规定 state 的业务含义
+private volatile int state;
+
+protected final int getState() {
+    return state;
+}
+
+protected final void setState(int newState) {
+    state = newState;
+}
+
+protected final boolean compareAndSetState(int expect, int update) {
+    return U.compareAndSetInt(this, STATE, expect, update);
+}
 ~~~
 
-state 只是一个同步状态容器，不直接等于“锁”。ReentrantLock 可以把它解释成重入次数，Semaphore 可以解释成许可数，CountDownLatch 可以解释成剩余计数。
+其次，AQS 把“什么情况下算获取/释放成功”留给具体同步器子类：
+
+~~~java
+// AQS 默认不替子类决定同步语义；具体同步器需要覆盖这些钩子
+protected boolean tryAcquire(int arg) {
+    throw new UnsupportedOperationException();
+}
+
+protected boolean tryRelease(int arg) {
+    throw new UnsupportedOperationException();
+}
+
+protected int tryAcquireShared(int arg) {
+    throw new UnsupportedOperationException();
+}
+
+protected boolean tryReleaseShared(int arg) {
+    throw new UnsupportedOperationException();
+}
+~~~
+
+例如，项目中的最小独占同步器只定义“尝试拿到状态”的条件；返回 `false` 后，排队、阻塞和唤醒交给 AQS：
+
+~~~java
+static final class Mutex extends AbstractQueuedSynchronizer {
+    @Override
+    protected boolean tryAcquire(int ignored) {
+        if (compareAndSetState(0, 1)) {
+            setExclusiveOwnerThread(Thread.currentThread());
+            return true;  // 成功：当前线程拿到同步状态
+        }
+        return false;     // 失败：AQS 接管排队、阻塞和重试
+    }
+}
+~~~
+
+Java 21 中，多个公开获取入口还会汇聚到 AQS 的内部主入口。这里仅保留方法签名，方法体省略：
+
+~~~text
+// acquire(...) 内部负责入队、park、唤醒、取消和重新竞争
+final int acquire(Node node, int arg,
+                  boolean shared, boolean interruptible,
+                  boolean timed, long time)
+~~~
+
+这几段源码串起来就是 AQS 的边界：子类定义同步语义，AQS 提供状态与等待机制，调用方负责正确配对获取和释放。项目中的可运行版本见 [AqsLockDemo.java](../04-示例代码/src/main/java/com/xuegucheng/javatechreview/concurrency/AqsLockDemo.java)。
+
+## AQS 与具体同步器如何分工
+
+| 层次 | 主要责任 | 典型问题 |
+| --- | --- | --- |
+| 具体同步器子类 | 解释 `state`，实现获取/释放条件，决定独占或共享协议 | “许可还有多少？”“当前线程能否重入？” |
+| AQS | 管理同步队列、节点连接、CAS 竞争、park/unpark、取消和 shared 传播 | “失败线程在哪里等？”“释放后唤醒谁？” |
+| 调用方 | 正确配对获取与释放，维护业务条件和异常清理 | “是否 finally 释放？”“条件谓词是否重新检查？” |
+
+常见映射如下：
+
+| 同步器 | AQS 模式 | `state` 的典型含义 |
+| --- | --- | --- |
+| `ReentrantLock` | exclusive | 当前线程的重入次数 |
+| `Semaphore` | shared | 剩余许可数 |
+| `CountDownLatch` | shared | 尚未完成的计数 |
+| `ReentrantReadWriteLock` | 读 shared、写 exclusive | 读写持有状态的组合编码 |
+| `Condition` | 与某把锁绑定的条件等待协议 | 不是独立的锁；节点会在条件队列和同步队列之间转移 |
+
+这也是为什么阅读 AQS 源码时不能只背 `state`：同一个模板在不同同步器里代表不同协议。AQS 负责通用等待机制，子类负责同步语义。
+
+## 先说结论
+
+AQS 的核心可以分成两层：
+
+~~~text
+子类同步协议
+  ├─ state 的含义
+  ├─ tryAcquire / tryRelease
+  └─ exclusive / shared 规则
+
+AQS 通用等待机制
+  ├─ FIFO 风格的双向同步等待队列
+  ├─ CAS 竞争与节点连接
+  ├─ LockSupport.park / unpark
+  └─ 中断、超时、取消和 shared 传播
+~~~
+
+`state` 只是同步状态容器，不直接等于“锁”。只有把它放进具体子类的协议中，才能知道它表示重入次数、许可数、闸门计数还是其他状态。
 
 ## 30 秒回答
 
@@ -66,6 +173,8 @@ flowchart TD
 ```
 
 图中主线是 `acquire(arg)`（不响应中断），因此使用非限时的 `LockSupport.park`。限时获取变体会使用 `parkNanos`，中断和超时最终还会进入取消或返回路径。JDK 21 里 6 个公开获取入口最终共用同一个 `acquire(node, arg, shared, interruptible, timed, time)` 实现，差异主要由 `shared`、`interruptible` 和 `timed` 参数决定：
+
+独立结构图：[AQS 与 Condition 双队列 SVG](../03-图示/AQS/AQS与Condition双队列.svg)。
 
 | 入口 | interruptible | timed | 中断/超时后的行为 |
 | --- | --- | --- | --- |

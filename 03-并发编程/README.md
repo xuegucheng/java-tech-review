@@ -145,7 +145,7 @@ StampedLock、ReadWriteLock、Phaser、Exchanger、ForkJoinPool 深度源码、V
 
 ## 图示状态
 
-正文已按认知难点就近嵌入 Mermaid 流程图：AQS exclusive 获取路径（[AQS 核心原理](02-深度解析/AQS核心原理.md)）、execute 三步决策与二次检查（[ThreadPoolExecutor 线程池](02-深度解析/ThreadPoolExecutor线程池.md)）、Condition 双队列与节点转移（[ReentrantLock 与 Condition](02-深度解析/ReentrantLock与Condition.md)）、ThreadLocalMap 弱引用链（[ThreadLocal 原理与内存泄漏](02-深度解析/ThreadLocal原理与内存泄漏.md)）。独立的结构类 SVG 仍待正文人工审核后补充，见 [03-图示/README.md](03-图示/README.md)。
+正文已按认知难点就近嵌入 Mermaid 流程图：AQS exclusive 获取路径（[AQS 核心原理](02-深度解析/AQS核心原理.md)）、execute 三步决策与二次检查（[ThreadPoolExecutor 线程池](02-深度解析/ThreadPoolExecutor线程池.md)）、Condition 双队列与节点转移（[ReentrantLock 与 Condition](02-深度解析/ReentrantLock与Condition.md)）、ThreadLocalMap 弱引用链（[ThreadLocal 原理与内存泄漏](02-深度解析/ThreadLocal原理与内存泄漏.md)）。目前已补充 7 张独立高清 SVG，新增 AQS 概念与职责分工图，完整索引见 [03-图示/README.md](03-图示/README.md)。
 
 ## 运行示例
 

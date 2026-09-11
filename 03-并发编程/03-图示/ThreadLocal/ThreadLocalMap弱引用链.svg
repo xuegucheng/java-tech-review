@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">ThreadLocalMap 弱引用 key 与强引用 value</title>
+  <desc id="desc">展示线程池工作线程到 ThreadLocalMap、Entry、value 的强引用链，说明 ThreadLocal key 被回收后为何仍可能残留 value，以及显式 remove 的清理路径。</desc>
+  <defs>
+    <marker id="arrow-blue" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L10,3 L0,6 Z" fill="#2563eb"/>
+    </marker>
+    <marker id="arrow-red" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L10,3 L0,6 Z" fill="#dc2626"/>
+    </marker>
+    <marker id="arrow-green" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L10,3 L0,6 Z" fill="#16a34a"/>
+    </marker>
+    <style>
+      .title { font:700 40px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif; fill:#0f172a; }
+      .subtitle { font:400 20px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif; fill:#475569; }
+      .section { font:700 25px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif; fill:#0f172a; }
+      .label { font:700 19px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif; fill:#0f172a; }
+      .body { font:400 17px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif; fill:#334155; }
+      .small { font:400 15px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif; fill:#475569; }
+      .node { rx:13; stroke-width:2; }
+    </style>
+  </defs>
+
+  <rect width="1600" height="900" fill="#f8fafc"/>
+  <text x="70" y="70" class="title">ThreadLocal：弱引用只保护 key，不会自动释放 value</text>
+  <text x="70" y="108" class="subtitle">真实引用方向是 Thread → ThreadLocalMap → Entry → value；线程池长期存活会放大未清理的影响。</text>
+
+  <rect x="70" y="150" width="1460" height="380" rx="18" fill="#eff6ff" stroke="#93c5fd" stroke-width="2"/>
+  <text x="105" y="198" class="section">一条强引用链 + 一条弱引用链</text>
+
+  <rect x="105" y="295" width="205" height="85" class="node" fill="#dcfce7" stroke="#4ade80"/>
+  <text x="207" y="330" text-anchor="middle" class="label">线程池 Worker Thread</text>
+  <text x="207" y="357" text-anchor="middle" class="body">长期存活</text>
+  <rect x="380" y="295" width="220" height="85" class="node" fill="#ffffff" stroke="#60a5fa"/>
+  <text x="490" y="330" text-anchor="middle" class="label">ThreadLocalMap</text>
+  <text x="490" y="357" text-anchor="middle" class="body">threadLocals</text>
+  <rect x="670" y="295" width="180" height="85" class="node" fill="#ffffff" stroke="#60a5fa"/>
+  <text x="760" y="330" text-anchor="middle" class="label">Entry[] table</text>
+  <text x="760" y="357" text-anchor="middle" class="body">开放寻址</text>
+  <rect x="920" y="295" width="220" height="85" class="node" fill="#fef3c7" stroke="#fbbf24"/>
+  <text x="1030" y="330" text-anchor="middle" class="label">Entry</text>
+  <text x="1030" y="357" text-anchor="middle" class="body">弱 key + 强 value</text>
+  <rect x="1210" y="295" width="250" height="85" class="node" fill="#fee2e2" stroke="#f87171"/>
+  <text x="1335" y="330" text-anchor="middle" class="label">value / 业务对象</text>
+  <text x="1335" y="357" text-anchor="middle" class="body">可能是大对象</text>
+  <line x1="320" y1="337" x2="370" y2="337" stroke="#2563eb" stroke-width="3" marker-end="url(#arrow-blue)"/>
+  <line x1="610" y1="337" x2="660" y2="337" stroke="#2563eb" stroke-width="3" marker-end="url(#arrow-blue)"/>
+  <line x1="860" y1="337" x2="910" y2="337" stroke="#2563eb" stroke-width="3" marker-end="url(#arrow-blue)"/>
+  <line x1="1150" y1="337" x2="1200" y2="337" stroke="#dc2626" stroke-width="3" marker-end="url(#arrow-red)"/>
+  <text x="1175" y="315" text-anchor="middle" class="small">强引用</text>
+
+  <rect x="920" y="185" width="220" height="65" class="node" fill="#ede9fe" stroke="#a78bfa"/>
+  <text x="1030" y="213" text-anchor="middle" class="label">key</text>
+  <text x="1030" y="237" text-anchor="middle" class="body">WeakReference&lt;ThreadLocal&gt;</text>
+  <line x1="1030" y1="250" x2="1030" y2="285" stroke="#7c3aed" stroke-width="3" stroke-dasharray="8 6" marker-end="url(#arrow-blue)"/>
+  <text x="1055" y="272" class="small">弱引用</text>
+  <path d="M900 170 C780 145 700 170 620 205" fill="none" stroke="#dc2626" stroke-width="3" stroke-dasharray="8 6" marker-end="url(#arrow-red)"/>
+  <text x="690" y="172" class="small" fill="#b91c1c">ThreadLocal 本身无其他强引用 → GC 后 key = null</text>
+  <text x="105" y="455" class="body">结果：Entry 变成 stale，但 value 仍沿 Thread → Map → Entry 强引用链存活。</text>
+  <text x="105" y="490" class="small">这不是“弱引用失效”，而是弱 key 与强 value 的生命周期不对称。</text>
+
+  <rect x="70" y="570" width="1460" height="250" rx="18" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+  <text x="105" y="618" class="section">清理责任：显式 remove 是确定性边界</text>
+  <rect x="105" y="670" width="210" height="70" class="node" fill="#dbeafe" stroke="#60a5fa"/>
+  <text x="210" y="699" text-anchor="middle" class="label">任务开始</text>
+  <text x="210" y="723" text-anchor="middle" class="body">set / get</text>
+  <rect x="405" y="670" width="220" height="70" class="node" fill="#fef3c7" stroke="#fbbf24"/>
+  <text x="515" y="699" text-anchor="middle" class="label">业务执行</text>
+  <text x="515" y="723" text-anchor="middle" class="body">使用线程上下文</text>
+  <rect x="715" y="670" width="230" height="70" class="node" fill="#dcfce7" stroke="#4ade80"/>
+  <text x="830" y="699" text-anchor="middle" class="label">finally { remove(); }</text>
+  <text x="830" y="723" text-anchor="middle" class="body">确定性清理</text>
+  <line x1="325" y1="705" x2="395" y2="705" stroke="#2563eb" stroke-width="3" marker-end="url(#arrow-blue)"/>
+  <line x1="635" y1="705" x2="705" y2="705" stroke="#16a34a" stroke-width="3" marker-end="url(#arrow-green)"/>
+  <text x="1010" y="685" class="body">没有 remove：</text>
+  <text x="1010" y="718" class="body">• get / set / remove / 扩容时可能机会式清理 stale entry；</text>
+  <text x="1010" y="747" class="body">• set(null) 通常只清空 value，不等于删除 Entry；</text>
+  <text x="1010" y="776" class="small">• ThreadLocal 不负责跨线程传播，也不是自动生命周期管理器。</text>
+</svg>

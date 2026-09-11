@@ -1,0 +1,106 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">ThreadPoolExecutor execute 决策与运行状态</title>
+  <desc id="desc">展示 execute 的核心线程、入队、二次检查、最大线程和拒绝决策，以及 shutdown、shutdownNow 到 TERMINATED 的状态转换。</desc>
+  <defs>
+    <marker id="arrow-blue" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L10,3 L0,6 Z" fill="#2563eb"/>
+    </marker>
+    <marker id="arrow-red" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L10,3 L0,6 Z" fill="#dc2626"/>
+    </marker>
+    <marker id="arrow-green" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L10,3 L0,6 Z" fill="#16a34a"/>
+    </marker>
+    <marker id="arrow-muted" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L10,3 L0,6 Z" fill="#64748b"/>
+    </marker>
+    <marker id="arrow-orange" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L10,3 L0,6 Z" fill="#d97706"/>
+    </marker>
+    <style>
+      .title { font:700 40px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif; fill:#0f172a; }
+      .subtitle { font:400 20px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif; fill:#475569; }
+      .section { font:700 25px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif; fill:#0f172a; }
+      .label { font:700 19px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif; fill:#0f172a; }
+      .body { font:400 16px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif; fill:#334155; }
+      .small { font:400 15px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif; fill:#475569; }
+      .node { rx:13; stroke-width:2; }
+    </style>
+  </defs>
+
+  <rect width="1600" height="900" fill="#f8fafc"/>
+  <text x="70" y="70" class="title">ThreadPoolExecutor：任务路径与生命周期是两条线</text>
+  <text x="70" y="108" class="subtitle">execute 决定“任务去哪儿”；runState 决定“池还接不接受任务”。入队后必须二次检查。</text>
+
+  <rect x="70" y="150" width="1460" height="360" rx="18" fill="#eff6ff" stroke="#93c5fd" stroke-width="2"/>
+  <text x="105" y="198" class="section">execute：核心线程 → 队列 → 二次检查 / 最大线程 → 拒绝</text>
+
+  <rect x="105" y="240" width="190" height="80" class="node" fill="#ffffff" stroke="#60a5fa"/>
+  <text x="200" y="275" text-anchor="middle" class="label">execute(task)</text>
+  <text x="200" y="302" text-anchor="middle" class="body">提交任务</text>
+  <rect x="365" y="240" width="230" height="80" class="node" fill="#dcfce7" stroke="#4ade80"/>
+  <text x="480" y="275" text-anchor="middle" class="label">workerCount &lt; core?</text>
+  <text x="480" y="302" text-anchor="middle" class="body">addWorker(task)</text>
+  <line x1="300" y1="280" x2="355" y2="280" stroke="#2563eb" stroke-width="3" marker-end="url(#arrow-blue)"/>
+  <text x="327" y="260" text-anchor="middle" class="small">是</text>
+
+  <rect x="670" y="240" width="235" height="80" class="node" fill="#fef3c7" stroke="#fbbf24"/>
+  <text x="787" y="275" text-anchor="middle" class="label">workQueue.offer</text>
+  <text x="787" y="302" text-anchor="middle" class="body">核心线程已满</text>
+  <line x1="600" y1="280" x2="660" y2="280" stroke="#2563eb" stroke-width="3" marker-end="url(#arrow-blue)"/>
+  <text x="630" y="260" text-anchor="middle" class="small">否</text>
+
+  <rect x="980" y="240" width="280" height="80" class="node" fill="#ede9fe" stroke="#a78bfa"/>
+  <text x="1120" y="275" text-anchor="middle" class="label">二次检查 state / worker</text>
+  <text x="1120" y="302" text-anchor="middle" class="body">仍可接收且有人处理？</text>
+  <line x1="910" y1="280" x2="970" y2="280" stroke="#2563eb" stroke-width="3" marker-end="url(#arrow-blue)"/>
+  <text x="940" y="260" text-anchor="middle" class="small">入队成功</text>
+
+  <rect x="980" y="380" width="235" height="75" class="node" fill="#ffffff" stroke="#60a5fa"/>
+  <text x="1097" y="414" text-anchor="middle" class="label">workerCount &lt; max?</text>
+  <text x="1097" y="440" text-anchor="middle" class="body">队列满才判断</text>
+  <line x1="787" y1="330" x2="787" y2="417" stroke="#2563eb" stroke-width="3" marker-end="url(#arrow-blue)"/>
+  <text x="810" y="375" class="small">offer 失败</text>
+  <path d="M1120 320 L1120 350 L1260 350 L1260 370" fill="none" stroke="#16a34a" stroke-width="3" marker-end="url(#arrow-green)"/>
+  <text x="1150" y="345" class="small">workerCount==0</text>
+
+  <rect x="1270" y="380" width="220" height="75" class="node" fill="#dcfce7" stroke="#4ade80"/>
+  <text x="1380" y="414" text-anchor="middle" class="label">addWorker(...)</text>
+  <text x="1380" y="440" text-anchor="middle" class="body">task 或 null，补 worker</text>
+  <line x1="1225" y1="417" x2="1260" y2="417" stroke="#16a34a" stroke-width="3" marker-end="url(#arrow-green)"/>
+  <text x="1242" y="397" text-anchor="middle" class="small">是</text>
+  <rect x="1270" y="265" width="220" height="65" class="node" fill="#fee2e2" stroke="#f87171"/>
+  <text x="1380" y="293" text-anchor="middle" class="label">reject(task)</text>
+  <text x="1380" y="316" text-anchor="middle" class="body">直接拒绝</text>
+  <path d="M1260 280 L1260 297 L1265 297" fill="none" stroke="#dc2626" stroke-width="3" marker-end="url(#arrow-red)"/>
+  <text x="1255" y="225" text-anchor="end" class="small">已 shutdown</text>
+  <path d="M1215 417 L1235 417 L1235 310 L1265 310" fill="none" stroke="#dc2626" stroke-width="3" marker-end="url(#arrow-red)"/>
+  <text x="1265" y="370" class="small">否</text>
+  <text x="105" y="480" class="small">关键差异：池已 shutdown 时，addWorker 的状态预检会失败，直接 reject；只有“运行中且队列满”才进入 maximumPoolSize 判断。</text>
+
+  <rect x="70" y="550" width="1460" height="245" rx="18" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+  <text x="105" y="595" class="section">runState：关闭不是立刻终止，终止还要等 worker 收敛</text>
+  <rect x="105" y="650" width="190" height="65" class="node" fill="#dcfce7" stroke="#4ade80"/>
+  <text x="200" y="690" text-anchor="middle" class="label">RUNNING</text>
+  <rect x="395" y="650" width="205" height="65" class="node" fill="#fef3c7" stroke="#fbbf24"/>
+  <text x="497" y="690" text-anchor="middle" class="label">SHUTDOWN</text>
+  <rect x="700" y="650" width="170" height="65" class="node" fill="#fee2e2" stroke="#f87171"/>
+  <text x="785" y="690" text-anchor="middle" class="label">STOP</text>
+  <rect x="970" y="650" width="180" height="65" class="node" fill="#ede9fe" stroke="#a78bfa"/>
+  <text x="1060" y="690" text-anchor="middle" class="label">TIDYING</text>
+  <rect x="1250" y="650" width="220" height="65" class="node" fill="#e2e8f0" stroke="#64748b"/>
+  <text x="1360" y="690" text-anchor="middle" class="label">TERMINATED</text>
+  <line x1="300" y1="682" x2="385" y2="682" stroke="#2563eb" stroke-width="3" marker-end="url(#arrow-blue)"/>
+  <text x="342" y="665" text-anchor="middle" class="small">shutdown()</text>
+  <line x1="610" y1="682" x2="690" y2="682" stroke="#dc2626" stroke-width="3" marker-end="url(#arrow-red)"/>
+  <text x="650" y="665" text-anchor="middle" class="small">shutdownNow()</text>
+  <line x1="300" y1="650" x2="690" y2="625" stroke="#dc2626" stroke-width="3" marker-end="url(#arrow-red)"/>
+  <text x="490" y="620" text-anchor="middle" class="small">RUNNING → STOP</text>
+  <line x1="875" y1="682" x2="960" y2="682" stroke="#7c3aed" stroke-width="3" marker-end="url(#arrow-blue)"/>
+  <text x="917" y="665" text-anchor="middle" class="small">workerCount==0</text>
+  <path d="M497 715 C497 745 1060 745 1060 715" fill="none" stroke="#d97706" stroke-width="3" marker-end="url(#arrow-orange)"/>
+  <text x="780" y="740" text-anchor="middle" class="small">队列空 &amp;&amp; workerCount==0</text>
+  <line x1="1155" y1="682" x2="1240" y2="682" stroke="#64748b" stroke-width="3" marker-end="url(#arrow-muted)"/>
+  <text x="1197" y="665" text-anchor="middle" class="small">terminated()</text>
+  <text x="105" y="780" class="body">SHUTDOWN：不接收新任务，但继续处理队列；STOP：不再处理队列并尝试中断 worker，tryTerminate 只需 workerCount 归零。</text>
+</svg>

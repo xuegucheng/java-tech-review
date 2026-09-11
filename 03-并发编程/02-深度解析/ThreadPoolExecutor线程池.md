@@ -64,6 +64,8 @@ flowchart TD
 
 注意 offer 失败的两条出路语义不同：池已 shutdown 时 addWorker 的状态预检直接返回 false（不会创建新 Worker），任务走拒绝；池在运行且仅因队列满而 offer 失败时，才轮到 maximumPoolSize 判断。
 
+图示：[ThreadPoolExecutor 执行与状态 SVG](../03-图示/ThreadPoolExecutor/ThreadPoolExecutor执行与状态.svg)。
+
 ~~~text
 1. workerCount < corePoolSize？
    是 → addWorker(command, true)

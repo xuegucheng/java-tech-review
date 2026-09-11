@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">JMM 安全发布、可见性与 happens-before</title>
+  <desc id="desc">对比没有 happens-before 的普通共享变量访问与通过 volatile 建立安全发布的访问路径，并列出常见 happens-before 规则。</desc>
+  <defs>
+    <marker id="arrow-blue" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L10,3 L0,6 Z" fill="#2563eb"/>
+    </marker>
+    <marker id="arrow-red" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L10,3 L0,6 Z" fill="#dc2626"/>
+    </marker>
+    <marker id="arrow-green" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L10,3 L0,6 Z" fill="#16a34a"/>
+    </marker>
+    <style>
+      .title { font:700 40px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif; fill:#0f172a; }
+      .subtitle { font:400 20px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif; fill:#475569; }
+      .section { font:700 25px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif; fill:#0f172a; }
+      .label { font:700 21px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif; fill:#0f172a; }
+      .body { font:400 18px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif; fill:#334155; }
+      .small { font:400 16px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif; fill:#475569; }
+      .inverse { fill:#ffffff; }
+    </style>
+  </defs>
+
+  <rect width="1600" height="900" fill="#f8fafc"/>
+  <text x="70" y="70" class="title">JMM：安全发布不是“恰好读到了正确值”</text>
+  <text x="70" y="108" class="subtitle">happens-before 是跨线程可观察结果的偏序约束，不是物理时间线，也不是 JVM 内存区域图。</text>
+
+  <rect x="70" y="155" width="700" height="330" rx="18" fill="#fff1f2" stroke="#f87171" stroke-width="2"/>
+  <text x="105" y="205" class="section">没有明确同步边界：普通读写</text>
+  <rect x="105" y="245" width="250" height="88" rx="12" fill="#ffffff" stroke="#fca5a5" stroke-width="2"/>
+  <text x="230" y="282" text-anchor="middle" class="label">线程 A</text>
+  <text x="230" y="313" text-anchor="middle" class="body">data = 42; ready = true;</text>
+  <rect x="485" y="245" width="250" height="88" rx="12" fill="#ffffff" stroke="#fca5a5" stroke-width="2"/>
+  <text x="610" y="282" text-anchor="middle" class="label">线程 B</text>
+  <text x="610" y="313" text-anchor="middle" class="body">if (ready) use(data);</text>
+  <line x1="360" y1="289" x2="475" y2="289" stroke="#dc2626" stroke-width="3" stroke-dasharray="9 7" marker-end="url(#arrow-red)"/>
+  <text x="417" y="269" text-anchor="middle" class="small" fill="#b91c1c">没有 HB</text>
+  <text x="105" y="380" class="body">可能观察到：</text>
+  <text x="130" y="417" class="body">• ready 不可见；或</text>
+  <text x="130" y="450" class="body">• 观察到的结果没有 Java 语义保证，不能靠一次运行证明安全。</text>
+
+  <rect x="830" y="155" width="700" height="330" rx="18" fill="#ecfdf5" stroke="#4ade80" stroke-width="2"/>
+  <text x="865" y="205" class="section">volatile 发布：先写对象，再发布标志</text>
+  <rect x="865" y="245" width="240" height="88" rx="12" fill="#ffffff" stroke="#86efac" stroke-width="2"/>
+  <text x="985" y="282" text-anchor="middle" class="label">线程 A</text>
+  <text x="985" y="313" text-anchor="middle" class="body">data = 42;</text>
+  <rect x="1170" y="245" width="290" height="88" rx="12" fill="#ffffff" stroke="#86efac" stroke-width="2"/>
+  <text x="1315" y="282" text-anchor="middle" class="label">volatile ready = true</text>
+  <line x1="1110" y1="289" x2="1160" y2="289" stroke="#16a34a" stroke-width="3" marker-end="url(#arrow-green)"/>
+  <rect x="865" y="385" width="240" height="70" rx="12" fill="#ffffff" stroke="#86efac" stroke-width="2"/>
+  <text x="985" y="428" text-anchor="middle" class="label">volatile read ready</text>
+  <rect x="1170" y="385" width="290" height="70" rx="12" fill="#ffffff" stroke="#86efac" stroke-width="2"/>
+  <text x="1315" y="428" text-anchor="middle" class="label">再读取 data = 42</text>
+  <line x1="1315" y1="345" x2="985" y2="375" stroke="#16a34a" stroke-width="3" marker-end="url(#arrow-green)"/>
+  <text x="1150" y="365" text-anchor="middle" class="small" fill="#15803d">volatile 写 → 后续 volatile 读：HB</text>
+  <line x1="1110" y1="420" x2="1160" y2="420" stroke="#16a34a" stroke-width="3" marker-end="url(#arrow-green)"/>
+  <text x="865" y="475" class="small">前提：读取方确实读到了对应的 volatile 发布标志。</text>
+
+  <text x="70" y="545" class="section">常见 happens-before 规则：把“同步边界”画出来</text>
+  <rect x="70" y="580" width="340" height="150" rx="16" fill="#dbeafe" stroke="#60a5fa" stroke-width="2"/>
+  <text x="100" y="625" class="label">程序次序</text>
+  <text x="100" y="665" class="body">同一线程中，前面的动作</text>
+  <text x="100" y="695" class="body">HB 后面的动作。</text>
+  <rect x="445" y="580" width="340" height="150" rx="16" fill="#ede9fe" stroke="#a78bfa" stroke-width="2"/>
+  <text x="475" y="625" class="label">monitor</text>
+  <text x="475" y="665" class="body">同一 monitor 的 unlock</text>
+  <text x="475" y="695" class="body">HB 后续 lock。</text>
+  <rect x="820" y="580" width="340" height="150" rx="16" fill="#fef3c7" stroke="#fbbf24" stroke-width="2"/>
+  <text x="850" y="625" class="label">线程协作</text>
+  <text x="850" y="665" class="body">start 前的动作 HB 新线程；</text>
+  <text x="850" y="695" class="body">终止 HB join 返回。</text>
+  <rect x="1195" y="580" width="335" height="150" rx="16" fill="#dcfce7" stroke="#86efac" stroke-width="2"/>
+  <text x="1225" y="625" class="label">传递性</text>
+  <text x="1225" y="665" class="body">A HB B 且 B HB C，</text>
+  <text x="1225" y="695" class="body">则 A HB C。</text>
+
+  <rect x="70" y="770" width="1460" height="75" rx="14" fill="#0f172a"/>
+  <text x="100" y="817" class="label inverse">边界提醒：</text>
+  <text x="260" y="817" class="body inverse">volatile 解决可见性与有序性，不把 count++ 变成原子操作；复合更新仍需锁、CAS 或原子类。</text>
+</svg>

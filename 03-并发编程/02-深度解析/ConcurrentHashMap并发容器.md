@@ -40,6 +40,8 @@ Java 21 的 ConcurrentHashMap 仍能从这些结构理解：
 - transferIndex 记录扩容任务分配位置；
 - nextTable 作为扩容期间的新表。
 
+图示：[ConcurrentHashMap 并发写入与扩容 SVG](../03-图示/ConcurrentHashMap/ConcurrentHashMap并发写入与扩容.svg)。
+
 字段的具体修饰和辅助方法以目标 JDK 源码为准，不把 JDK 8 的字段名和 Java 21 的字段名混写。
 
 ## get 为什么通常不需要锁
