@@ -77,6 +77,19 @@ Condition notFull = lock.newCondition();
 
 典型有界缓冲区可以让生产者等 notFull，让消费者等 notEmpty，避免所有线程被 notifyAll 一起唤醒后再竞争。
 
+```mermaid
+flowchart LR
+    subgraph 同步队列
+        H["head 哨兵"] --- N1["等待锁的 Node"] --- N2["Node"]
+    end
+    subgraph 条件队列["Condition 队列（每个 Condition 一条）"]
+        C1["await 中的 Node"] --- C2["Node"]
+    end
+    T["持有锁的线程"] -- "await：释放全部重入次数" --> C1
+    C1 -- "signal：节点转移回同步队列（锁并未移交）" --> N1
+    N1 -- "重新竞争并获取锁后 await 才返回" --> T
+```
+
 await 的关键流程：
 
 1. 检查当前线程是否持有锁；
@@ -101,7 +114,7 @@ signal 不能在不持有锁时调用，因为它需要修改该 Condition 的�
 
 选择不是新旧或性能之争，而是协议复杂度是否需要显式能力。
 
-## 源码路径
+## 关键源码路径
 
 - ReentrantLock.sync：持有的同步器；
 - FairSync / NonfairSync：公平与非公平获取入口；

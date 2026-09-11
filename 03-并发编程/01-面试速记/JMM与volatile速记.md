@@ -41,32 +41,11 @@ happens-before 不等于 A 在物理时间上先完成，也不等于所有 CPU 
 
 ## DCL 为什么需要 volatile
 
-~~~java
-class Singleton {
-    private static volatile Singleton instance;
+- new 分三步：分配内存 → 构造初始化 → 引用写入 instance；无同步边界时重排可让“引用先可见、初始化后可见”；
+- 第二次检查线程可能拿到未构造完的对象；volatile 在引用写入与后续读取之间建立 happens-before，封住这个窗口；
+- 面试兜底：更简单的单例直接用静态初始化或枚举。
 
-    static Singleton getInstance() {
-        if (instance == null) {
-            synchronized (Singleton.class) {
-                if (instance == null) {
-                    instance = new Singleton();
-                }
-            }
-        }
-        return instance;
-    }
-}
-~~~
-
-创建对象可以抽象成：
-
-~~~text
-分配内存
-→ 执行构造初始化
-→ 把引用写入 instance
-~~~
-
-没有正确的发布边界时，引用写入可能在其他线程观察中先于初始化效果出现，第二次检查线程可能拿到尚未完整构造的对象。volatile 让引用写入与后续读取形成所需的可见性和有序性边界。更简单的单例优先使用静态初始化或枚举。
+完整代码和 happens-before 分析见 [Java 内存模型与 happens-before](../02-深度解析/Java内存模型与happens-before.md) 的“DCL 与 final 之间的边界”。
 
 ## synchronized 为什么同时解决两类问题
 
@@ -82,7 +61,7 @@ synchronized 临界区内同一时刻只能有一个持有者，解决了受保�
 
 编译器和运行时可能使用内存屏障、原子指令或其他实现手段满足 JMM 要求。JMM 的 happens-before 是可移植语义；具体屏障数量、指令和优化属于实现与硬件细节，不能把某个 x86 观察当成 Java 规范保证。
 
-## 高价值追问
+## 高频追问
 
 - happens-before 是否意味着时间上 A 一定先执行？不是，它是可观察性和顺序约束。
 - JMM 是不是 JVM 内存结构？不是，JMM 规定并发内存语义，堆/栈/元空间是运行时布局。
@@ -91,7 +70,7 @@ synchronized 临界区内同一时刻只能有一个持有者，解决了受保�
 - DCL 为什么要 volatile？防止引用发布与初始化观察顺序不满足安全发布要求。
 - final 是否等于深度不可变？不是，final 引用指向的对象仍可能可变。
 
-## 关键源码与验证
+## 关键源码路径
 
 - 规范入口：happens-before、volatile 和 monitor 的语言语义；
 - 实现入口：volatile 字段访问、VarHandle 的访问模式和 monitor 操作；

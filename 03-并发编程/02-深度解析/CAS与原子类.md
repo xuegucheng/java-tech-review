@@ -45,7 +45,7 @@ for (;;) {
 
 失败意味着其他线程已经改变了值，当前线程重新读取并计算。这个循环保证单个计数器的更新不丢失，但不保证围绕计数器的其他对象状态同步更新。
 
-Java 21 的实现应从 VarHandle、原子访问和具体类源码阅读；Unsafe 是许多旧版实现和底层机制的历史入口，不能把“Atomic 一定只靠 Unsafe”当作版本无关事实。
+Java 21 的 AtomicInteger 内部仍通过 Unsafe.getAndAddInt 等原子访问实现（其源码注释说明：本应迁移到 VarHandle，但存在未解决的循环启动依赖）；API 的内存语义以 VarHandle 访问模式文档化。应用层不应直接使用 Unsafe，新代码的原子访问入口是 Atomic 类或 VarHandle，具体实现随 JDK 版本演进，不能把“Atomic 一定只靠 Unsafe”当作版本无关事实。
 
 ## AtomicReference 与整体状态替换
 
@@ -102,7 +102,7 @@ CAS：对一个位置执行条件更新
 锁：保护一段临界区和整体不变量
 ~~~
 
-## 高价值追问
+## 高频追问
 
 - AtomicInteger 为什么能做 count++？因为 incrementAndGet 内部用 CAS 循环重试。
 - CAS 能否保证多个字段一致？不能，除非把字段封装为一个可原子替换的状态，或使用锁。
@@ -110,10 +110,10 @@ CAS：对一个位置执行条件更新
 - LongAdder 是否比 AtomicLong 更准确？不是，它更适合高竞争统计；强一致性语义要看业务。
 - ABA 一定是 bug 吗？只有中间变化会影响当前判断时才是问题。
 
-## 关键源码与验证
+## 关键源码路径
 
 - AtomicInteger、AtomicLong、AtomicReference：单变量和引用状态的 CAS API；
-- VarHandle：Java 21 原子访问和内存语义入口；
+- VarHandle：Java 21 应用层原子访问和内存语义入口（AtomicInteger 内部仍走 Unsafe，见上文版本说明）；
 - Striped64 / LongAdder：分片计数和热点分散；
 - [AtomicityDemo](../04-示例代码/src/main/java/com/xuegucheng/javatechreview/concurrency/AtomicityDemo.java)；
 - [AqsLockDemo](../04-示例代码/src/main/java/com/xuegucheng/javatechreview/concurrency/AqsLockDemo.java)。

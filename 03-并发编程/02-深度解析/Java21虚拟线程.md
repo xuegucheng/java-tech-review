@@ -66,7 +66,7 @@ Java 21 需要注意：虚拟线程在 synchronized 保护的代码中执行阻�
 - 通过压测确认具体 JDK、平台和库的行为；
 - 不把“ReentrantLock 永远解决 pinning”写成无条件保证。
 
-后续 JDK 可能优化 pinning 诊断和实现，但这不改变 Java 21 基线的版本标记。
+后续版本确有变化：JDK 24 通过 JEP 491 已移除 synchronized 造成的 pinning（JDK 21 中仍未移除，Java 25 后陆续改进诊断与实现）。本模块按 Java 21 基线描述，不把这些后续优化倒灌成 Java 21 的固定事实。
 
 ## Virtual Thread 能否替代线程池
 
@@ -96,7 +96,7 @@ Java 21 需要注意：虚拟线程在 synchronized 保护的代码中执行阻�
 
 Virtual Thread 不自动提供结构化并发；Structured Concurrency 在本仓库列为 P2/后续主题，不在本版展开。
 
-## 关键源码与验证
+## 关键源码路径
 
 - Thread.Builder.OfVirtual；
 - Executors.newVirtualThreadPerTaskExecutor；

@@ -107,7 +107,7 @@ permits = 3
 - InterruptedException 不要随意吞掉，无法继续时恢复中断状态；
 - 线程池关闭时要让等待者能退出。
 
-## 源码路径
+## 关键源码路径
 
 - CountDownLatch.Sync：AQS shared state 和归零传播；
 - Semaphore.Sync：许可数的 shared 获取与释放；

@@ -127,7 +127,7 @@ ConcurrentHashMap 的 size、mappingCount 和遍历不能被描述成普通锁�
 
 如果业务需要快照、一致统计或跨 key 原子性，应该使用更高层协议。
 
-## 源码路径
+## 关键源码路径
 
 - get：table、bin、Node.value/next 的读取；
 - putVal：CAS 空 bin、bin 级 synchronized 和树化；

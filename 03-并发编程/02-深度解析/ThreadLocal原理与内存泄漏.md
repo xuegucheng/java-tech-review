@@ -49,6 +49,17 @@ Thread → ThreadLocalMap → Entry → value
 
 ThreadLocal 本身不反向拥有所有线程中的值。一个 ThreadLocal key 可能被回收，但存活的 Thread 仍然可以通过 map 持有 value。
 
+```mermaid
+flowchart LR
+    TL["ThreadLocal 实例"] -. "弱引用（key）" .-> E
+    TH["Thread（线程池中长期存活）"] -- 强 --> M["ThreadLocalMap"]
+    M -- 强 --> E["Entry"]
+    E -- 强 --> V["value（可能长期滞留）"]
+    E -. key 被回收后为 null .-> GC["stale entry"]
+```
+
+GC 根指向 Thread，Thread 强引用链 ThreadLocalMap → Entry → value；key 一侧只剩弱引用，回收后 Entry 变 stale，value 是否滞留取决于后续是否触清理。
+
 ## 为什么不是 HashMap
 
 ThreadLocalMap 是 ThreadLocal 专用的轻量结构，使用数组和开放寻址，而不是 HashMap 的桶、链表和树：

@@ -25,17 +25,44 @@ ThreadPoolExecutor 用一个 AtomicInteger ctl 同时编码：
 
 这样可以用一次 CAS 同时观察或修改运行状态与 worker 数量，减少两个字段分别更新时的竞态窗口。面试重点是“状态和数量需要原子协调”，不必把每一位常数全部背下来。
 
-常见运行状态：
+常见运行状态与触发条件：
 
-~~~text
-RUNNING → SHUTDOWN → TIDYING → TERMINATED
-             ↓
-           STOP → TIDYING → TERMINATED
-~~~
+```mermaid
+stateDiagram-v2
+    RUNNING --> SHUTDOWN: shutdown()
+    RUNNING --> STOP: shutdownNow()
+    SHUTDOWN --> STOP: shutdownNow()
+    SHUTDOWN --> TIDYING: 队列空 且 workerCount==0
+    STOP --> TIDYING: workerCount==0
+    TIDYING --> TERMINATED: terminated() 钩子完成
+```
+
+shutdown() 触发 RUNNING → SHUTDOWN；shutdownNow() 可从 RUNNING 或 SHUTDOWN 进入 STOP，随后中断 Worker 并调用 drainQueue() 清空等待队列。进入 TIDYING 的判断在 tryTerminate 中：SHUTDOWN 要求队列和 worker 都为空，STOP 只要求 worker 为零；TIDYING 时调用 terminated() 钩子，完成后进入 TERMINATED。
 
 SHUTDOWN 仍可处理队列任务；STOP 不再处理队列，并尝试中断正在运行的任务。
 
 ## execute 的关键路径
+
+```mermaid
+flowchart TD
+    T["execute(command)"] --> A{"workerCount < corePoolSize？"}
+    A -- 是 --> B["addWorker(command, core=true)"]
+    B -- 成功 --> OK1["返回"]
+    B -- 失败 --> C
+    A -- 否 --> C{"池在运行 且 offer 入队成功？"}
+    C -- 是 --> D["入队后二次检查 ctl"]
+    D -- "已 shutdown" --> E["remove(command) + reject"]
+    D -- "workerCount == 0" --> F["addWorker(null, core=false)"]
+    D -- 正常 --> OK2["返回"]
+    C -- "已 shutdown（offer 分支不成立）" --> J["reject"]
+    C -- "运行中但队列满" --> G{"workerCount < maximumPoolSize？"}
+    G -- 是 --> H["addWorker(command, core=false)"]
+    H -- 成功 --> OK3["返回"]
+    H -- 失败 --> J
+    G -- 否 --> J
+```
+
+注意 offer 失败的两条出路语义不同：池已 shutdown 时 addWorker 的状态预检直接返回 false（不会创建新 Worker），任务走拒绝；池在运行且仅因队列满而 offer 失败时，才轮到 maximumPoolSize 判断。
 
 ~~~text
 1. workerCount < corePoolSize？
@@ -93,6 +120,8 @@ getTask 会考虑队列是否为空、线程池状态、keepAliveTime 和是否�
 
 拒绝不是异常处理的末端，而是容量模型的一部分。线上要记录拒绝量、队列长度、活跃线程、任务等待时间和下游超时。
 
+还有一个容易忽略的边界：线程池已经 shutdown 后再提交任务，CallerRunsPolicy 会检查运行状态，发现池已关闭时直接丢弃任务、不执行也不抛异常；只有 AbortPolicy 会以 RejectedExecutionException 显式失败。关闭期仍可能来任务的服务，要显式处理这个静默丢弃窗口。
+
 ## execute、submit 与异常
 
 execute 接收 Runnable，任务异常可以到达执行线程的 UncaughtExceptionHandler；submit 把任务包装成 FutureTask，异常通常保存在 Future 中，调用方必须通过 get 观察。
@@ -124,7 +153,7 @@ CPU 密集和 I/O 密集不能用一个绝对公式解决。CPU 核数只是初�
 
 线程池的隔离通常比一个全局大池更重要：不同优先级、不同下游和不同耗时模型的任务应避免互相拖垮。
 
-## 源码路径
+## 关键源码路径
 
 - ctl、runStateOf、workerCountOf：状态与数量的组合；
 - execute：核心决策和二次检查；

@@ -127,7 +127,7 @@ JMM 说“必须满足什么”，实现决定“如何做到”。可能涉及�
 
 不能从某次 x86 运行中推导出所有架构都提供同样的弱内存行为，也不能把某条屏障指令直接当成 JMM 的全部定义。
 
-## 关键源码与验证
+## 关键源码路径
 
 - Java 语义入口：volatile、synchronized、Thread.start 和 join 的同步规则；
 - 实现入口：VarHandle 访问模式、Atomic 类和 AQS 的 volatile state；

@@ -99,7 +99,7 @@ HotSpot 会根据竞争情况选择不同的快速路径、CAS 尝试、自旋�
 
 不能只用“性能更好”作为 ReentrantLock 的理由；先看是否需要它额外的控制能力。
 
-## 高价值追问
+## 高频追问
 
 - synchronized 锁的到底是什么？对象 monitor，具体取决于使用形式。
 - synchronized 普通方法和 static synchronized 锁一样吗？不一样，分别是对象和 Class。

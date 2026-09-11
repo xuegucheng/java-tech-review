@@ -53,6 +53,31 @@ state 只是一个同步状态容器，不直接等于“锁”。ReentrantLock 
 
 ## exclusive 获取路径
 
+```mermaid
+flowchart TD
+    A["acquire(arg)"] --> B["tryAcquire(arg)"]
+    B -- 成功 --> R["直接返回，继续执行"]
+    B -- 失败 --> C["创建或加入同步队列 Node"]
+    C --> D{"前驱是 head 且可再次尝试？"}
+    D -- 是 --> B
+    D -- 否 --> E["LockSupport.park"]
+    E -- unpark --> D
+    C -. 超时或取消 .-> X["摘除或跳过失效节点"]
+```
+
+图中主线是 `acquire(arg)`（不响应中断），因此使用非限时的 `LockSupport.park`。限时获取变体会使用 `parkNanos`，中断和超时最终还会进入取消或返回路径。JDK 21 里 6 个公开获取入口最终共用同一个 `acquire(node, arg, shared, interruptible, timed, time)` 实现，差异主要由 `shared`、`interruptible` 和 `timed` 参数决定：
+
+| 入口 | interruptible | timed | 中断/超时后的行为 |
+| --- | --- | --- | --- |
+| `acquire(arg)` | false | false | 忽略中断继续等待，成功后补一次 self-interrupt |
+| `acquireInterruptibly(arg)` | true | false | 取消排队节点并抛 InterruptedException |
+| `tryAcquireNanos(arg, nanos)` | true | true | 中断抛异常；超时摘除节点返回 false |
+| `acquireShared(arg)` | false | false | 忽略中断继续等待，成功后补一次 self-interrupt，并按 shared 协议传播 |
+| `acquireSharedInterruptibly(arg)` | true | false | 中断取消排队节点并抛 InterruptedException，成功时按 shared 协议传播 |
+| `tryAcquireSharedNanos(arg, nanos)` | true | true | 中断抛异常；超时摘除节点返回 false |
+
+对照阅读时先确认目标方法落在哪一行，再把中断/超时语义叠加到这条主线上。
+
 抽象流程：
 
 ~~~text
@@ -131,7 +156,7 @@ Condition.await 的线程不是直接留在同步队列里等待条件：
 
 不是。head 通常是同步队列的哨兵或最近处理过的头节点，线程信息和同步持有者之间没有这种直接等价关系。ReentrantLock 的 owner 由它自己的同步器语义维护；AQS 队列 head 只描述排队结构。
 
-## 教学示例
+## Runnable Example
 
 [AqsLockDemo](../04-示例代码/src/main/java/com/xuegucheng/javatechreview/concurrency/AqsLockDemo.java) 用一个极简 Mutex 只实现独占 state：
 
