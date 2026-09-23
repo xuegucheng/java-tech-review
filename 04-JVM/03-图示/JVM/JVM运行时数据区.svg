@@ -1,0 +1,124 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1100" viewBox="0 0 1600 1100" role="img" aria-labelledby="title desc">
+  <title id="title">JVMS Runtime Data Areas 与 HotSpot 和 JMM 边界</title>
+  <desc id="desc">左侧展示 JVMS 抽象运行时区域中的共享区域和按线程区域；右侧区分 HotSpot 本地进程内存、JMM 并发语义，以及线程局部引用可以指向共享堆对象。</desc>
+  <defs>
+    <marker id="arrow-blue" markerWidth="12" markerHeight="12" refX="10" refY="4" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L12,4 L0,8 Z" fill="#2563eb"/>
+    </marker>
+    <style>
+      .title { font:700 38px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif; fill:#0f172a; }
+      .subtitle { font:400 20px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif; fill:#475569; }
+      .panel-title { font:700 24px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif; fill:#0f172a; }
+      .section { font:700 22px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif; fill:#0f172a; }
+      .label { font:700 19px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif; fill:#0f172a; }
+      .body { font:400 17px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif; fill:#334155; }
+      .small { font:400 15px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif; fill:#475569; }
+      .frame-label { font:700 16px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif; fill:#1e3a8a; }
+    </style>
+  </defs>
+
+  <rect width="1600" height="1100" fill="#f8fafc"/>
+  <text x="55" y="62" class="title">JVM Runtime Data Areas：抽象结构与实现边界</text>
+  <text x="55" y="100" class="subtitle">JVMS 描述运行时职责和生命周期；图中位置不代表物理地址或连续内存布局。</text>
+
+  <rect x="50" y="135" width="1035" height="885" rx="20" fill="#ffffff" stroke="#334155" stroke-width="3"/>
+  <rect x="50" y="135" width="1035" height="74" rx="20" fill="#e2e8f0"/>
+  <path d="M50 190 L50 209 L1085 209 L1085 190" fill="#e2e8f0"/>
+  <text x="82" y="181" class="panel-title">JVMS Runtime Data Areas · 规范抽象</text>
+  <text x="1015" y="180" text-anchor="end" class="small">不是物理地址图</text>
+
+  <rect x="78" y="230" width="979" height="286" rx="17" fill="#f0fdf4" stroke="#22c55e" stroke-width="2"/>
+  <text x="104" y="267" class="section">JVM 级共享区域</text>
+  <text x="1030" y="266" text-anchor="end" class="small">启动时建立 · 多个 JVM 线程共享</text>
+
+  <rect x="100" y="287" width="430" height="205" rx="14" fill="#ffffff" stroke="#86efac" stroke-width="2"/>
+  <text x="125" y="325" class="section">Heap</text>
+  <text x="125" y="356" class="body">类实例与数组的抽象分配区域</text>
+  <rect x="130" y="382" width="228" height="76" rx="12" fill="#dcfce7" stroke="#4ade80" stroke-width="2"/>
+  <text x="244" y="414" text-anchor="middle" class="label">User 实例</text>
+  <text x="244" y="440" text-anchor="middle" class="small">对象身份示意</text>
+  <text x="386" y="399" class="small">可被一个或多个</text>
+  <text x="386" y="423" class="small">线程中的引用到达</text>
+  <text x="386" y="459" class="small">自动存储管理</text>
+
+  <rect x="550" y="287" width="485" height="205" rx="14" fill="#ffffff" stroke="#86efac" stroke-width="2"/>
+  <text x="575" y="325" class="section">Method Area</text>
+  <text x="575" y="356" class="body">每类结构：字段 / 方法数据、方法代码等</text>
+  <rect x="575" y="378" width="435" height="92" rx="12" fill="#ecfdf5" stroke="#34d399" stroke-width="2"/>
+  <text x="597" y="410" class="label">Run-Time Constant Pool</text>
+  <text x="597" y="439" class="small">每个 class / interface 一份 · JVMS 逻辑上归于 Method Area</text>
+  <text x="597" y="461" class="small">Class File constant_pool 的运行时表示</text>
+
+  <rect x="78" y="537" width="979" height="419" rx="17" fill="#eff6ff" stroke="#60a5fa" stroke-width="2"/>
+  <text x="104" y="574" class="section">Thread 生命周期区域</text>
+  <text x="1030" y="573" text-anchor="end" class="small">线程创建时建立 · 线程结束时销毁</text>
+
+  <rect x="100" y="594" width="455" height="327" rx="14" fill="#ffffff" stroke="#93c5fd" stroke-width="2"/>
+  <text x="125" y="628" class="label">Thread A</text>
+  <rect x="122" y="644" width="411" height="47" rx="9" fill="#dbeafe"/>
+  <text x="142" y="674" class="body">pc Register · 当前非 native 指令位置</text>
+  <rect x="122" y="704" width="411" height="167" rx="10" fill="#f8fbff" stroke="#bfdbfe" stroke-width="2"/>
+  <text x="143" y="734" class="label">JVM Stack</text>
+  <rect x="142" y="748" width="371" height="103" rx="9" fill="#ffffff" stroke="#60a5fa" stroke-width="2"/>
+  <text x="160" y="775" class="frame-label">Frame · currentMethod()</text>
+  <text x="160" y="802" class="small">Local Variables · Operand Stack</text>
+  <text x="160" y="826" class="small">RCP reference · 返回 / 异常所需状态</text>
+  <rect x="122" y="883" width="411" height="27" rx="7" fill="#e0f2fe"/>
+  <text x="142" y="903" class="small">Native Method Stack · 实现可选，若提供通常按线程</text>
+
+  <rect x="575" y="594" width="460" height="327" rx="14" fill="#ffffff" stroke="#93c5fd" stroke-width="2"/>
+  <text x="600" y="628" class="label">Thread B</text>
+  <rect x="597" y="644" width="416" height="47" rx="9" fill="#dbeafe"/>
+  <text x="617" y="674" class="body">pc Register · 当前非 native 指令位置</text>
+  <rect x="597" y="704" width="416" height="167" rx="10" fill="#f8fbff" stroke="#bfdbfe" stroke-width="2"/>
+  <text x="618" y="734" class="label">JVM Stack</text>
+  <rect x="617" y="748" width="376" height="103" rx="9" fill="#ffffff" stroke="#60a5fa" stroke-width="2"/>
+  <text x="635" y="775" class="frame-label">Frame · currentMethod()</text>
+  <text x="635" y="802" class="small">Local Variables · Operand Stack</text>
+  <text x="635" y="826" class="small">RCP reference · 返回 / 异常所需状态</text>
+  <rect x="597" y="883" width="416" height="27" rx="7" fill="#e0f2fe"/>
+  <text x="617" y="903" class="small">Native Method Stack · 实现可选，若提供通常按线程</text>
+
+  <text x="103" y="943" class="small">共享/私有只说明区域归属，不直接推出线程安全或对象不可共享。</text>
+  <text x="103" y="978" class="small">Method Area 在规范中逻辑上属于 Heap；本图按职责分组，不表示物理分区。</text>
+
+  <rect x="1110" y="135" width="440" height="335" rx="18" fill="#fffbeb" stroke="#f59e0b" stroke-width="2" stroke-dasharray="10 7"/>
+  <text x="1140" y="178" class="panel-title">HotSpot / OS 进程视角</text>
+  <text x="1140" y="209" class="small">实现相关 · 不与 JVMS 区域处于同一层级</text>
+  <rect x="1140" y="232" width="380" height="55" rx="10" fill="#fef3c7"/>
+  <text x="1160" y="256" class="label">Metaspace</text>
+  <text x="1160" y="278" class="small">Java 21 HotSpot 类元数据的本地内存管理</text>
+  <rect x="1140" y="298" width="380" height="55" rx="10" fill="#fef3c7"/>
+  <text x="1160" y="322" class="label">DirectByteBuffer 内容</text>
+  <text x="1160" y="344" class="small">可能位于普通 GC 堆外；不代表每种实现相同</text>
+  <rect x="1140" y="364" width="380" height="55" rx="10" fill="#fef3c7"/>
+  <text x="1160" y="388" class="label">Code Cache 等本地结构</text>
+  <text x="1160" y="410" class="small">仅作实现示例，不是完整 Native Memory 清单</text>
+  <text x="1140" y="448" class="small">Direct Memory 不是 JVMS §2.5 的 Runtime Data Area。</text>
+
+  <rect x="1110" y="490" width="440" height="208" rx="18" fill="#f5f3ff" stroke="#a78bfa" stroke-width="2"/>
+  <text x="1140" y="533" class="panel-title">JMM / JLS：并发语义</text>
+  <text x="1140" y="570" class="body">回答共享变量读写的可见性、顺序等保证。</text>
+  <text x="1140" y="603" class="body">它不是 Heap / Stack / Method Area 布局图。</text>
+  <text x="1140" y="645" class="small">Runtime Data Areas ≠ Java Memory Model</text>
+  <text x="1140" y="675" class="small">完整 JMM 由并发模块唯一 Owner 负责。</text>
+
+  <rect x="1110" y="718" width="440" height="302" rx="18" fill="#ffffff" stroke="#64748b" stroke-width="2"/>
+  <text x="1140" y="761" class="panel-title">线程引用可以指向共享对象</text>
+  <text x="1140" y="788" class="small">关系示意 · 不表示物理位置或内存比例</text>
+
+  <rect x="1140" y="812" width="160" height="59" rx="10" fill="#dbeafe" stroke="#60a5fa" stroke-width="2"/>
+  <text x="1220" y="837" text-anchor="middle" class="frame-label">Thread A Frame</text>
+  <text x="1220" y="858" text-anchor="middle" class="small">Local: user</text>
+  <rect x="1140" y="917" width="160" height="59" rx="10" fill="#dbeafe" stroke="#60a5fa" stroke-width="2"/>
+  <text x="1220" y="942" text-anchor="middle" class="frame-label">Thread B Frame</text>
+  <text x="1220" y="963" text-anchor="middle" class="small">Local: cached</text>
+
+  <rect x="1370" y="863" width="150" height="65" rx="11" fill="#dcfce7" stroke="#4ade80" stroke-width="2"/>
+  <text x="1445" y="891" text-anchor="middle" class="label">Heap</text>
+  <text x="1445" y="916" text-anchor="middle" class="small">同一个 User</text>
+  <path d="M1301 840 C1335 840 1330 879 1363 885" fill="none" stroke="#2563eb" stroke-width="3" marker-end="url(#arrow-blue)"/>
+  <path d="M1301 946 C1336 946 1332 914 1363 907" fill="none" stroke="#2563eb" stroke-width="3" marker-end="url(#arrow-blue)"/>
+
+  <text x="55" y="1065" class="small">图示边界：JVMS 运行时数据区是抽象模型；HotSpot/OS 是实现视角；JMM 描述并发可观察语义。</text>
+</svg>

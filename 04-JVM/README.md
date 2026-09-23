@@ -1,6 +1,6 @@
 # 04-JVM
 
-> 状态：架构规划已建立，正文与图示按阶段建设。本轮不把规划条目伪装成已完成资产。
+> 状态：首个 P0 主题的面试速记、Deep Dive、Mermaid 流程和 SVG 结构图已建立；其余主题按既定路线建设。
 
 ## 模块定位
 
@@ -23,9 +23,9 @@
 
 ### P0：先掌握的主线
 
-| Deep Dive Owner（规划） | 核心问题 |
+| Deep Dive Owner（优先级；已有资产带链接） | 核心问题 |
 | --- | --- |
-| JVM执行模型与运行时数据区.md | JVM 抽象执行模型有哪些运行时区域，各自何时创建、由谁共享或释放？ |
+| [JVM执行模型与运行时数据区.md](02-深度解析/JVM执行模型与运行时数据区.md) · 已建 | JVM 抽象执行模型有哪些运行时区域，各自何时创建、由谁共享或释放？ |
 | Java虚拟机栈与栈帧.md | 方法调用如何形成栈帧；局部变量、操作数栈、动态链接和返回如何协作？ |
 | Java对象创建与分配路径.md | 从创建请求到初始化对象，分配与构造分别发生什么？ |
 | 类文件与类加载生命周期.md | 类如何经历加载、验证、准备、解析和初始化？ |
@@ -93,7 +93,7 @@ P2_COUNT 指这 4 个受限扩展主题组，不计入 19 个计划 Deep Dive Ow
 
 - **Runtime Data Areas 不等于 JMM。** JVMS 运行时数据区描述抽象运行时结构及其生命周期；JMM 规定并发读写的可见性、顺序和 happens-before 关系。
 - JMM 的唯一 Owner 是 [03-并发编程的 Java Memory Model 文章](../03-并发编程/02-深度解析/Java内存模型与happens-before.md)。本模块只链接 JMM 来解释并发语义，不复制 happens-before、安全发布或 volatile 规则。
-- 本模块 Runtime Data Areas 的唯一规划 Owner 是 JVM执行模型与运行时数据区.md。JVMS Method Area 是规范抽象；Metaspace 是 HotSpot 实现选择之一，两者不能互换。Direct Memory 不属于 JVMS 规定的运行时数据区清单。
+- 本模块 Runtime Data Areas 的唯一 Owner 是 [JVM执行模型与运行时数据区](02-深度解析/JVM执行模型与运行时数据区.md)。JVMS Method Area 是规范抽象；Metaspace 是 HotSpot 实现选择之一，两者不能互换。Direct Memory 不属于 JVMS 规定的运行时数据区清单。
 - Java 语言级对象不变量、不可变设计由 [Java Core 对象设计 Owner](../01-Java核心/02-深度解析/对象创建与不可变设计.md) 负责。static、主动使用与 Java 类初始化语义由 [static 与类初始化 Owner](../01-Java核心/02-深度解析/static与类初始化.md) 负责；JVM 类加载 Owner 解释与之衔接的生命周期和实现边界。
 - HashMap、集合契约、线程池、ThreadLocal 和并发容器仍由现有模块负责；JVM 文中只保留必要场景说明和回链。
 
@@ -101,9 +101,9 @@ P2_COUNT 指这 4 个受限扩展主题组，不计入 19 个计划 Deep Dive Ow
 
 只规划 6 个综合入口，不生成碎片题库。每篇最终应有结论、30 秒回答、2 分钟展开、流程/原因、高频追问、易混边界，并链接到唯一 Deep Dive、图或实验。
 
-| 入口（规划） | 优先级 | 聚合范围 |
+| 面试速记入口（已有入口带链接） | 优先级 | 聚合范围 |
 | --- | --- | --- |
-| JVM核心模型与运行时数据区.md | P0 | 执行、运行时区域、JVMS 与 HotSpot 区分、JMM 边界 |
+| [JVM核心模型与运行时数据区.md](01-面试速记/JVM核心模型与运行时数据区.md) · 已建 | P0 | 执行、运行时区域、JVMS 与 HotSpot 区分、JMM 边界 |
 | 对象创建与对象内存.md | P0 | 创建主线；对象布局/TLAB 作为 P1 追问 |
 | 类加载与双亲委派.md | P0 | 生命周期、委派、自定义加载器和类身份 |
 | GC可达性、算法与G1.md | P0 | Roots、可达性、算法、收集器地图、G1 |
@@ -112,12 +112,12 @@ P2_COUNT 指这 4 个受限扩展主题组，不计入 19 个计划 Deep Dive Ow
 
 ## 图示规划
 
-共规划 13 张图，图应解释真实难点；未创建之前不把它们列成已有资源。
+共规划 13 张图；前两项已建，其余 11 项仍是规划。图应解释真实难点，不把规划项列成已有资源。
 
 | 图（规划名称） | 形式 | 解答的理解难点 |
 | --- | --- | --- |
-| JVM 整体执行模型 | Mermaid | 类文件、加载、执行、运行时区域之间的关系。 |
-| Runtime Data Areas | SVG | 线程私有与共享区域、抽象生命周期及与 JMM 的边界。 |
+| [JVM 整体执行模型](02-深度解析/JVM执行模型与运行时数据区.md#先看程序怎样进入-jvm) · 已建 | Mermaid | 类文件、加载、执行、运行时区域之间的关系。 |
+| [Runtime Data Areas](03-图示/JVM/JVM运行时数据区.svg) · 已建 | SVG | 线程私有与共享区域、抽象生命周期及与 JMM 的边界。 |
 | Java Stack Frame | SVG | 局部变量、操作数栈、动态链接和返回信息的空间关系。 |
 | 对象创建流程 | Mermaid | 分配、默认状态、初始化与构造调用的先后关系。 |
 | HotSpot 对象布局 | SVG | 对象头、实例数据、填充；标记压缩指针和版本差异。 |
@@ -221,20 +221,20 @@ P2_COUNT 指这 4 个受限扩展主题组，不计入 19 个计划 Deep Dive Ow
 
 ## 资产状态与本轮计数
 
-本轮只建立规划 Owner 与地图，没有创建文章、图或示例代码。
+本轮完成 1 篇 P0 Deep Dive、1 篇对应面试速记、1 张正文 Mermaid 和 1 张独立 SVG；没有增加示例代码或 Maven 模块。
 
 | 规划项 | 数量 | 口径 |
 | --- | ---: | --- |
-| P0_COUNT | 11 | P0 Deep Dive Owner |
-| P1_COUNT | 8 | P1 Deep Dive Owner |
+| P0_COUNT | 11 | P0 Deep Dive Owner 总数；已建 1 |
+| P1_COUNT | 8 | P1 Deep Dive Owner 总数；尚未建设 |
 | P2_COUNT | 4 | 限定扩展主题组，不生成独立 Owner 文章 |
-| INTERVIEW_ENTRY_COUNT | 6 | 规划入口 |
-| DEEP_DIVE_PLANNED_COUNT | 19 | P0 + P1 规划 Owner |
-| DIAGRAM_PLANNED_COUNT | 13 | 8 Mermaid + 5 SVG |
-| EXAMPLE_PLANNED_COUNT | 8 | 2 个可自动测试候选 + 6 组隔离手工实验 |
+| INTERVIEW_ENTRY_COUNT | 6 | 规划入口；已建 1 |
+| DEEP_DIVE_PLANNED_COUNT | 19 | P0 + P1 Owner 总数；已建 1 |
+| DIAGRAM_PLANNED_COUNT | 13 | 8 Mermaid + 5 SVG；已建 2 |
+| EXAMPLE_PLANNED_COUNT | 8 | 2 个可自动测试候选 + 6 组隔离手工实验；目前未建代码 |
 
-JVM_OWNER_COUNT 为 19 个计划 Deep Dive Owner；未来扩展 P2 时先更新 Ownership Matrix，避免出现第二个权威来源。
+JVM_OWNER_COUNT 为 19 个 P0/P1 Deep Dive Owner，其中 1 个已有正文；未来扩展 P2 时先更新 Ownership Matrix，避免出现第二个权威来源。
 
 ## 下一步建设建议
 
-开始正文时先写 **JVM执行模型与运行时数据区.md**。它定义后续文章共同使用的执行与内存术语，能在第一篇固定 JVMS 抽象区域、Java Stack Frame 的后续展开边界、HotSpot Metaspace/Direct Memory 的实现边界，以及 JMM 的跨模块 Owner；其余类加载、对象、GC 和诊断主题都依赖这套词汇。
+下一篇建议写 **类文件与类加载生命周期.md**。它紧接本篇的 .class → JVM 入口，解释一个类如何进入运行时并建立后续可用的类级结构；先补齐这条依赖，再进入 Frame 和对象创建，符合本 README 的学习顺序。
