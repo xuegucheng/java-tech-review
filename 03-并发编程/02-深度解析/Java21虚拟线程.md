@@ -68,7 +68,7 @@ Java 21 需要注意：虚拟线程在 synchronized 保护的代码中执行阻�
 - 通过压测确认具体 JDK、平台和库的行为；
 - 不把“ReentrantLock 永远解决 pinning”写成无条件保证。
 
-后续版本确有变化：JDK 24 通过 JEP 491 已移除 synchronized 造成的 pinning（JDK 21 中仍未移除，Java 25 后陆续改进诊断与实现）。本模块按 Java 21 基线描述，不把这些后续优化倒灌成 Java 21 的固定事实。
+后续版本确有变化：从 JDK 24 起，[JEP 491：Synchronize Virtual Threads without Pinning](https://openjdk.org/jeps/491) 调整了 monitor 实现，使虚拟线程在 `synchronized` 中阻塞时也能释放 carrier，消除了几乎所有由 `synchronized` 引起的 pinning；native 或 foreign 调用仍可能 pin。Java 21 仍保留上文所述行为。本模块按 Java 21 基线描述，不把后续变化倒灌成 Java 21 的固定事实。
 
 ## Virtual Thread 能否替代线程池
 
