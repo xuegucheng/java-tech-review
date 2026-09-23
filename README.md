@@ -14,7 +14,7 @@ Interview Review → Deep Dive → Diagram → Runnable Example → Test
 
 - **今天突击**：从 [Java 核心](01-Java核心/README.md) 和 [集合框架](02-集合框架/README.md) 的 `01-面试速记/` 开始。
 - **1 天路线**：先 Java 对象模型、参数传递、相等性，再集合契约、HashMap 和 LRU。
-- **7 天路线**：Day 1 Java Core + Collections，Day 2 Concurrency，Day 3 JVM，Day 4 MySQL，Day 5 Redis + MQ，Day 6 Spring，Day 7 Distributed + System Design。当前并发模块已完成第一版，进入人工内容审核阶段；尚未创建的模块仍保持为待建设。
+- **7 天路线**：Day 1 Java Core + Collections，Day 2 Concurrency，Day 3 JVM（先从 Knowledge Map 开始，正文按阶段建设），Day 4 MySQL，Day 5 Redis + MQ，Day 6 Spring，Day 7 Distributed + System Design。当前并发模块已完成第一版，进入人工内容审核阶段；尚未创建的模块仍保持为待建设。
 - **验证结论**：从主题文章进入同域 `03-图示/`、`04-示例代码/` 和测试。
 - **阅读边界**：正文优先使用通用领域模型；订单、缓存、资源分配等工程案例用于解释取舍，特定行业案例只作为可选补充，不要求读者了解作者的工作背景。
 
@@ -74,6 +74,8 @@ java-tech-review/
 │       ├── README.md
 │       ├── pom.xml
 │       └── src/main/java + src/test/java
+├── 04-JVM/
+│   └── README.md          # Knowledge Map 与规划 Owner；资产按阶段落地
 ├── 项目文档/
 ├── 调研/
 ├── .github/
@@ -90,7 +92,7 @@ java-tech-review/
 | [01 Java 核心](01-Java核心/README.md) | 语言语义、对象模型、类型设计和运行边界 | 已整理面试速记、深度解析、图示和 5 个示例 |
 | [02 集合框架](02-集合框架/README.md) | 集合契约、数据结构、哈希和顺序语义 | 已整理面试速记、深度解析、图示和 2 个示例 |
 | [03 并发编程](03-并发编程/README.md) | JMM、锁、AQS、线程池、ThreadLocal、并发集合和现代并发模型 | 第一版完成，持续人工内容审核 |
-| JVM | 类加载、内存、GC、诊断和调优 | 待建设 |
+| [04 JVM](04-JVM/README.md) | 执行模型、类加载、内存、GC、诊断和运行时优化 | 架构规划已建立，正文待分阶段建设 |
 | Spring / Database / Redis / MQ | 生产后端核心栈 | 待建设 |
 | Distributed / System Design | 分布式一致性、可靠性和设计题 | 待建设 |
 
