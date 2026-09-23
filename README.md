@@ -30,6 +30,7 @@ Interview Review → Deep Dive → Diagram → Runnable Example → Test
 | LinkedHashMap 与 LRU | [Interview Review](02-集合框架/01-面试速记/有序Map与LRU缓存.md) | [Deep Dive](02-集合框架/02-深度解析/LinkedHashMap与LRU缓存.md) |
 | 并发主线：JMM、锁、AQS、线程池 | [Concurrency Review](03-并发编程/01-面试速记/并发编程面试主线.md) | [Concurrency Deep Dive](03-并发编程/README.md) |
 | JVM 执行模型与运行时数据区 | [Interview Review](04-JVM/01-面试速记/JVM核心模型与运行时数据区.md) | [Deep Dive](04-JVM/02-深度解析/JVM执行模型与运行时数据区.md) |
+| JVM 类文件与类加载生命周期 | [Interview Review](04-JVM/01-面试速记/类加载与双亲委派.md) | [Deep Dive](04-JVM/02-深度解析/类文件与类加载生命周期.md) |
 
 P0 是导航权重，不是内容价值评级。完整原理文章仍然保留，只是不让低频细节挡住核心机制。
 
@@ -78,7 +79,9 @@ java-tech-review/
 ├── 04-JVM/
 │   ├── README.md
 │   ├── 01-面试速记/JVM核心模型与运行时数据区.md
+│   ├── 01-面试速记/类加载与双亲委派.md
 │   ├── 02-深度解析/JVM执行模型与运行时数据区.md
+│   ├── 02-深度解析/类文件与类加载生命周期.md
 │   └── 03-图示/
 │       ├── README.md
 │       └── JVM/JVM运行时数据区.svg
@@ -98,7 +101,7 @@ java-tech-review/
 | [01 Java 核心](01-Java核心/README.md) | 语言语义、对象模型、类型设计和运行边界 | 已整理面试速记、深度解析、图示和 5 个示例 |
 | [02 集合框架](02-集合框架/README.md) | 集合契约、数据结构、哈希和顺序语义 | 已整理面试速记、深度解析、图示和 2 个示例 |
 | [03 并发编程](03-并发编程/README.md) | JMM、锁、AQS、线程池、ThreadLocal、并发集合和现代并发模型 | 第一版完成，持续人工内容审核 |
-| [04 JVM](04-JVM/README.md) | 执行模型、类加载、内存、GC、诊断和运行时优化 | 架构规划完成；首个 P0 主题及配套资源已建立 |
+| [04 JVM](04-JVM/README.md) | 执行模型、类加载、内存、GC、诊断和运行时优化 | 架构规划完成；前两个 P0 主题及配套资源已建立 |
 | Spring / Database / Redis / MQ | 生产后端核心栈 | 待建设 |
 | Distributed / System Design | 分布式一致性、可靠性和设计题 | 待建设 |
 

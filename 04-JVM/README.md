@@ -1,6 +1,6 @@
 # 04-JVM
 
-> 状态：首个 P0 主题的面试速记、Deep Dive、Mermaid 流程和 SVG 结构图已建立；其余主题按既定路线建设。
+> 状态：前两个 P0 主题的面试速记与 Deep Dive 已建立；共含 3 张正文 Mermaid 和 1 张 SVG 结构图，其余主题按既定路线建设。
 
 ## 模块定位
 
@@ -28,7 +28,7 @@
 | [JVM执行模型与运行时数据区.md](02-深度解析/JVM执行模型与运行时数据区.md) · 已建 | JVM 抽象执行模型有哪些运行时区域，各自何时创建、由谁共享或释放？ |
 | Java虚拟机栈与栈帧.md | 方法调用如何形成栈帧；局部变量、操作数栈、动态链接和返回如何协作？ |
 | Java对象创建与分配路径.md | 从创建请求到初始化对象，分配与构造分别发生什么？ |
-| 类文件与类加载生命周期.md | 类如何经历加载、验证、准备、解析和初始化？ |
+| [类文件与类加载生命周期.md](02-深度解析/类文件与类加载生命周期.md) · 已建 | 类如何经历加载、验证、准备、解析和初始化？ |
 | ClassLoader双亲委派与类身份.md | 委派如何工作，为什么同名类仍可能类型不兼容？ |
 | GCRoots与对象可达性.md | GC Roots 与引用链如何决定对象是否可达？ |
 | 垃圾收集算法与收集器选择.md | 标记、复制、整理和分代假设解决什么取舍；如何理解常见收集器？ |
@@ -75,7 +75,7 @@ P2_COUNT 指这 4 个受限扩展主题组，不计入 19 个计划 Deep Dive Ow
 | Java Stack Frame | P0：Java虚拟机栈与栈帧.md | 与总览分开，避免总览过载；不为局部变量表、操作数栈等各建碎片文章。 |
 | 对象创建过程 | P0：Java对象创建与分配路径.md | 讲创建/初始化和规范可保证的行为；不把具体对象头布局说成 JVMS 要求。 |
 | 对象布局、对象头、Compressed Oops、TLAB | P1：HotSpot对象布局与TLAB.md | 合并为一个 HotSpot 分配与布局模型，标明版本、架构和观测限制。 |
-| Class File 与加载/连接/初始化生命周期 | P0：类文件与类加载生命周期.md | 生命周期合并为完整模型；Java 语言层面的主动使用和初始化语义链接 Java Core Owner。 |
+| Class File 与 Loading/Linking/Resolution 生命周期 | P0：[类文件与类加载生命周期](02-深度解析/类文件与类加载生命周期.md) | JVMS 生命周期唯一 Owner；Java 语言层面的初始化触发与源码顺序链接 Java Core Owner，类加载器委派与身份由下一篇 ClassLoader Owner 负责。 |
 | ClassLoader、双亲委派、自定义加载器、类身份 | P0：ClassLoader双亲委派与类身份.md | 合并为加载器可见性与类型身份模型；双亲委派是常见默认策略，不是 JVMS 对所有加载器的强制规则。 |
 | GC Roots、Reachability Analysis | P0：GCRoots与对象可达性.md | 合并为可达性 Mental Model；堆对象布局不在此重复定义。 |
 | Reference Types | P1：引用类型与可达性处理.md | 从 Roots/可达性机制中拆出独立增量；清理、入队与回收时机不作确定性承诺。 |
@@ -105,14 +105,14 @@ P2_COUNT 指这 4 个受限扩展主题组，不计入 19 个计划 Deep Dive Ow
 | --- | --- | --- |
 | [JVM核心模型与运行时数据区.md](01-面试速记/JVM核心模型与运行时数据区.md) · 已建 | P0 | 执行、运行时区域、JVMS 与 HotSpot 区分、JMM 边界 |
 | 对象创建与对象内存.md | P0 | 创建主线；对象布局/TLAB 作为 P1 追问 |
-| 类加载与双亲委派.md | P0 | 生命周期、委派、自定义加载器和类身份 |
+| [类加载与双亲委派.md](01-面试速记/类加载与双亲委派.md) · 已建 | P0 | 已闭环生命周期；委派、自定义加载器和类身份留待对应 Deep Dive |
 | GC可达性、算法与G1.md | P0 | Roots、可达性、算法、收集器地图、G1 |
 | JVM故障排查与诊断工具.md | P0 | 证据链、工具选择、CPU/线程、GC/内存症状 |
 | JIT、现代GC与性能分析.md | P1 | JIT、版本化的 ZGC、JFR/JMC 和 P2 扩展边界 |
 
 ## 图示规划
 
-共规划 13 张图；前两项已建，其余 11 项仍是规划。图应解释真实难点，不把规划项列成已有资源。
+共规划 14 张图，其中 4 张已建，其余 10 项仍是规划。图应解释真实难点，不把规划项列成已有资源。
 
 | 图（规划名称） | 形式 | 解答的理解难点 |
 | --- | --- | --- |
@@ -121,7 +121,8 @@ P2_COUNT 指这 4 个受限扩展主题组，不计入 19 个计划 Deep Dive Ow
 | Java Stack Frame | SVG | 局部变量、操作数栈、动态链接和返回信息的空间关系。 |
 | 对象创建流程 | Mermaid | 分配、默认状态、初始化与构造调用的先后关系。 |
 | HotSpot 对象布局 | SVG | 对象头、实例数据、填充；标记压缩指针和版本差异。 |
-| Class Loading Lifecycle | Mermaid | 加载、验证、准备、解析、初始化的状态/流程关系。 |
+| [Class Loading Lifecycle](02-深度解析/类文件与类加载生命周期.md) · 已建 | Mermaid | 加载、验证、准备、解析、初始化的状态/流程关系。 |
+| [Class File → Runtime Type](02-深度解析/类文件与类加载生命周期.md) · 已建 | Mermaid | 区分二进制表示、VM 运行时类型、`Class<?>` 镜像与 JVM 创建的数组类。 |
 | Parent Delegation | Mermaid | 委派调用顺序、父加载器返回和本地查找分支。 |
 | GC Roots Reachability | SVG | Roots 到对象的引用图及不可达对象判定。 |
 | G1 Region 结构 | SVG | Region、Humongous 区域和逻辑代际视图；不画成连续物理分代。 |
@@ -221,20 +222,20 @@ P2_COUNT 指这 4 个受限扩展主题组，不计入 19 个计划 Deep Dive Ow
 
 ## 资产状态与本轮计数
 
-本轮完成 1 篇 P0 Deep Dive、1 篇对应面试速记、1 张正文 Mermaid 和 1 张独立 SVG；没有增加示例代码或 Maven 模块。
+本轮完成 1 篇 P0 Deep Dive、1 篇对应面试速记和 2 张正文 Mermaid；同时完成上一轮 SVG 的本地渲染检查与文字溢出修正。没有增加示例代码或 Maven 模块。
 
 | 规划项 | 数量 | 口径 |
 | --- | ---: | --- |
-| P0_COUNT | 11 | P0 Deep Dive Owner 总数；已建 1 |
+| P0_COUNT | 11 | P0 Deep Dive Owner 总数；已建 2 |
 | P1_COUNT | 8 | P1 Deep Dive Owner 总数；尚未建设 |
 | P2_COUNT | 4 | 限定扩展主题组，不生成独立 Owner 文章 |
-| INTERVIEW_ENTRY_COUNT | 6 | 规划入口；已建 1 |
-| DEEP_DIVE_PLANNED_COUNT | 19 | P0 + P1 Owner 总数；已建 1 |
-| DIAGRAM_PLANNED_COUNT | 13 | 8 Mermaid + 5 SVG；已建 2 |
+| INTERVIEW_ENTRY_COUNT | 6 | 规划入口；已建 2 |
+| DEEP_DIVE_PLANNED_COUNT | 19 | P0 + P1 Owner 总数；已建 2 |
+| DIAGRAM_PLANNED_COUNT | 14 | 9 Mermaid + 5 SVG；已建 4 |
 | EXAMPLE_PLANNED_COUNT | 8 | 2 个可自动测试候选 + 6 组隔离手工实验；目前未建代码 |
 
-JVM_OWNER_COUNT 为 19 个 P0/P1 Deep Dive Owner，其中 1 个已有正文；未来扩展 P2 时先更新 Ownership Matrix，避免出现第二个权威来源。
+JVM_OWNER_COUNT 为 19 个 P0/P1 Deep Dive Owner，其中 2 个已有正文；未来扩展 P2 时先更新 Ownership Matrix，避免出现第二个权威来源。
 
 ## 下一步建设建议
 
-下一篇建议写 **类文件与类加载生命周期.md**。它紧接本篇的 .class → JVM 入口，解释一个类如何进入运行时并建立后续可用的类级结构；先补齐这条依赖，再进入 Frame 和对象创建，符合本 README 的学习顺序。
+下一篇建议写 **ClassLoader双亲委派与类身份.md**。生命周期 Owner 已闭环；接下来解释加载器委派、定义关系和运行时类型身份，再进入 Frame 与对象创建，符合本 README 的学习顺序。

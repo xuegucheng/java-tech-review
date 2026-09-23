@@ -44,10 +44,11 @@
   <rect x="550" y="287" width="485" height="205" rx="14" fill="#ffffff" stroke="#86efac" stroke-width="2"/>
   <text x="575" y="325" class="section">Method Area</text>
   <text x="575" y="356" class="body">每类结构：字段 / 方法数据、方法代码等</text>
-  <rect x="575" y="378" width="435" height="92" rx="12" fill="#ecfdf5" stroke="#34d399" stroke-width="2"/>
-  <text x="597" y="410" class="label">Run-Time Constant Pool</text>
-  <text x="597" y="439" class="small">每个 class / interface 一份 · JVMS 逻辑上归于 Method Area</text>
-  <text x="597" y="461" class="small">Class File constant_pool 的运行时表示</text>
+  <rect x="575" y="378" width="435" height="108" rx="12" fill="#ecfdf5" stroke="#34d399" stroke-width="2"/>
+  <text x="597" y="408" class="label">Run-Time Constant Pool</text>
+  <text x="597" y="435" class="small">每个 class / interface 一份</text>
+  <text x="597" y="456" class="small">JVMS 逻辑上将其归于 Method Area</text>
+  <text x="597" y="477" class="small">Class File constant_pool 的运行时表示</text>
 
   <rect x="78" y="537" width="979" height="419" rx="17" fill="#eff6ff" stroke="#60a5fa" stroke-width="2"/>
   <text x="104" y="574" class="section">Thread 生命周期区域</text>
