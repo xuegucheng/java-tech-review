@@ -16,11 +16,11 @@
 | 编号 | 面试问题 | 重要程度 | 追问深度 |
 | --- | --- | --- | --- |
 | Q01 | Spring 怎么解决循环依赖？为什么需要三级缓存？ | P0 | 源码 |
-| Q02 | Spring 事务在什么情况下会失效？ | P0 | 工程实践 |
-| Q03 | AOP 的实现原理，JDK 代理和 CGLIB 怎么选？ | P0 | 源码 |
+| [Q02](Spring/Q02-Spring事务失效场景.md) | Spring 事务在什么情况下会失效？ | P0 | 工程实践 |
+| [Q03](Spring/Q03-JDK代理与CGLIB选型.md) | AOP 的实现原理，JDK 代理和 CGLIB 怎么选？ | P0 | 源码 |
 | Q04 | Spring Bean 的生命周期是怎样的？ | P0 | 源码 |
-| Q05 | IOC 和 DI 是什么？ | P0 | 原理 |
-| Q06 | BeanFactory 和 ApplicationContext 的区别？ | P1 | 原理 |
+| [Q05](Spring/Q05-IoC与DI.md) | IOC 和 DI 是什么？ | P0 | 原理 |
+| [Q06](Spring/Q06-BeanFactory与ApplicationContext.md) | BeanFactory 和 ApplicationContext 的区别？ | P1 | 原理 |
 | Q07 | Spring 事务的传播行为？ | P0 | 工程实践 |
 | Q08 | @Transactional 的实现原理？ | P0 | 源码 |
 | Q09 | Spring MVC 的请求流程？ | P0 | 原理 |
@@ -30,7 +30,7 @@
 | Q13 | Spring 的线程安全问题？ | P1 | 工程实践 |
 | Q14 | @Component 和 @Bean 的区别？ | P1 | 工程实践 |
 | Q15 | Spring 的事件机制？ | P2 | 工程实践 |
-| Q16 | AOP 是什么，解决了什么问题？ | P0 | 原理 |
+| [Q16](Spring/Q16-AOP是什么.md) | AOP 是什么，解决了什么问题？ | P0 | 原理 |
 
 ## 题目正文
 
@@ -56,39 +56,13 @@
 
 ### Q02：Spring 事务在什么情况下会失效？ `P0` `高频`
 
-**30 秒回答**：事务失效基本可归为三类——代理没生效、异常没触发回滚、事务边界没覆盖到真正执行的代码。
-
-**深入理解**：代理没生效最常见于自调用，同类内部用 this 调另一个 @Transactional 方法绕过了代理；final 方法无法被 CGLIB 覆写，同样失效（Spring 5.x 只支持代理类上的 public 方法，Spring Framework 6.0 起 protected 和包级可见方法也可生效，这是明确的版本差异）。异常没回滚，是因为默认只对 RuntimeException 和 Error 回滚，受检异常需要显式写 rollbackFor = Exception.class；异常被自己 try/catch 吞掉同样不会回滚。边界没覆盖，包括传播行为用错（嵌套事务里内层用默认 REQUIRED 并自行捕获异常、或外层用了 REQUIRES_NEW 提前提交）、数据表引擎不支持事务、多数据源没有纳入同一个事务管理器；异步方法或新起的线程也不在原事务里。
-
-**面试官可能继续追问**：
-- **自调用为什么一定失效？** —— 事务是代理对象在方法调用前后开启/提交/回滚的，同类内 this 调用走的是原始对象，根本没有经过代理那一层；解法是注入自身代理（`AopContext.currentProxy()`）或拆分到另一个 Bean。
-- **怎么确认事务到底生没生效？** —— 看日志里连接的开市（`begin`）与提交（`commit`）时机是否包住了目标代码；或者临时打开事务管理器的 DEBUG 日志，比猜快得多。
-
-**实际工程场景**：WMS 出库扣减 + 流水写入要求同事务，早期把两个操作写在同一个 public 方法里没问题；后来抽成私有方法被同类调用，事务静默失效，超卖风险就是这么来的。治理约定：事务注解只标在入口 public 方法上，私有方法靠调用链继承事务；受检异常统一配 `rollbackFor = Exception.class`。
-
-**容易答错的地方**：列不全。及格线是五类：自调用、非 public/final 方法、异常类型不匹配、异常被吞、传播行为/引擎/多数据源问题——只答前两类会被认为没踩过坑。
-
-> 权威内容：Spring 事务机制当前尚未在仓库建设，可参考 Spring 官方文档的 Transaction Management 章节。
+完整标准答案已独立成页：[Q02 · Spring 事务在什么情况下会失效？](Spring/Q02-Spring事务失效场景.md)
 
 ---
 
 ### Q03：AOP 的实现原理，JDK 代理和 CGLIB 怎么选？ `P0` `高频`
 
-**30 秒回答**：Spring AOP 在运行时为目标 Bean 生成代理对象，拦截方法调用后按通知链织入增强；目标类实现了接口时可以用 JDK 动态代理，否则用 CGLIB 生成子类代理。
-
-**深入理解**：JDK 动态代理基于接口，用 Proxy.newProxyInstance 生成一个实现同一接口的代理类，方法调用转发给 InvocationHandler，所以目标类必须有接口。CGLIB 通过字节码生成目标类的子类并覆写方法，因此 final 类、final 方法和 private 方法都无法被增强（Spring 5.2 起 CGLIB 用的是 Spring 自行 repackage 的版本）。选择上，Spring Boot 2.x 起 spring.aop.proxy-target-class 默认为 true，即使有接口也优先用 CGLIB，Spring 5.x 之前则默认优先 JDK 代理。两者都只能拦截 Spring 容器里 Bean 的外部方法调用，同类自调用无效；要增强非容器对象、构造器或 final 方法，只能改用 AspectJ 的编译期或加载期织入。
-
-**为什么这样设计**：选运行时代理而不是 AspectJ 编译期织入，是为了零侵入——业务代码不用改、不需要特殊编译器，代价就是拦不到自调用和私有方法，这也正是上一题「自调用导致事务失效」的根因。
-
-**面试官可能继续追问**：
-- **通知的执行顺序怎么定？** —— 同一个切面的多个增强按声明顺序（或 @Order）组织成责任链，环绕通知最外层；@Order 值小的优先级高，异常路径上顺序会反转，这题容易被现场追问「异常时还倒着走吗」。
-- **为什么 CGLIB 代理要求类不能 final？** —— 它靠生成子类并覆写方法实现增强，final 类无法被继承、final 方法无法被覆写，增强点就漏掉了。
-
-**实际工程场景**：统一日志、鉴权、耗时统计这类横切关注点用 AOP 收尾，比散落在业务代码里的 try-finally 更可控；但要注意别在环绕通知里做重逻辑——通知链上的每一毫秒都乘在调用量上，高接口会把「顺手打个日志」做成热点。
-
-**容易答错的地方**：说「Spring Boot 一定用 CGLIB」。配置项 `spring.aop.proxy-target-class` 可以改回 JDK 代理；另外引入 AspectJ  Weaver（`spring-boot-starter-aop` 之外的 load-time/compile-time weaving）后，能力边界就和运行时代理不同了。
-
-> 权威内容：Spring AOP 当前尚未在仓库建设，可参考 Spring 官方文档的 Aspect Oriented Programming with Spring 章节。
+完整标准答案已独立成页：[Q03 · AOP 的实现原理，JDK 代理和 CGLIB 怎么选？](Spring/Q03-JDK代理与CGLIB选型.md)
 
 ---
 
@@ -112,37 +86,13 @@
 
 ### Q05：IOC 和 DI 是什么？ `P0` `高频`
 
-**30 秒回答**：IOC 是把创建和管理对象的控制权从代码里交到容器，DI 是它的具体形式——容器在初始化时把依赖注入到 Bean，而不是 Bean 自己去 new；两者是同一件事的思想与实现。
-
-**深入理解**：没有容器时，A 要用 B 就自己 `new B()`，依赖关系硬编码在 A 内部；IOC 之后 A 只声明「我需要一个 B」，由容器在启动时装配。三种注入方式：构造器注入（依赖不可变、必需依赖显式、循环依赖在启动期就失败——Spring 4.3 起单构造器可以省略 @Autowired）；Setter 注入（适合可选依赖）；字段注入（写起来短，但隐藏依赖、不利于测试、无法用于 final 字段）。@Autowired 的解析流程是先按类型在 BeanFactory 里找候选，找到多个再按参数名/ @Qualifier 匹配，仍有多个则要求 @Primary 或报错。选型结论：框架类代码用构造器注入，业务代码跟随团队规范，但别用字段注入掩盖「这个类依赖了八个东西」的设计问题。
-
-**面试官可能继续追问**：
-- **IOC 容器启动时做了什么？** —— 读取配置（注解/XML）生成 BeanDefinition、执行 BeanFactoryPostProcessor、实例化并装配单例（默认）、发布刷新完成事件；非懒加载的单例都在启动期建好。
-- **依赖注入的循环和启动失败是一回事吗？** —— 字段/Setter 循环依赖能被三级缓存接住（见 Q01），构造器循环依赖会直接在启动期抛异常——后者其实是好事，它逼你在编译期就发现依赖环。
-
-**实际工程场景**：把「一个大 Service 注入了十几个 Repository」当信号——要么是职责过多该拆，要么是缺一个领域服务层。面试里讲这层判断，比背注入方式对比更能体现设计意识。
-
-**容易答错的地方**：把 IOC 说成「 Spring 特有的新技术」。它是依赖倒置原则（DIP）的工程化实现，思想比框架老得多；另外「控制反转」反的是「获取依赖的方式」，不是「控制流」。
-
-> 权威内容：Spring IOC 容器当前尚未在仓库建设，可参考 Spring 官方文档的 The IoC Container 章节。
+完整标准答案已独立成页：[Q05 · IOC 和 DI 是什么？](Spring/Q05-IoC与DI.md)
 
 ---
 
 ### Q06：BeanFactory 和 ApplicationContext 的区别？ `P1` `重点`
 
-**30 秒回答**：ApplicationContext 是 BeanFactory 的子接口，在「Bean 工厂」之上加了国际化、事件发布、资源加载、AOP 自动代理等一整套企业级能力；行为上最直观的差异是 BeanFactory 默认懒加载单例，ApplicationContext 启动时就把非懒加载的单例全部实例化。
-
-**深入理解**：能力差异逐个说：事件体系（ApplicationEvent + ApplicationListener，@EventListener 也依赖它）；国际化（MessageSource，按 Locale 取消息）；资源访问（ResourceLoader，classpath:/file:/http: 统一抽象）；环境抽象（Environment + @Profile，按环境激活不同 Bean）；AOP 与事务的自动织入（AnnotationAwareAspectJAutoProxyCreator 这类 BeanPostProcessor 由 ApplicationContext 的 `invokeBeanFactoryPostProcessors` 阶段注册）。BeanFactory 能做的事 ApplicationContext 都能做（它继承了 BeanFactory），但 BeanFactory 通常只出现在「嵌入在框架内部按需取 Bean」的场景，比如某些 RPC 框架自己管生命周期时只需要最小容器。
-
-**面试官可能继续追问**：
-- **BeanFactoryPostProcessor 在生命周期哪个点执行？** —— 在所有 BeanDefinition 注册完、实例化任何 Bean 之前，它拿到的是 BeanDefinition 本身，可以改属性值、改作用域，甚至把某个 Bean 标记为懒加载。
-- **refresh() 方法的主干流程？** —— 准备环境 → 刷新 BeanFactory 生成 BeanDefinition → 执行 BeanFactoryPostProcessor → 注册 BeanPostProcessor → 初始化消息源/事件多播器 → 实例化剩余单例 → 发布 ContextRefreshedEvent。能画出这条主干，容器就通了。
-
-**实际工程场景**：启动慢的优化对象之一就是启动期实例化的单例——本地缓存预加载、健康检查客户端这些非必需 Bean 标 @Lazy 或用 `SmartInitializingSingleton` 延后；先看启动火焰图再决定懒加载谁，比一刀切更稳。
-
-**容易答错的地方**：只答「功能多」。最关键的行为差异是初始化时机：ApplicationContext 预实例化单例，配置错误在启动期就爆炸；BeanFactory 懒加载，错误被推迟到第一次取 Bean 时。
-
-> 权威内容：Spring 容器家族当前尚未在仓库建设，可参考 Spring 官方文档的 The IoC Container 与 ApplicationContext 章节。
+完整标准答案已独立成页：[Q06 · BeanFactory 和 ApplicationContext 的区别？](Spring/Q06-BeanFactory与ApplicationContext.md)
 
 ---
 
@@ -310,42 +260,7 @@
 
 ### Q16：AOP 是什么，解决了什么问题？ `P0` `原理`
 
-**30 秒回答**：AOP 是把散落在各处的**横切逻辑**——日志、事务、鉴权、耗时统计——从业务方法里抽出来，集中定义成切面，再在运行期织入到目标方法的调用前后。它解决两类耦合：业务与通用逻辑混在一个方法里，以及同一段通用逻辑在几十个方法里重复。Spring AOP 的实现方式就是运行时代理，代理机制本身见 [Q03](#q03aop-的实现原理jdk-代理和-cglib-怎么选-p0-高频)。
-
-**深入理解**：日志、事务、安全、监控的共同特征是「每个业务方法都要有，但都不属于业务语义」。不抽出来的后果是可枚举的：代码侵入、重复、口径不一致、无法统一开关、单测里全是无关的 mock。
-
-术语这一层要能对上号（面试官常用英文问）：
-
-| 术语 | 含义 | Spring 里的落地 |
-| --- | --- | --- |
-| JoinPoint（连接点） | 程序执行中可以插入增强的点 | Spring AOP 只支持**方法执行**这一个维度 |
-| Pointcut（切点） | 匹配连接点的表达式 | `@Pointcut("execution(* com..service.*.*(..))")` |
-| Advice（通知） | 织入的动作与时机 | `@Before` / `@After` / `@AfterReturning` / `@AfterThrowing` / `@Around` |
-| Aspect（切面） | 切点 + 通知的模块化单元 | `@Aspect` 标注的类 |
-| Weaving（织入） | 把切面接进目标对象的过程 | Spring AOP 在**运行期**通过代理完成 |
-
-织入时机决定了能力上限：
-
-| 时机 | 代表 | 能拦什么 | 代价 |
-| --- | --- | --- | --- |
-| 编译期 | AspectJ `ajc` | 方法、字段、构造器、静态块，甚至 `final` 方法 | 换编译器，构建链要改 |
-| 类加载期 | AspectJ LTW | 同上，不改编译器但要让 `javaagent` 介入 | 部署复杂度上升 |
-| 运行期代理 | Spring AOP（默认） | **只能拦 Bean 的方法调用**，且必须是外部调用 | 零侵入，但自调用、private、final 全部失效 |
-
-代理在 `BeanPostProcessor.postProcessAfterInitialization` 阶段生成（见 [Q04](#q04spring-bean-的生命周期是怎样的-p0-高频)）：容器最终持有的是代理对象而不是原始对象。
-
-**为什么这样设计**：Spring 选运行期代理，本质是用「能力边界」换「零侵入」——业务代码不用改一行、不需要特殊编译器，代价就是上面那三条拦不到。需要更强能力时才叠加 AspectJ。
-
-**面试官可能继续追问**：
-- **为什么同类自调用会失效？** —— `this.b()` 用的是原始对象引用，不经过代理，通知链根本没进入。解法是注入自身代理、`AopContext.currentProxy()`（需 `exposeProxy`），或把方法拆到另一个 Bean。完整清单见 [Q02](#q02spring-事务在什么情况下会失效-p0-高频)。
-- **多个切面的顺序怎么定？** —— `@Order` 或实现 `Ordered`，值小的优先级高；进入按序、退出逆序，形成栈式结构；异常路径上 `AfterThrowing` 与 `After` 的相对顺序会反转。
-- **环绕通知里把异常吞掉会怎样？** —— 容器感知不到异常，事务不会回滚，调用方还会拿到「成功」的返回值。这不是 AOP 的问题，是通知里写了不该写的 `catch`。
-
-**实际工程场景**：事务（`@Transactional` 本身就是基于 AOP 的增强，所以自调用失效是代理模式的必然结果）；统一日志与链路追踪（入口切面生成 traceId、出口清理）；鉴权与限流（切点落在 Controller 层，把校验前置到业务之外）。注意环绕通知里别做重逻辑——通知链上的每一毫秒都乘在调用量上。
-
-**容易答错的地方**：把 Spring AOP 等同于 AspectJ（`spring-boot-starter-aop` 里带着 AspectJ 的注解和切点解析器，但**织入方式仍是代理**）；只说「AOP 用来做日志和事务」（这是用法不是理解）；忘了「只对 Bean 的外部方法调用生效」，于是把自调用失效解释成 Spring 的 bug；认为 JDK 代理一定比 CGLIB 慢（现代 JDK 上单次调用差距很小，主要成本在代理类生成）。
-
-> 权威内容：Spring AOP 当前尚未在仓库建设，可参考 Spring 官方文档 *Aspect Oriented Programming with Spring* 章节；代理机制与选型见 [Q03](#q03aop-的实现原理jdk-代理和-cglib-怎么选-p0-高频)。
+完整标准答案已独立成页：[Q16 · AOP 是什么，解决了什么问题？](Spring/Q16-AOP是什么.md)
 
 ---
 

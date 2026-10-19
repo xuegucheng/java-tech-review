@@ -17,14 +17,14 @@
 | 编号 | 面试问题 | 重要程度 | 追问深度 |
 | --- | --- | --- | --- |
 | Q01 | Java 是值传递还是引用传递？ | P0 | 原理 |
-| Q02 | 为什么重写 equals 就必须重写 hashCode？ | P0 | 源码 |
+| [Q02](Java基础/Q02-equals与hashCode.md) | 为什么重写 equals 就必须重写 hashCode？ | P0 | 源码 |
 | Q03 | String 为什么设计成不可变？ | P0 | 原理 |
 | Q04 | 泛型擦除带来了哪些限制？ | P1 | 源码 |
 | Q05 | static 代码块和字段的初始化顺序是怎样的？ | P2 | 原理 |
 | Q06 | 重载和重写分别在什么阶段确定？ | P0 | 源码 |
 | Q07 | 包装类的缓存机制会在什么时候让 `==` 骗你？ | P1 | 工程实践 |
 | Q08 | 接口和抽象类怎么选？ | P1 | 设计 |
-| Q09 | `==` 和 equals 的区别？ | P0 | 工程实践 |
+| [Q09](Java基础/Q09-等号与equals.md) | `==` 和 equals 的区别？ | P0 | 工程实践 |
 | Q10 | String、StringBuilder、StringBuffer 的区别？ | P0 | 工程实践 |
 | Q11 | 泛型通配符 `? extends` 和 `? super`，PECS 原则？ | P1 | 设计 |
 | Q12 | Java 异常体系是怎样的？ | P0 | 工程实践 |
@@ -70,33 +70,7 @@ void f(User u) {
 
 ### Q02：为什么重写 equals 就必须重写 hashCode？ `P0` `高频`
 
-**30 秒回答**：`hashCode` 是「先定位桶、再用 equals 比较」这个两段式查找的第一段，两者口径不一致，对象就会落进错误的桶，表现成「写得进去、查不出来」。
-
-**深入理解**：以 `HashMap` 为例，`put` 先用 `hash(key)` 定位桶、桶内再用 `equals` 比较，`get` 走同样路径。只重写 `equals` 时，两个逻辑相等的对象会算出不同哈希、落到不同桶，于是 `get`/`containsKey` 返回不存在，而 `size()` 却显示两个元素都在。
-
-```java
-// 典型错误：只重写 equals
-public boolean equals(Object o) {
-    return o instanceof Order && ((Order) o).id == id;
-}
-// put 两个 id 相同的 Order，size() == 2，get(id) 却可能为 null
-```
-
-契约三条：`equals` 相等则 `hashCode` 必须相等；`hashCode` 相等不要求 `equals` 相等（哈希冲突合法）；对象参与哈希结构期间 `hashCode` 不能变。
-
-**为什么这样设计**：这是两段式结构的必然要求，不是 Java 的额外约定。第一段用 `hashCode` 把查找降到平均 O(1)，第二段用 `equals` 消化冲突——两段必须对「相等」持同一套口径，否则整个结构不成立。代价是「相等」这个概念被拆成两份实现，忘记同步就产生隐蔽 bug。
-
-**面试官可能继续追问**：
-
-- **HashMap 定位桶时用的是 hashCode 还是 hash()？** —— 是扰动后的值：`h = key.hashCode(); h ^= (h >>> 16);`，再 `(n - 1) & h` 取桶。只答 hashCode 不算完整。
-- **把可变字段放进 equals/hashCode 有什么后果？** —— 对象作为 key 存入 `HashMap` 后修改该字段，哈希变了就再也找不到这个 entry，形成「查不掉的脏数据」；这也是 key 推荐用不可变类型的原因。
-- **hashCode 相同一定 equals 吗？** —— 不一定，哈希冲突是合法且必然存在的，桶内用 `equals` 逐个比较（JDK 8 起同桶元素超过 8 个树化为红黑树，低于 6 个再退化回链表）。
-
-**实际工程场景**：任何放进 `HashSet`/`HashMap` 的领域对象都要成对重写；IDEA 生成模板默认用 `31 * ` 乘法与 `Objects.equals`，比手写安全。缓存场景注意：以可变实体做 key 前先取不可变快照（如取 id 构造只读 key 对象）。
-
-**容易答错的地方**：认为「hashCode 相等则 equals 必须相等」——契约只要求单向；认为随便拼个字符串当哈希就合格——冲突过多会让结构退化成链表遍历；跨 JVM 的分布式缓存里，不同语言客户端的 equals/hashCode 实现不一致会直接导致缓存错乱。
-
-> 权威内容：[equals 与 hashCode 对象契约](../../01-Java核心/01-面试速记/equals与hashCode对象契约.md) · [equals 与 hashCode 契约](../../01-Java核心/02-深度解析/equals与hashCode契约.md)
+完整标准答案已独立成页：[Q02 · 为什么重写 equals 就必须重写 hashCode？](Java基础/Q02-equals与hashCode.md)
 
 ### Q03：String 为什么设计成不可变？ `P0` `高频`
 
@@ -262,35 +236,7 @@ c == d;        // true  —— 包装与基本类型比较会自动拆箱
 
 ### Q09：`==` 和 equals 的区别？ `P0` `高频`
 
-**30 秒回答**：`==` 对基本类型比值、对引用类型比「是不是同一个实例」；`equals` 是 `Object` 的方法，默认实现就是 `==`，但可以被重写成「值相等或逻辑相等」的比较——`String`、包装类、集合都重写了它。
-
-**深入理解**：
-
-| 场景 | `==` | `equals` |
-| --- | --- | --- |
-| 基本类型 | 比值 | 不适用 |
-| 引用类型、未重写 equals | 同一引用才为 true | 等价于 `==` |
-| `String` 字面量之间 | 常量池命中为 true | 逐字符比较 |
-| `new String("a")` 与 `"a"` | false | true |
-| `Integer` 128 与 128 | false（超出缓存） | true |
-
-关键边界：`String` 的 `==` 结果取决于实例是否来自常量池——`"a" + "b"` 编译期折叠成字面量，`== "ab"` 为 true；但含变量的拼接（如 `String s = "a"; s + "b"`）运行期生成新对象，`== "ab"` 为 false。包装类的 `==` 还受缓存区间影响（见 Q07）。
-
-阿里巴巴 Java 开发规约与静态检查插件（p3c）要求：`equals` 的调用方放常量或确定非空的对象（`"x".equals(y)` 优于 `y.equals("x")`）。另一个实操坑是代码生成：IDEA 生成的 `equals`/`hashCode` 模板在类新增字段后不会自动更新——字段加了、契约没重新生成，是生产 bug 的常见来源。
-
-**为什么这样设计**：`==` 必须是最便宜的同一性判断，语言级语义不能给重写留口子；`equals` 留给类型自己定义「什么算相等」。代价是两套「相等」并存，工程师必须在每个比较点想清楚要哪一种——这也是这道题几乎每轮都出现的原因。
-
-**面试官可能继续追问**：
-
-- **Object.equals 的默认实现是什么？** —— `return this == obj;`，即同一性比较。不重写 `equals` 的类（`Object`、`Thread`、`StringBuilder` 等）用 `==` 和 `equals` 等价。
-- **重写 equals 要遵守哪些约束？** —— 自反、对称、传递、一致、对 null 返回 false。违反对称性会让集合行为不可预测，如 `Timestamp` 继承 `Date` 后双向比较结果不一致（已知的 JDK 设计缺陷）。
-- **hashCode 相等 equals 一定相等吗？** —— 不一定，哈希冲突合法；反过来 equals 相等则 hashCode 必须相等，否则哈希容器失效（Q02）。
-
-**实际工程场景**：枚举比较用 `==`（JVM 保证单例）；实体对象进 `HashSet`/`HashMap` 前先确认 `equals`/`hashCode` 已按业务主键重写；DTO 跨服务传输用 `equals` 比字段，不要依赖 `==`；null 安全比较统一 `Objects.equals(a, b)`。
-
-**容易答错的地方**：认为「String 内容一样 `==` 就为 true」——只有常量池折叠或 `intern()` 后才成立；认为 `equals` 就是「值比较」——它只是「对象自己定义的相等」，语义由类型决定；忽略数组要用 `Arrays.equals`——`Object.equals` 比两个数组永远是比引用。
-
-> 权威内容：[运算符与表达式陷阱](../../01-Java核心/02-深度解析/运算符与表达式陷阱.md) · [equals 与 hashCode 契约](../../01-Java核心/02-深度解析/equals与hashCode契约.md) · [equals 与 hashCode 对象契约](../../01-Java核心/01-面试速记/equals与hashCode对象契约.md)
+完整标准答案已独立成页：[Q09 · == 和 equals 的区别？](Java基础/Q09-等号与equals.md)
 
 ### Q10：String、StringBuilder、StringBuffer 的区别？ `P0` `高频`
 
