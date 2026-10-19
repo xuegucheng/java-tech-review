@@ -24,8 +24,8 @@
 | --- | --- | --- | --- |
 | [Java基础](Java基础.md) | 相等性契约、不可变性、泛型与擦除、异常、反射、注解、SPI、Java 8+ 特性、序列化 | 20 | P0 |
 | [Java多线程](Java多线程.md) | JMM、volatile、synchronized、AQS、ReentrantLock、CAS、线程池、ThreadLocal、CompletableFuture、虚拟线程 | 17 | P0 |
-| [JVM](JVM.md) | 内存区域、对象分配、类加载、GC Roots、G1/ZGC、常用参数、OOM 与 CPU 排查、调优 | 17 | P0 |
-| [Spring](Spring.md) | IOC/DI、Bean 生命周期、AOP 与代理、循环依赖、事务传播与失效、MVC、Boot 自动配置、Starter | 15 | P0 |
+| [JVM](JVM.md) | 内存区域、对象分配、类加载、GC 算法与分代、GC Roots、G1/ZGC、常用参数、OOM 与 CPU 排查、调优 | 18 | P0 |
+| [Spring](Spring.md) | IOC/DI、Bean 生命周期、AOP 概念与代理、循环依赖、事务传播与失效、MVC、Boot 自动配置、Starter | 16 | P0 |
 | [数据库基础](数据库基础.md) | B+ 树、索引失效、MVCC、隔离级别、explain、三大日志、锁与死锁、主从复制 | 16 | P0 |
 | [SQL](SQL.md) | JOIN、GROUP BY、子查询、EXISTS/IN、慢 SQL 分析、索引失效对照、五道可运行手写题 | 14 | P0 |
 | [Redis](Redis.md) | 数据结构、单线程模型、持久化、过期与淘汰、缓存异常、一致性、分布式锁、哨兵与 Cluster、线上排查 | 16 | P0 |
@@ -35,7 +35,7 @@
 | [操作系统](操作系统.md) | IO 多路复用、进程与线程、虚拟内存、死锁、零拷贝、分页与磁盘 IO | 9 | P1 |
 | [分布式](分布式.md) | CAP/BASE、分布式事务、Raft、一致性哈希、注册发现、限流熔断、Session、调度、链路追踪 | 12 | P0 |
 | [消息队列](消息队列.md) | 消息丢失、重复消费、积压、顺序性、选型、事务消息、死信与可观测性 | 9 | P1 |
-| **合计** | | **180** | |
+| **合计** | | **182** | |
 
 需要完整展开的场景题（秒杀、库存扣减、幂等、缓存一致性），入口在 [04-场景设计题](../04-场景设计题/README.md)；算法题在 [03-算法题](../03-算法题/README.md)。
 
